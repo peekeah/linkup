@@ -25,10 +25,12 @@ class User {
   }
 
   create(user: IUser) {
-    this.users.push({
+    const newUser = {
       ...user,
       id: globalUserId++,
-    })
+    }
+    this.users.push(newUser)
+    return newUser
   }
 
   update(user: IUser) {
@@ -60,3 +62,5 @@ class User {
 
   }
 }
+
+export default new User();
