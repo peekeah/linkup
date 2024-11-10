@@ -1,27 +1,29 @@
-import { Server } from "http"
+import { createServer } from "http"
 import { WebSocketServer } from 'ws';
 import express from 'express';
+
 import user from "./controllers/user";
 import UserSchema from "./schema/user";
 import errorHandler from "./middlewares/error";
 
 const app = express();
-app.use(express.json());
+const server = createServer(app);
 
-const server = new Server(app);
+const port = 3001;
+
+app.use(express.json());
 
 const wss = new WebSocketServer({
   server
 });
 
+
 wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
-
   ws.on('message', function message(data) {
     console.log('received: %s', data);
+    ws.send('something');
   });
-
-  ws.send('something');
 });
 
 // HTTP Routes
@@ -69,4 +71,4 @@ app.post("/users", (req, res) => {
   }
 })
 
-app.listen(3001, () => console.log("server listening on port", 3001))
+server.listen(port, () => console.log("server listening on port", port))
