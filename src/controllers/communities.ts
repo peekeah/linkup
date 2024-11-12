@@ -1,11 +1,12 @@
 import chat from "./chat";
+import { UserId } from "./user";
 
 interface ICommunity {
   id: number;
   name: string;
   owner: IMember;
   admins: IMember[];
-  members: IMember[];
+  member: IMember[];
   timeouts: ITimeout[];
 }
 
@@ -15,9 +16,16 @@ export interface IMember {
   email: string;
 }
 
+/*
 interface ITimeout extends IMember {
   timeout: number;
   startTime: Date;
+}
+*/
+
+interface ITimeout {
+  userId: UserId,
+  timeout: number
 }
 
 let globalCommunityId = 1;
@@ -71,6 +79,35 @@ class Community {
     }
     return community;
   }
+
+  // Todo: Add authorization
+  giveTimeout(id: number, userId: UserId, timeout: number) {
+    const community = this.communities.find((community) => id === community.id)
+
+    if (!community) throw new Error("Community not found")
+
+    community.timeouts.push({
+      userId,
+      timeout
+    })
+
+    const idx = this.communities.findIndex(el => el.id === id)
+
+    this.communities[idx] = community
+
+  }
+
+  clearTimeout(id: number, userId: UserId) {
+    let community = this.communities.find((community) => id === community.id)
+
+    if (!community) throw new Error("Community not found")
+
+    community.timeouts = community.timeouts.filter(el => el.userId !== userId)
+    const idx = this.communities.findIndex(el => el.id === id)
+
+    this.communities[idx] = community
+  }
+
 }
 
 export default new Community();
