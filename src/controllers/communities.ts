@@ -5,7 +5,7 @@ interface ICommunity {
   id: string;
   name: string;
   owner: IMember;
-  admins: IMember[];
+  admin: IMember[];
   member: IMember[];
   timeouts: ITimeout[];
 }
@@ -85,7 +85,7 @@ class Community {
 
     const idx = this.communities.findIndex((community) => id === community.id)
 
-    if (!id) {
+    if (!idx) {
       throw new Error("Community not found")
     }
 
@@ -100,8 +100,8 @@ class Community {
 
     const idx = this.communities.findIndex((community) => id === community.id)
 
-    if (!id) {
-      throw new Error("Community not found")
+    if (!idx) {
+      throw new Error("User is not member of community")
     }
 
     const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
@@ -109,6 +109,44 @@ class Community {
     if (!existUser) throw new Error("user does not exist");
 
     this.communities[idx].member = this.communities[idx].member.filter(user => user.userId !== userId)
+
+  }
+
+  addAdmin(id: string, userId: UserId, userName: string) {
+    const idx = this.communities.findIndex(community => community.id === id);
+
+    if (!idx) {
+      throw new Error("Community not found")
+    }
+
+    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+
+    if (!existUser) throw new Error("User is not member of community");
+
+    const existAdmin = this.communities[idx].admin.findIndex(user => user.userId === userId)
+
+    if (existAdmin) throw new Error("Already admin")
+
+    this.communities[idx].admin.push({ userId, name: userName })
+
+  }
+
+  removeAdmin(id: string, userId: UserId) {
+    const idx = this.communities.findIndex(community => community.id === id);
+
+    if (!idx) {
+      throw new Error("Community not found")
+    }
+
+    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+
+    if (!existUser) throw new Error("User is not member of community");
+
+    const existAdmin = this.communities[idx].admin.findIndex(user => user.userId === userId)
+
+    if (!existAdmin) throw new Error("User is not an admin")
+
+    this.communities[idx].admin = this.communities[idx].admin.filter(user => user.userId !== userId)
 
   }
 
