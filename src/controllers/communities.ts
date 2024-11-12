@@ -1,21 +1,15 @@
+import chat from "./chat";
+
 interface ICommunity {
   id: number;
   name: string;
-  owner: string;
+  owner: IMember;
   admins: IMember[];
   members: IMember[];
   timeouts: ITimeout[];
-  messages: IMessage[];
 }
 
-interface IMessage {
-  sender: [];
-  content: string;
-  date: Date
-  isDeleted: boolean
-}
-
-interface IMember {
+export interface IMember {
   id: number;
   name: string;
   email: string;
@@ -35,12 +29,19 @@ class Community {
     this.communities = []
   }
 
-  create(community: ICommunity) {
+  create(name: string, owner: IMember) {
+    const id = globalCommunityId++;
     const newEntry = {
-      ...community,
-      id: globalCommunityId++,
+      id,
+      name,
+      owner,
+      admins: [],
+      members: [],
+      timeouts: [],
     }
     this.communities.push(newEntry)
+    chat.initChat(id.toString())
+
     return newEntry
   }
 
@@ -68,9 +69,7 @@ class Community {
     if (!community) {
       throw new Error("entry not found")
     }
-
     return community;
-
   }
 }
 

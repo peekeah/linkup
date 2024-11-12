@@ -1,5 +1,7 @@
+export type UserId = string;
+
 interface IUser {
-  id: number;
+  id: UserId;
   name: string;
   email: string;
   mobile: string;
@@ -27,7 +29,7 @@ class User {
   create(user: IUser) {
     const newUser = {
       ...user,
-      id: globalUserId++,
+      id: (globalUserId++).toString(),
     }
     this.users.push(newUser)
     return newUser
@@ -43,7 +45,7 @@ class User {
     this.users[id] = user
   }
 
-  delete(id: number) {
+  delete(id: string) {
     this.users = this.users.filter(user => user.id !== id)
   }
 
@@ -51,7 +53,7 @@ class User {
     return this.users;
   }
 
-  getUser(id: number) {
+  getUser(id: string) {
     const user = this.users.find(el => el.id === id)
 
     if (!user) {
