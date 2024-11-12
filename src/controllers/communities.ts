@@ -37,19 +37,19 @@ class Community {
   }
 
   create(name: string, owner: IMember) {
-    // const id = (globalCommunityId++).toString();
-    const id = globalCommunityId++;
+    const id = (globalCommunityId++).toString();
+
     const newEntry = {
-      id: id.toString(),
+      id,
       name,
       owner,
-      admins: [],
+      admin: [],
       member: [],
       timeouts: [],
     }
 
     this.communities.push(newEntry)
-    chat.initChat(id.toString())
+    chat.initChat(id)
 
     return newEntry
   }
