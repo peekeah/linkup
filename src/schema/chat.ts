@@ -1,53 +1,53 @@
 import { z } from "zod";
-import { IncomingCommunityMessages } from "./community";
-
-export type IncomingMessages = IncomingChatMessages | IncomingCommunityMessages;
+import { IncomingCommunityMessages, Member } from "./community";
 
 export enum SupportedChatMessages {
   AddChat = "ADD_CHAT",
   DeleteChat = "DELETE_CHAT",
-  Upvote = "UPVOTE",
-  Downvote = "DOWNVOTE"
+  UpvoteMessage = "UPVOTE_MESSAGE",
+  DownvoteMessage = "DOWNVOTE_MESSAGE"
 }
 
 export type IncomingChatMessages = {
-  payload: AddChatType
   type: SupportedChatMessages.AddChat,
+  payload: AddChatType
 } | {
   type: SupportedChatMessages.DeleteChat,
   payload: DeleteChatType
 } | {
-  type: SupportedChatMessages.Upvote,
-  payload: DeleteChatType
+  type: SupportedChatMessages.UpvoteMessage,
+  payload: UpvoteMessageType
 } | {
-  type: SupportedChatMessages.Downvote,
-  payload: DownvoteType
+  type: SupportedChatMessages.DownvoteMessage,
+  payload: DownvoteMessageType
 }
 
-const AddChat = z.object({
+export const AddChat = z.object({
   roomId: z.string(),
   content: z.string(),
-  sender: z.string()
+  sender: Member
 })
 
-const DeleteChat = z.object({
+export const DeleteChat = z.object({
   roomId: z.string(),
   chatId: z.string()
 })
 
-const Upvote = z.object({
+export const UpvoteMessage = z.object({
   userId: z.string(),
   roomId: z.string(),
   chatId: z.string()
 })
 
-const Downvote = z.object({
+export const DownvoteMessage = z.object({
   userId: z.string(),
   roomId: z.string(),
   chatId: z.string()
 })
+
+export type IncomingMessage = IncomingChatMessages | IncomingCommunityMessages;
 
 export type AddChatType = z.infer<typeof AddChat>;
 export type DeleteChatType = z.infer<typeof DeleteChat>;
-export type UpvoteType = z.infer<typeof Upvote>;
-export type DownvoteType = z.infer<typeof Downvote>
+export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;
+export type DownvoteMessageType = z.infer<typeof DownvoteMessage>

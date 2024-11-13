@@ -5,6 +5,7 @@ export enum SupportedCommunityMessages {
   UpdateCommunity = "UPDATE_COMMUNITY",
   DeleteCommunity = "DELETE_COMMUNITY",
   GetCommunity = "GET_COMMUNITY",
+  GetCommunities = "GET_COMMUNITIES",
   AddAdmin = "ADD_ADMIN",
   RemoveAdmin = "REMOVE_ADMIN",
   JoinCommunity = "JOIN_COMMUNITY",
@@ -12,6 +13,11 @@ export enum SupportedCommunityMessages {
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT"
 }
+
+export const Member = z.object({
+  userId: z.string(),
+  name: z.string(),
+})
 
 export type IncomingCommunityMessages = {
   type: SupportedCommunityMessages.CreateCommunity,
@@ -25,6 +31,9 @@ export type IncomingCommunityMessages = {
 } | {
   type: SupportedCommunityMessages.GetCommunity,
   payload: GetCommunityType
+} | {
+  type: SupportedCommunityMessages.GetCommunities,
+  payload: null
 } | {
   type: SupportedCommunityMessages.UpdateCommunity,
   payload: UpdateCommunityType
@@ -50,12 +59,7 @@ export type IncomingCommunityMessages = {
 
 const CreateCommunity = z.object({
   name: z.string(),
-  owner: z.string()
-})
-
-const Member = z.object({
-  userId: z.string(),
-  name: z.string(),
+  owner: Member
 })
 
 const UpdateCommunity = z.object({

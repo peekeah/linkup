@@ -85,11 +85,11 @@ class Community {
 
     const idx = this.communities.findIndex((community) => id === community.id)
 
-    if (!idx) {
+    if (idx === -1) {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+    const existUser = this.communities[idx]?.member?.findIndex(user => user.userId === userId)
 
     if (existUser) throw new Error("user already joined");
 
@@ -100,13 +100,13 @@ class Community {
 
     const idx = this.communities.findIndex((community) => id === community.id)
 
-    if (!idx) {
-      throw new Error("User is not member of community")
+    if (idx === -1) {
+      throw new Error("Community not found")
     }
 
     const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
 
-    if (!existUser) throw new Error("user does not exist");
+    if (!existUser) throw new Error("User is not member of community");
 
     this.communities[idx].member = this.communities[idx].member.filter(user => user.userId !== userId)
 
@@ -115,7 +115,7 @@ class Community {
   addAdmin(id: string, userId: UserId, userName: string) {
     const idx = this.communities.findIndex(community => community.id === id);
 
-    if (!idx) {
+    if (idx === -1) {
       throw new Error("Community not found")
     }
 
@@ -134,7 +134,7 @@ class Community {
   removeAdmin(id: string, userId: UserId) {
     const idx = this.communities.findIndex(community => community.id === id);
 
-    if (!idx) {
+    if (idx === -1) {
       throw new Error("Community not found")
     }
 

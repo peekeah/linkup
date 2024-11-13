@@ -1,28 +1,31 @@
-import { createServer } from "http"
+import { createServer } from "http";
 import { WebSocketServer } from 'ws';
 import express from 'express';
 
 import user from "./controllers/user";
 import UserSchema from "./schema/user";
 import errorHandler from "./middlewares/error";
+import requestHandler from "./controllers/requestHandler";
 
-const app = express();
-const server = createServer(app);
+const app = express(); const server = createServer(app);
 
 const port = 3001;
 
 app.use(express.json());
 
-const wss = new WebSocketServer({
-  server
-});
-
+const wss = new WebSocketServer({ server });
 
 wss.on('connection', function connection(ws) {
   ws.on('error', console.error);
   ws.on('message', function message(data) {
-    console.log('received: %s', data);
-    ws.send('something');
+    try {
+      const message = JSON.parse(data.toString());
+      console.log('mm', message)
+      requestHandler(message, ws)
+    } catch (err) {
+      console.log('err', err)
+      ws.send("Invalid request")
+    }
   });
 });
 
