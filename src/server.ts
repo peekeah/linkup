@@ -3,7 +3,7 @@ import { WebSocketServer } from 'ws';
 import express from 'express';
 
 import user from "./controllers/user";
-import UserSchema from "./schema/user";
+import UserSchema, { LoginType } from "./schema/user";
 import errorHandler from "./middlewares/error";
 import requestHandler from "./controllers/requestHandler";
 
@@ -34,25 +34,7 @@ app.get("/", (_req, res) => {
   res.send("<h1>Hello world </h1>")
 })
 
-app.get("/users", (_req, res) => {
-  try {
-    const users = user.getUsers()
-    res.send({
-      status: true,
-      data: users
-    })
-
-  } catch (err) {
-    const { statusCode, errMessage } = errorHandler(err)
-    res.status(statusCode).send({
-      status: false,
-      message: errMessage
-    })
-
-  }
-})
-
-app.post("/users", (req, res) => {
+app.post("/signup", (req, res) => {
   try {
     const userData = req.body;
 
@@ -71,6 +53,44 @@ app.post("/users", (req, res) => {
       status: false,
       message: errMessage
     })
+  }
+})
+
+app.post("/login", (req, res) => {
+  try {
+    const { email, password }: LoginType = req.body;
+
+    const token = user.login(email, password)
+
+    res.send({
+      status: true,
+      data: token
+    })
+  } catch (err) {
+    const { statusCode, errMessage } = errorHandler(err)
+    res.status(statusCode).send({
+      status: false,
+      message: errMessage
+    })
+  }
+})
+
+// Todo: Admin only route
+app.get("/users", (_req, res) => {
+  try {
+    const users = user.getUsers()
+    res.send({
+      status: true,
+      data: users
+    })
+
+  } catch (err) {
+    const { statusCode, errMessage } = errorHandler(err)
+    res.status(statusCode).send({
+      status: false,
+      message: errMessage
+    })
+
   }
 })
 

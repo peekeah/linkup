@@ -1,4 +1,6 @@
 import { userMockData } from "../mock/user";
+import { generateHash, verifyHash } from "../utils/bcrypt";
+import { generateToken } from "../utils/jwt";
 
 export type UserId = string;
 
@@ -29,13 +31,31 @@ class User {
     this.users = userMockData;
   }
 
-  create(user: IUser) {
+  async create(user: IUser) {
     const newUser = {
       ...user,
+      password: await generateHash(user.password),
       id: (globalUserId++).toString(),
     }
     this.users.push(newUser)
     return newUser
+  }
+
+  async login(email: string, password: string) {
+    const user = this.users.find(user => user.email === email)
+
+    if (!user) throw new Error("User does not exist")
+
+    const comparePassword = await verifyHash(password, user.password)
+
+    if (comparePassword) {
+      throw new Error("Password is incorrect")
+    }
+
+    return generateToken(JSON.stringify({
+      id: user.id,
+      email: user.email
+    }))
   }
 
   update(user: IUser) {
@@ -45,6 +65,7 @@ class User {
       throw new Error("user not found")
     }
 
+    // Todo: Prevent password update
     this.users[id] = user
   }
 

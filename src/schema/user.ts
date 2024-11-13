@@ -19,5 +19,11 @@ const UserSchema = z.object({
   address: AddressSchema,
 });
 
+const Login = z.object({
+  email: z.string(),
+  password: z.string()
+})
+
+export type LoginType = z.infer<typeof Login>
 
 export default UserSchema;
