@@ -1,7 +1,8 @@
+import { communitiesMockData } from "../mock/communities";
 import chat from "./chat";
 import { UserId } from "./user";
 
-interface ICommunity {
+export interface ICommunity {
   id: string;
   name: string;
   owner: IMember;
@@ -33,7 +34,8 @@ class Community {
   private communities: ICommunity[]
 
   constructor() {
-    this.communities = []
+    // Note: Mock data initializaton
+    this.communities = communitiesMockData;
   }
 
   create(name: string, owner: IMember) {

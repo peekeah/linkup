@@ -1,7 +1,8 @@
+import { chatMockData } from "../mock/chat";
 import { IMember } from "./communities";
 import { UserId } from "./user";
 
-interface IChat {
+export interface IChat {
   id: string;
   content: string;
   sender: IMember;
@@ -16,7 +17,9 @@ class Chat {
   private chats: Map<string, IChat[]>;
 
   constructor() {
-    this.chats = new Map();
+    // Note: Chat mock data initialization
+    // this.chats = new Map();
+    this.chats = chatMockData;
   }
 
   initChat(roomId: string) {

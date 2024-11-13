@@ -1,6 +1,8 @@
+import { userMockData } from "../mock/user";
+
 export type UserId = string;
 
-interface IUser {
+export interface IUser {
   id: UserId;
   name: string;
   email: string;
@@ -23,7 +25,8 @@ class User {
   private users: IUser[];
 
   constructor() {
-    this.users = []
+    // Note: User mock data initialization
+    this.users = userMockData;
   }
 
   create(user: IUser) {
