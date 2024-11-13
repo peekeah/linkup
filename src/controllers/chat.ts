@@ -37,7 +37,6 @@ class Chat {
       throw new Error("Chat not found")
     }
 
-
     return limit && offset
       ? chat.slice(-1 * limit, -1 * offset)
       : chat.slice();
