@@ -91,7 +91,7 @@ class Community {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx]?.member?.findIndex(user => user.userId === userId)
+    const existUser = this.communities[idx]?.member?.find(user => user.userId === userId)
 
     if (existUser) throw new Error("user already joined");
 
@@ -106,7 +106,7 @@ class Community {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+    const existUser = this.communities[idx].member.find(user => user.userId === userId)
 
     if (!existUser) throw new Error("User is not member of community");
 
@@ -121,11 +121,11 @@ class Community {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+    const existUser = this.communities[idx].member.find(user => user.userId === userId)
 
     if (!existUser) throw new Error("User is not member of community");
 
-    const existAdmin = this.communities[idx].admin.findIndex(user => user.userId === userId)
+    const existAdmin = this.communities[idx].admin.find(user => user.userId === userId)
 
     if (existAdmin) throw new Error("Already admin")
 
@@ -140,11 +140,11 @@ class Community {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx].member.findIndex(user => user.userId === userId)
+    const existUser = this.communities[idx].member.find(user => user.userId === userId)
 
     if (!existUser) throw new Error("User is not member of community");
 
-    const existAdmin = this.communities[idx].admin.findIndex(user => user.userId === userId)
+    const existAdmin = this.communities[idx].admin.find(user => user.userId === userId)
 
     if (!existAdmin) throw new Error("User is not an admin")
 
@@ -154,30 +154,37 @@ class Community {
 
   // Todo: Add authorization
   giveTimeout(id: string, userId: UserId, timeout: number) {
-    const community = this.communities.find((community) => id === community.id)
 
-    if (!community) throw new Error("Community not found")
+    const idx = this.communities.findIndex(community => community.id === id);
 
-    community.timeouts.push({
+    if (idx === -1) {
+      throw new Error("Community not found")
+    }
+
+    const existUser = this.communities[idx].member.find(user => user.userId === userId)
+
+    if (!existUser) throw new Error("User is not member of community");
+
+    this.communities[idx].timeouts.push({
       userId,
       timeout
     })
 
-    const idx = this.communities.findIndex(el => el.id === id)
-
-    this.communities[idx] = community
-
   }
 
   clearTimeout(id: string, userId: UserId) {
-    let community = this.communities.find((community) => id === community.id)
 
-    if (!community) throw new Error("Community not found")
+    const idx = this.communities.findIndex(community => community.id === id);
 
-    community.timeouts = community.timeouts.filter(el => el.userId !== userId)
-    const idx = this.communities.findIndex(el => el.id === id)
+    if (idx === -1) {
+      throw new Error("Community not found")
+    }
 
-    this.communities[idx] = community
+    const existUser = this.communities[idx].member.find(user => user.userId === userId)
+
+    if (!existUser) throw new Error("User is not member of community");
+
+    this.communities[idx].timeouts = this.communities[idx].timeouts.filter(el => el.userId !== userId)
   }
 
 }
