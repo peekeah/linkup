@@ -64,13 +64,14 @@ class Chat {
   }
 
   deleteChat(roomId: string, chatId: string) {
+
     const chat = this.chats.get(roomId)
 
     if (!chat) throw new Error("Chat not found")
 
     let messageId = chat.findIndex(({ id }) => id === chatId)
 
-    if (!messageId) throw new Error("Message not found")
+    if (messageId === -1) throw new Error("Message not found")
 
     chat[messageId] = {
       ...chat[messageId],
