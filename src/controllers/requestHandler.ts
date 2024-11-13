@@ -10,6 +10,9 @@ const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
     const { type, payload } = message;
 
     switch (type) {
+      case SupportedChatMessages.GetChat:
+        ws.send(JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset)))
+        break;
       case SupportedChatMessages.AddChat:
         chat.addChat(payload.roomId, payload.content, payload.sender)
         /*

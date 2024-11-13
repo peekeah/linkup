@@ -26,6 +26,23 @@ class Chat {
     this.chats.set(roomId, [])
   }
 
+  getChats(roomId: string, limit: number | undefined, offset: number | undefined) {
+    const existCommunity = this.chats.has(roomId)
+
+    if (!existCommunity) throw new Error("Community not found")
+
+    const chat = this.chats.get(roomId)
+
+    if (!chat) {
+      throw new Error("Chat not found")
+    }
+
+
+    return limit && offset
+      ? chat.slice(-1 * limit, -1 * offset)
+      : chat.slice();
+  }
+
   addChat(roomId: string, content: string, sender: IMember) {
 
     const chat = this.chats.get(roomId)
