@@ -42,7 +42,7 @@ export const GetChat = z.object({
 export const AddChat = z.object({
   roomId: z.string(),
   content: z.string(),
-  sender: Member
+  // sender: Member
 })
 
 export const DeleteChat = z.object({

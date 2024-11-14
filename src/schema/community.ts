@@ -84,13 +84,13 @@ const GetCommunity = z.object({
 
 const JoinCommunity = z.object({
   roomId: z.string(),
-  userId: z.string(),
+  // userId: z.string(),
   userName: z.string(),
 })
 
 const LeaveCommunity = z.object({
   roomId: z.string(),
-  userId: z.string(),
+  // userId: z.string(),
 })
 
 const AddAdmin = z.object({

@@ -22,14 +22,11 @@ const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) 
         ws.send(JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset)))
         break;
       case SupportedChatMessages.AddChat:
-        chat.addChat(payload.roomId, payload.content, payload.sender)
-        /*
-        const response = {
-          status: "success",
-          message: "Message added successfully"
+        const sender = {
+          userId: tokenData.userId,
+          name: tokenData.userName
         }
-        ws.send(JSON.stringify(response))
-        */
+        chat.addChat(payload.roomId, payload.content, sender)
         break;
 
       // Todo(Auth) - OP & Admin & Owner
@@ -39,11 +36,11 @@ const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) 
         break;
 
       case SupportedChatMessages.UpvoteMessage:
-        chat.upvote(payload.userId, payload.roomId, payload.chatId);
+        chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
         break;
 
       case SupportedChatMessages.DownvoteMessage:
-        chat.downvote(payload.userId, payload.roomId, payload.chatId);
+        chat.downvote(tokenData.userId, payload.roomId, payload.chatId);
         break;
 
       // Community routes
@@ -84,11 +81,11 @@ const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) 
         break;
 
       case SupportedCommunityMessages.JoinCommunity:
-        communities.joinCommunity(payload.roomId, payload.userId, payload.userName)
+        communities.joinCommunity(payload.roomId, tokenData.userId, payload.userName)
         break;
 
       case SupportedCommunityMessages.LeaveCommunity:
-        communities.leaveCommunity(payload.roomId, payload.userId)
+        communities.leaveCommunity(payload.roomId, tokenData.userId)
         break;
 
       // Todo(Auth) - Admin & Owner 
