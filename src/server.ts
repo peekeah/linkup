@@ -6,6 +6,7 @@ import user from "./controllers/user";
 import UserSchema, { LoginType } from "./schema/user";
 import errorHandler from "./middlewares/error";
 import requestHandler from "./controllers/requestHandler";
+import { generateHash } from "./utils/bcrypt";
 
 const app = express(); const server = createServer(app);
 
