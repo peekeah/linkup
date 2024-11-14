@@ -11,6 +11,11 @@ export interface ICommunity {
   timeouts: ITimeout[];
 }
 
+export interface IUpdateCommunity {
+  id: string;
+  name: string;
+}
+
 export interface IMember {
   userId: UserId,
   name: string;
@@ -56,14 +61,19 @@ class Community {
     return newEntry
   }
 
-  update(community: ICommunity) {
-    const id = this.communities.findIndex(({ id }) => id === community.id)
+  update(payload: IUpdateCommunity) {
+    const id = this.communities.findIndex(({ id }) => id === payload.id)
 
     if (!id) {
-      throw new Error("Entry not found")
+      throw new Error("Community not found")
     }
 
-    this.communities[id] = community
+    let community = this.communities[id];
+
+    this.communities[id] = {
+      ...community,
+      name: payload.name
+    }
   }
 
   delete(id: string) {

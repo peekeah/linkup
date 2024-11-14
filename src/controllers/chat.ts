@@ -1,3 +1,4 @@
+import { UserType } from "../middlewares/auth";
 import { chatMockData } from "../mock/chat";
 import { IMember } from "./communities";
 import { UserId } from "./user";
@@ -63,7 +64,7 @@ class Chat {
 
   }
 
-  deleteChat(roomId: string, chatId: string) {
+  deleteChat(roomId: string, chatId: string, userId: UserId, userType: UserType) {
 
     const chat = this.chats.get(roomId)
 
@@ -72,6 +73,10 @@ class Chat {
     let messageId = chat.findIndex(({ id }) => id === chatId)
 
     if (messageId === -1) throw new Error("Message not found")
+
+    if (userType === "user" && userId !== chat[messageId].sender.userId) {
+      throw new Error("Unauthorized access")
+    }
 
     chat[messageId] = {
       ...chat[messageId],
@@ -90,6 +95,7 @@ class Chat {
     if (!messageId) throw new Error("Message not found")
 
     const message = chat[messageId];
+
     message.upvotes.push(userId)
     chat[messageId] = message;
 
@@ -106,6 +112,7 @@ class Chat {
     if (!messageId) throw new Error("Message not found")
 
     let message = chat[messageId];
+
     message.upvotes = message.upvotes.filter(id => id !== userId)
     chat[messageId] = message;
 

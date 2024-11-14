@@ -15,13 +15,17 @@ app.use(express.json());
 
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws, req) {
+  const header = req.headers["authorization"]?.split(" ");
+
+  const token = header?.[1] || "";
+
   ws.on('error', console.error);
   ws.on('message', function message(data) {
     try {
       const message = JSON.parse(data.toString());
-      console.log('mm', message)
-      requestHandler(message, ws)
+      console.log('message=>', message)
+      requestHandler(ws, message, token)
     } catch (err) {
       console.log('err', err)
       ws.send("Invalid request")
@@ -56,15 +60,15 @@ app.post("/signup", (req, res) => {
   }
 })
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
   try {
     const { email, password }: LoginType = req.body;
 
-    const token = user.login(email, password)
+    const token = await user.login(email, password)
 
     res.send({
       status: true,
-      data: token
+      data: { token }
     })
   } catch (err) {
     const { statusCode, errMessage } = errorHandler(err)

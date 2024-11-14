@@ -42,20 +42,28 @@ class User {
   }
 
   async login(email: string, password: string) {
-    const user = this.users.find(user => user.email === email)
+    try {
 
-    if (!user) throw new Error("User does not exist")
+      const user = this.users.find(user => user.email === email)
 
-    const comparePassword = await verifyHash(password, user.password)
+      if (!user) {
+        throw new Error("User does not exist")
+      }
 
-    if (comparePassword) {
-      throw new Error("Password is incorrect")
+      const comparePassword = await verifyHash(password, user.password)
+
+      if (!comparePassword) {
+        throw new Error("Password is incorrect")
+      }
+
+      return generateToken({
+        userId: user.id,
+        email: user.email,
+        userName: user.name
+      })
+    } catch (err) {
+      throw err
     }
-
-    return generateToken(JSON.stringify({
-      id: user.id,
-      email: user.email
-    }))
   }
 
   update(user: IUser) {

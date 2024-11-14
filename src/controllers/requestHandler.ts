@@ -3,9 +3,17 @@ import { IncomingMessage, SupportedChatMessages } from "../schema/chat"
 import chat from "./chat"
 import { SupportedCommunityMessages } from "../schema/community";
 import communities from "./communities";
+import { authenticate, authorize, UserType } from "../middlewares/auth";
+import { verifyToken } from "../utils/jwt";
 
-const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
+const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) => {
   try {
+    // Auth
+    const tokenData = verifyToken(token);
+    authenticate(tokenData.userId)
+
+    let userType: UserType | null = null;
+
     // Chat routes
     const { type, payload } = message;
 
@@ -23,8 +31,11 @@ const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
         ws.send(JSON.stringify(response))
         */
         break;
+
+      // Todo(Auth) - OP & Admin & Owner
       case SupportedChatMessages.DeleteChat:
-        chat.deleteChat(payload.roomId, payload.chatId);
+        userType = authorize(payload.roomId, tokenData.userId, ["user", "admin", "owner"])
+        chat.deleteChat(payload.roomId, payload.chatId, tokenData.userId, userType);
         break;
 
       case SupportedChatMessages.UpvoteMessage:
@@ -40,11 +51,15 @@ const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
         communities.create(payload.name, payload.owner)
         break;
 
+      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.UpdateCommunity:
-        communities.delete(payload.id)
+        userType = authorize(payload.id, tokenData.userId, ["owner"]);
+        communities.update(payload)
         break;
 
+      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.DeleteCommunity:
+        userType = authorize(payload.id, tokenData.userId, ["owner"]);
         communities.delete(payload.id)
         break;
 
@@ -56,11 +71,15 @@ const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
         ws.send(JSON.stringify(communities.getCommunities()))
         break;
 
+      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.AddAdmin:
+        userType = authorize(payload.roomId, tokenData.userId, ["owner"]);
         communities.addAdmin(payload.roomId, payload.userId, payload.userName)
         break;
 
+      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.RemoveAdmin:
+        userType = authorize(payload.roomId, tokenData.userId, ["owner"]);
         communities.removeAdmin(payload.roomId, payload.userId)
         break;
 
@@ -72,11 +91,15 @@ const requestHandler = (message: IncomingMessage, ws: WebSocket) => {
         communities.leaveCommunity(payload.roomId, payload.userId)
         break;
 
+      // Todo(Auth) - Admin & Owner 
       case SupportedCommunityMessages.GiveTimeout:
+        userType = authorize(payload.roomId, tokenData.userId, ["owner", "admin"]);
         communities.giveTimeout(payload.roomId, payload.userId, payload.timeout)
         break;
 
+      // Todo(Auth) - Admin & Owner 
       case SupportedCommunityMessages.ClearTimeout:
+        userType = authorize(payload.roomId, tokenData.userId, ["owner", "admin"]);
         communities.clearTimeout(payload.roomId, payload.userId)
         break;
 

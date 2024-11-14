@@ -64,7 +64,7 @@ const CreateCommunity = z.object({
 
 const UpdateCommunity = z.object({
   id: z.string(),
-  name: z.string().optional(),
+  name: z.string(),
   // owner: Member,
   // admin: z.array(Member),
   // member: z.array(Member),

@@ -1,6 +1,14 @@
 import jwt from "jsonwebtoken";
 
-export const generateToken = (payload: string) => {
+export interface TokenData {
+  userId: string;
+  email: string;
+  userName: string;
+  exp?: number;
+  iat?: number;
+}
+
+export const generateToken = (payload: TokenData) => {
   try {
     const secret = process.env.JWT_SECRET || "dummy password"
     return jwt.sign(payload, secret, {
@@ -15,8 +23,10 @@ export const generateToken = (payload: string) => {
 export const verifyToken = (token: string) => {
   try {
     const secret = process.env.JWT_SECRET || "dummy password"
-    return jwt.verify(token, secret)
+    const decodedToken = jwt.verify(token, secret) as TokenData;
+    if (!decodedToken) throw new Error("Unauthorized access")
+    return decodedToken
   } catch (err) {
-    console.log("err", err)
+    throw err;
   }
 }
