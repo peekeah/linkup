@@ -1,12 +1,12 @@
 import { WebSocket } from "ws"
 import { IncomingMessage, SupportedChatMessages } from "../schema/chat"
-import chat from "./chat"
+import chat from "../controllers/chat"
 import { SupportedCommunityMessages } from "../schema/community";
-import communities from "./communities";
+import communities from "../controllers/communities";
 import { authenticate, authorize, UserType } from "../middlewares/auth";
 import { verifyToken } from "../utils/jwt";
 
-const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) => {
+const wsRequestHandler = (ws: WebSocket, message: IncomingMessage, token: string) => {
   try {
     // Auth
     const tokenData = verifyToken(token);
@@ -109,4 +109,4 @@ const requestHandler = (ws: WebSocket, message: IncomingMessage, token: string) 
   }
 }
 
-export default requestHandler
+export default wsRequestHandler;
