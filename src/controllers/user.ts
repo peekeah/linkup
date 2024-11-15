@@ -10,7 +10,8 @@ export interface IUser {
   email: string;
   mobile: string;
   password: string;
-  address: IAddress
+  address: IAddress;
+  // connection: WebSocket;
 }
 
 interface IAddress {

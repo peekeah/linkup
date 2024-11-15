@@ -27,7 +27,7 @@ class Chat {
     this.chats.set(roomId, [])
   }
 
-  getChats(roomId: string, limit: number | undefined, offset: number | undefined) {
+  getChats(roomId: string, limit?: number | undefined, offset?: number | undefined) {
     const existCommunity = this.chats.has(roomId)
 
     if (!existCommunity) throw new Error("Community not found")
@@ -61,7 +61,6 @@ class Chat {
     })
 
     this.chats.set(roomId, chat)
-
   }
 
   deleteChat(roomId: string, chatId: string, userId: UserId, userType: UserType) {
@@ -106,7 +105,13 @@ class Chat {
     chat[messageId] = message;
     this.chats.set(roomId, chat)
   }
-
 }
 
 export default new Chat();
+
+/*
+1. Store connection in user manager,
+2. Store connection in room manager,
+3. Use connection from global wss obj
+*/
+

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { IChat } from "../controllers/chat";
 
 export enum SupportedCommunityMessages {
   CreateCommunity = "CREATE_COMMUNITY",
@@ -11,7 +12,11 @@ export enum SupportedCommunityMessages {
   JoinCommunity = "JOIN_COMMUNITY",
   LeaveCommunity = "LEAVE_COMMUNITY",
   GiveTimeout = "GIVE_TIMEOUT",
-  ClearTimeout = "CLEAR_TIMEOUT"
+  ClearTimeout = "CLEAR_TIMEOUT",
+
+  BrodcastMessages = "BROADCAST_MESSAGE",
+  BroadcastUpvote = "UPVOTE_MESSAGE"
+
 }
 
 export const Member = z.object({
@@ -56,6 +61,14 @@ export type IncomingCommunityMessages = {
   type: SupportedCommunityMessages.ClearTimeout,
   payload: ClearTimeoutType
 };
+
+export type OutgoingCommunityMessages = {
+  type: SupportedCommunityMessages.BrodcastMessages,
+  data: BrodcastMessages,
+} | {
+  type: SupportedCommunityMessages.BroadcastUpvote,
+  data: BrodcastUpvotes
+}
 
 const CreateCommunity = z.object({
   name: z.string(),
@@ -115,6 +128,12 @@ const ClearTimeout = z.object({
   userId: z.string(),
 })
 
+
+const BrodcastUpvotes = z.object({
+  roomId: z.string(),
+  messageId: z.string()
+})
+
 export type CreateCommunityType = z.infer<typeof CreateCommunity>;
 export type UpdateCommunityType = z.infer<typeof UpdateCommunity>;
 export type DeleteCommunityType = z.infer<typeof DeleteCommunity>;
@@ -125,3 +144,6 @@ export type AddAdminType = z.infer<typeof AddAdmin>;
 export type RemoveAdminType = z.infer<typeof RemoveAdmin>;
 export type GiveTimeoutType = z.infer<typeof GiveTimeout>;
 export type ClearTimeoutType = z.infer<typeof ClearTimeout>;
+
+export type BrodcastMessages = IChat[];
+export type BrodcastUpvotes = IChat;

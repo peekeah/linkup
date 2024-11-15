@@ -4,12 +4,12 @@ import chat from "../controllers/chat"
 import { SupportedCommunityMessages } from "../schema/community";
 import communities from "../controllers/communities";
 import { authenticate, authorize, UserType } from "../middlewares/auth";
-import { verifyToken } from "../utils/jwt";
+import { TokenData } from "../utils/jwt";
+import { CustomWebsocket } from "../server";
 
-const wsRequestHandler = (ws: WebSocket, message: IncomingMessage, token: string) => {
+const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenData: TokenData) => {
   try {
     // Auth
-    const tokenData = verifyToken(token);
     authenticate(tokenData.userId)
 
     let userType: UserType | null = null;
@@ -27,6 +27,7 @@ const wsRequestHandler = (ws: WebSocket, message: IncomingMessage, token: string
           name: tokenData.userName
         }
         chat.addChat(payload.roomId, payload.content, sender)
+        communities.broadcastMessage(payload.roomId)
         break;
 
       // Todo(Auth) - OP & Admin & Owner
@@ -37,6 +38,7 @@ const wsRequestHandler = (ws: WebSocket, message: IncomingMessage, token: string
 
       case SupportedChatMessages.UpvoteMessage:
         chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
+        communities.broadcastUpvotes(payload.roomId, payload.chatId)
         break;
 
       // Community routes

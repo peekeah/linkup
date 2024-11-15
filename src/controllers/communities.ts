@@ -1,4 +1,6 @@
 import { communitiesMockData } from "../mock/communities";
+import { OutgoingCommunityMessages, SupportedCommunityMessages } from "../schema/community";
+import { activeClients } from "../store/clients";
 import chat from "./chat";
 import { UserId } from "./user";
 
@@ -20,13 +22,6 @@ export interface IMember {
   userId: UserId,
   name: string;
 }
-
-/*
-interface ITimeout extends IMember {
-  timeout: number;
-  startTime: Date;
-}
-*/
 
 interface ITimeout {
   userId: UserId,
@@ -195,6 +190,50 @@ class Community {
     if (!existUser) throw new Error("User is not member of community");
 
     this.communities[idx].timeouts = this.communities[idx].timeouts.filter(el => el.userId !== userId)
+  }
+
+  broadcastMessage(roomId: string) {
+    const community = this.communities.find(el => el.id === roomId);
+
+    if (!community) throw new Error("Community not found")
+
+    const messages = chat.getChats(roomId)
+
+    community.member.forEach(member => {
+      const conn = activeClients.get(member.userId)
+      const response: OutgoingCommunityMessages = {
+        type: SupportedCommunityMessages.BrodcastMessages,
+        data: messages
+      }
+      if (conn) {
+        conn.send(JSON.stringify(response))
+      }
+    });
+  }
+
+  broadcastUpvotes(roomId: string, messageId: string) {
+    const community = this.communities.find(el => el.id === roomId);
+
+    if (!community) throw new Error("Community not found")
+
+    const messages = chat.getChats(roomId)
+
+    const message = messages.find(el => el.id === messageId)
+
+    if (!message) {
+      throw new Error("Message not found")
+    }
+
+    community.member.forEach(member => {
+      const conn = activeClients.get(member.userId)
+      if (conn) {
+        const response: OutgoingCommunityMessages = {
+          type: SupportedCommunityMessages.BroadcastUpvote,
+          data: message
+        }
+        conn.send(JSON.stringify(response))
+      }
+    });
   }
 
 }
