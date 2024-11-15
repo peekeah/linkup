@@ -39,10 +39,6 @@ const wsRequestHandler = (ws: WebSocket, message: IncomingMessage, token: string
         chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
         break;
 
-      case SupportedChatMessages.DownvoteMessage:
-        chat.downvote(tokenData.userId, payload.roomId, payload.chatId);
-        break;
-
       // Community routes
       case SupportedCommunityMessages.CreateCommunity:
         communities.create(payload.name, payload.owner)

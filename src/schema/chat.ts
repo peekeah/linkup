@@ -6,7 +6,6 @@ export enum SupportedChatMessages {
   AddChat = "ADD_CHAT",
   DeleteChat = "DELETE_CHAT",
   UpvoteMessage = "UPVOTE_MESSAGE",
-  DownvoteMessage = "DOWNVOTE_MESSAGE"
 }
 
 export type IncomingChatMessages = {
@@ -21,9 +20,6 @@ export type IncomingChatMessages = {
 } | {
   type: SupportedChatMessages.UpvoteMessage,
   payload: UpvoteMessageType
-} | {
-  type: SupportedChatMessages.DownvoteMessage,
-  payload: DownvoteMessageType
 }
 
 export const GetChat = z.object({
@@ -56,16 +52,9 @@ export const UpvoteMessage = z.object({
   chatId: z.string()
 })
 
-export const DownvoteMessage = z.object({
-  userId: z.string(),
-  roomId: z.string(),
-  chatId: z.string()
-})
-
 export type IncomingMessage = IncomingChatMessages | IncomingCommunityMessages;
 
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;
 export type DeleteChatType = z.infer<typeof DeleteChat>;
 export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;
-export type DownvoteMessageType = z.infer<typeof DownvoteMessage>

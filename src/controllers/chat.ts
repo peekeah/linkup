@@ -96,26 +96,14 @@ class Chat {
 
     const message = chat[messageId];
 
-    message.upvotes.push(userId)
+    const existUpvote = message.upvotes.includes(userId)
+
+    if (!existUpvote) {
+      message.upvotes.push(userId)
+    } else {
+      message.upvotes = message.upvotes.filter(el => el !== userId)
+    }
     chat[messageId] = message;
-
-    this.chats.set(roomId, chat)
-  }
-
-  downvote(userId: UserId, roomId: string, chatId: string) {
-    const chat = this.chats.get(roomId)
-
-    if (!chat) throw new Error("Chat not found")
-
-    let messageId = chat.findIndex(({ id }) => id === chatId)
-
-    if (!messageId) throw new Error("Message not found")
-
-    let message = chat[messageId];
-
-    message.upvotes = message.upvotes.filter(id => id !== userId)
-    chat[messageId] = message;
-
     this.chats.set(roomId, chat)
   }
 
