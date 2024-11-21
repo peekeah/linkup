@@ -5,12 +5,14 @@ import Topbar from "./Topbar";
 
 const Dashboard = () => {
   return (
-    <div className="h-screen flex flex-col bg-white">
+    <div className="h-screen flex flex-col bg-white font-serif">
       <Topbar />
       <div className="flex w-screen flex-1">
         <Sidebar />
+        <div className="w-[450px] h-full">
         <ListPanel />
-        <div className="flex-1"> <ChatPanel /> </div>
+        </div>
+        <div className="flex-1 bg-indigo-300"> <ChatPanel /> </div>
       </div>
     </div>
   )

@@ -9,6 +9,7 @@ import UserIcon from "@/assets/user.svg"
 const Sidebar = () => {
   return (
     <div className="h-full px-3 py-5 flex flex-col justify-between">
+        {/* #Fixme: Fix active & inactive links */}
       <div className="space-y-3">
         <div><ButtonIcon icon={MessageIcon} active/></div>
         <div><ButtonIcon icon={UserIcon} /></div>
