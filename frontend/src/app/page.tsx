@@ -1,10 +1,10 @@
 import Navbar from "./Navbar";
 import Image from "next/image";
 
-import Hero from "./assets/hero.png";
-import Communities from "./assets/communities.png";
-import MessagingPerson from "./assets/person-messaging.png";
-import Security from "./assets/security.png";
+import Hero from "@/assets/hero.png";
+import Communities from "@/assets/communities.png";
+import MessagingPerson from "@/assets/person-messaging.png";
+import Security from "@/assets/security.png";
 
 import { Button } from "@/components/ui/button";
 
