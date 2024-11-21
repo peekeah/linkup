@@ -10,6 +10,16 @@ export default {
   ],
   theme: {
     extend: {
+      fontSize: {
+        h1: "72px",
+        h2: "54px",
+        heading: "20px",
+        body: "16px",
+      },
+      fontFamily: {
+        outfit: `"Outfit", sans-serif`,
+        serif: `"Plus Jakarta Sans", sans-serif`,
+      },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
