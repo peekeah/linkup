@@ -7,10 +7,10 @@ const Dashboard = () => {
   return (
     <div className="h-screen flex flex-col bg-white">
       <Topbar />
-      <div className="flex w-screen bg-blue-300 flex-1">
+      <div className="flex w-screen flex-1">
         <Sidebar />
         <ListPanel />
-        <ChatPanel />
+        <div className="flex-1"> <ChatPanel /> </div>
       </div>
     </div>
   )
