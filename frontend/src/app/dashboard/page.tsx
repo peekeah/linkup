@@ -9,10 +9,8 @@ const Dashboard = () => {
       <Topbar />
       <div className="flex w-screen flex-1">
         <Sidebar />
-        <div className="w-[450px] h-full">
-        <ListPanel />
-        </div>
-        <div className="flex-1 bg-indigo-300"> <ChatPanel /> </div>
+        <div className="w-[450px] h-full"><ListPanel /></div>
+        <div className="flex-1"><ChatPanel /> </div>
       </div>
     </div>
   )

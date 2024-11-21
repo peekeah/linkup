@@ -18,7 +18,6 @@ const ListPanel = () => {
               <div className="flex gap-3">
                 <Avatar className="shadow-md p-3">
                   <Image src={ProfilePicture} alt="Profile pic" />
-                  {/* <AvatarFallback>{item.name}</AvatarFallback> */}
                 </Avatar>
                 <div className="w-full">
                   <div className="flex justify-between">
