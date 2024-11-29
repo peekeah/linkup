@@ -7,6 +7,7 @@ import { getEnv } from "./config";
 import httpRoutes from "./routes/httpRoutes";
 import { TokenData, verifyToken } from "./utils/jwt";
 import { activeClients } from "./store/clients";
+import cors from "cors";
 
 export interface CustomWebsocket extends WebSocket {
   userId?: string;
@@ -19,6 +20,7 @@ const server = createServer(app);
 const port = getEnv("API_PORT", "5000")
 
 app.use(express.json());
+app.use(cors());
 
 export const wss = new WebSocketServer({ server });
 
