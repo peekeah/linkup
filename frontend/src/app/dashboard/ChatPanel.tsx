@@ -1,11 +1,13 @@
-"use client";
 
+"use client";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
 import { useEffect, useState } from "react";
 import { chatMessagesMock } from "@/mock";
+import ButtonIcon from "@/components/ui/button-icon";
+import InfoIcon from "@/assets/info-circle.png";
 
 interface Member {
   userId: string;
@@ -22,7 +24,7 @@ interface Message {
 
 type ChatMessages = Map<Date, Message[]>;
 
-const ChatPanel = () => {
+const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const userId = "user3"; // NOTE: Need to update dynamically
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
@@ -56,9 +58,9 @@ const ChatPanel = () => {
           {/* <AvatarFallback>{item.name}</AvatarFallback> */}
         </Avatar>
         <div className="w-full">
-          <div className="flex justify-between">
+          <div className="flex items-center gap-3">
             <div className="text-heading">{"User name"}</div>
-            {/* <ButtonIcon icon={ProfilePicture} /> */}
+            <ButtonIcon onClick={toggleDrawer} icon={InfoIcon} />
           </div>
         </div>
       </div>
