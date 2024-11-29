@@ -9,6 +9,7 @@ export interface UserList {
 
 export const userList = [
     {
+        "id": 1,
         "name": "Alan Smith",
         "lastMessage": {
             "avatar": "",
@@ -17,6 +18,7 @@ export const userList = [
         }
     },
     {
+        "id": 2,
         "name": "Beth Johnson",
         "lastMessage": {
             "avatar": "",
@@ -25,6 +27,7 @@ export const userList = [
         }
     },
     {
+        "id": 3,
         "name": "Chris Williams",
         "lastMessage": {
             "avatar": "",
@@ -33,6 +36,7 @@ export const userList = [
         }
     },
     {
+        "id": 4,
         "name": "Diana Brown",
         "lastMessage": {
             "avatar": "",
@@ -41,6 +45,7 @@ export const userList = [
         }
     },
     {
+        "id": 5,
         "name": "Ethan Davis",
         "lastMessage": {
             "avatar": "",
@@ -49,6 +54,7 @@ export const userList = [
         }
     },
     {
+        "id": 6,
         "name": "Fay Miller",
         "lastMessage": {
             "avatar": "",
@@ -57,6 +63,7 @@ export const userList = [
         }
     },
     {
+        "id": 7,
         "name": "George Wilson",
         "lastMessage": {
             "avatar": "",
@@ -65,6 +72,7 @@ export const userList = [
         }
     },
     {
+        "id": 8,
         "name": "Hannah Moore",
         "lastMessage": {
             "avatar": "",
@@ -73,6 +81,7 @@ export const userList = [
         }
     },
     {
+        "id": 9,
         "name": "Ian Taylor",
         "lastMessage": {
             "avatar": "",
@@ -81,6 +90,7 @@ export const userList = [
         }
     },
     {
+        "id": 10,
         "name": "Jack Anderson",
         "lastMessage": {
             "avatar": "",
@@ -88,7 +98,7 @@ export const userList = [
             "time": "7:30 pm"
         }
     }
-]
+];
 
 export const chatMessagesMock = [
     {

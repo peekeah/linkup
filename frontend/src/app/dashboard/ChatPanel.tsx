@@ -31,7 +31,7 @@ const ChatPanel = () => {
     const newChats = chatMessagesMock.reduce((acc, entry) => {
       const dateKey = entry.date.toISOString().split("T")[0];
 
-      let newEntry = {
+      const newEntry = {
         ...entry,
         date: dateKey
       }
@@ -44,11 +44,11 @@ const ChatPanel = () => {
       return acc;
     }, new Map());
 
-    setChatMessages(newChats)
+    setChatMessages(() => newChats)
   }, []);
 
   return (
-    <div>
+    <div className="p-5">
       {/* Chat header */}
       <div className="flex gap-3 items-center h-12">
         <Avatar className="shadow-md p-3">
@@ -64,17 +64,15 @@ const ChatPanel = () => {
       </div>
 
       {/* Chat body */}
-      <div className="space-y-3 overflow-y-scroll">
+      <div className="space-y-10 overflow-y-scroll">
         {
-          Array.from(chatMessages.entries()).map(([date, messages], index) => (
-            <div>
+          Array.from(chatMessages.entries()).map(([date, messages]) => (
+            <div key={date?.toString()}>
               <div className="text-center">{date?.toString()}</div>
-              <div className="p-3 w-full gap-3 flex flex-col justify-start">
+              <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (
-                    message.sender.userId !== userId ?
-                      <div className="max-w-[700px] bg-[#EAE8E8] rounded-t-xl rounded-br-xl p-3">{message.content}</div> :
-                      <div className="max-w-[700px] bg-primary text-white rounded-xl rounded-bl-xl p-3 self-end">{message.content}</div>
+                    <div key={message.id} className={`max-w-[700px] ${message.sender.userId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl p-3" : "bg-primary text-white rounded-xl rounded-bl-xl p-3 self-end"}`}>{message.content}</div>
                   ))
                 }
               </div>
