@@ -5,13 +5,16 @@ import { useRouter } from "next/navigation";
 import Auth, { AuthContext } from "@/store/auth";
 import Home from "./home"
 import { getToken } from "@/lib/auth";
+import Navbar from "./Navbar";
 
 export default function Page() {
 
-  const { auth } = useContext(AuthContext)
+  const { auth, updateAuth } = useContext(AuthContext);
   const router = useRouter();
 
+
   useEffect(() => {
+    console.log("aa", auth)
     // Read token from localstorage
     if (auth) {
       router.push("/dashboard")
@@ -21,12 +24,15 @@ export default function Page() {
 
     if (token) {
       // login
+      updateAuth(true)
+      router.push("/dashboard")
     }
-  }, [auth, router])
+  }, [auth])
 
 
   return (
     <Auth>
+      <Navbar />
       <Home />
     </Auth>
   );

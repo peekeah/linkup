@@ -1,21 +1,28 @@
 "use client";
-
 import Image from "next/image";
 
 import Hero from "@/assets/hero.png";
 import Communities from "@/assets/communities.png";
 import MessagingPerson from "@/assets/person-messaging.png";
 import Security from "@/assets/security.png";
-import Navbar from "./Navbar";
 
 import { Button } from "@/components/ui/button";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "@/store/auth";
+import { useRouter } from "next/navigation";
 
 const Home = () => {
+
+  const { auth } = useContext(AuthContext);
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log("aaa", auth)
+  }, [auth])
 
   return (
     <div className="bg-background">
       <div className="max-w-[1395px] mx-auto">
-        <Navbar />
         <div className="max-w-[1200px] space-y-12 mx-auto mt-[5%]">
 
           {/* Hero section */}
@@ -24,10 +31,10 @@ const Home = () => {
               <div className="text-h1 font-bold leading-[85px]">Connect with like minded people</div>
               <div className="text-[20px]">Join passionate individuals just like you who are eager to share ideas and learn from one another.</div>
               <div className="space-x-3">
-                <Button className="rounded-full">
+                <Button className="rounded-full" onClick={() => router.push("/login")}>
                   <div className="text-[20px]">Login</div>
                 </Button>
-                <Button variant="outline" className="rounded-full">
+                <Button variant="outline" className="rounded-full" onClick={() => router.push("/signup")}>
                   <div className="text-[20px]">Signup</div>
                 </Button>
               </div>
@@ -88,7 +95,6 @@ const Home = () => {
           </div>
         </div>
       </div>
-
     </div >
   )
 }
