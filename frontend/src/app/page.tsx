@@ -22,6 +22,7 @@ export default function Page() {
 
     const token = getToken();
 
+    // default: "h-9 px-24 py-8",
     if (token) {
       // login
       updateAuth(true)

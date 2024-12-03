@@ -16,7 +16,7 @@ const UserSchema = z.object({
   email: z.string().email("Invalid email address"),
   mobile: z.string().min(10, "Mobile number must be at least 10 characters"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
-  address: AddressSchema,
+  address: AddressSchema.optional(),
 });
 
 const Login = z.object({

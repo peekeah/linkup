@@ -7,18 +7,11 @@ import MessagingPerson from "@/assets/person-messaging.png";
 import Security from "@/assets/security.png";
 
 import { Button } from "@/components/ui/button";
-import { useContext, useEffect } from "react";
-import { AuthContext } from "@/store/auth";
 import { useRouter } from "next/navigation";
 
 const Home = () => {
 
-  const { auth } = useContext(AuthContext);
   const router = useRouter();
-
-  useEffect(() => {
-    console.log("aaa", auth)
-  }, [auth])
 
   return (
     <div className="bg-background">
@@ -31,10 +24,10 @@ const Home = () => {
               <div className="text-h1 font-bold leading-[85px]">Connect with like minded people</div>
               <div className="text-[20px]">Join passionate individuals just like you who are eager to share ideas and learn from one another.</div>
               <div className="space-x-3">
-                <Button className="rounded-full" onClick={() => router.push("/login")}>
+                <Button className="rounded-full h-9 px-24 py-8" onClick={() => router.push("/login")}>
                   <div className="text-[20px]">Login</div>
                 </Button>
-                <Button variant="outline" className="rounded-full" onClick={() => router.push("/signup")}>
+                <Button variant="outline" className="rounded-full h-9 px-24 py-8" onClick={() => router.push("/signup")}>
                   <div className="text-[20px]">Signup</div>
                 </Button>
               </div>

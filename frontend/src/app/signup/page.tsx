@@ -11,21 +11,29 @@ import api from "@/services/api";
 import { AuthContext } from "@/store/auth";
 import { useRouter } from "next/navigation";
 
-interface FormData {
+export interface SignupPayload {
+  name: string;
   email: string;
+  dob: string; // Note: update type to date
+  mobile: string;
   password: string;
+  confirmPassword: string;
 }
 
 type OnInputChange = ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
 
-const Login = () => {
+const Signup = () => {
 
   const router = useRouter();
   const { updateAuth } = useContext(AuthContext);
 
-  const [formData, setFormData] = useState<FormData>({
-    email: "charlie.brown@example.com",
-    password: "test_password"
+  const [formData, setFormData] = useState<SignupPayload>({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    dob: "",
+    mobile: ""
   })
 
   const onChange = (e: OnInputChange) => {
@@ -41,7 +49,7 @@ const Login = () => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const res = await api.login(formData.email, formData.password)
+      const res = await api.signup(formData)
       if (res?.data?.status) {
         updateAuth(true)
         router.push("/dashboard")
@@ -51,6 +59,8 @@ const Login = () => {
     }
   }
 
+  // Note: Need to add validations
+
   return (
     <form onSubmit={onSubmit}>
       <div className="flex gap-3 max-w-[1124px] mx-auto h-full w-full">
@@ -59,9 +69,13 @@ const Login = () => {
         </div>
         <div className="w-1/2 pt-[12%]">
           <div className="flex flex-col gap-7 p-3">
-            <div className="text-center uppercase text-3xl">Login</div>
+            <div className="text-center uppercase text-3xl">Create Account</div>
+            <Input placeholder="Name" value={formData.name} name="name" onChange={onChange} />
             <Input placeholder="Email" value={formData.email} name="email" onChange={onChange} />
+            <Input placeholder="Mobile" value={formData.mobile} name="mobile" onChange={onChange} />
+            <Input placeholder="Date of Birth" value={formData.dob} name="dob" onChange={onChange} />
             <PasswordInput placeholder="Password" value={formData.password} name="password" onChange={onChange} />
+            <PasswordInput placeholder="Confirm Password" value={formData.confirmPassword} name="confirmPassword" onChange={onChange} />
             <div className="text-end text-primary">Forget password</div>
 
             <div className="flex items-center">
@@ -89,4 +103,4 @@ const Login = () => {
   )
 }
 
-export default Login;
+export default Signup;
