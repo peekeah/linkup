@@ -10,7 +10,7 @@ const AddressSchema = z.object({
 });
 
 // Define the schema for the user
-const UserSchema = z.object({
+export const UserSchema = z.object({
   // id: z.number().int().positive("ID must be a positive integer"),
   name: z.string().min(1, "Name is required"),
   email: z.string().email("Invalid email address"),
@@ -25,5 +25,14 @@ const Login = z.object({
 })
 
 export type LoginType = z.infer<typeof Login>
+
+export enum SupportedUserMessages {
+  ChatHistory = "CHAT_HISTORY"
+}
+
+export type IncomingUserMessage = {
+  type: SupportedUserMessages.ChatHistory,
+  payload: null,
+}
 
 export default UserSchema;

@@ -1,7 +1,7 @@
 import { UserType } from "../middlewares/auth";
 import { chatMockData } from "../mock/chat";
-import { IMember } from "./communities";
-import { UserId } from "./user";
+import communities, { IMember } from "./communities";
+import user, { UserId } from "./user";
 
 export interface IChat {
   id: string;
@@ -43,22 +43,28 @@ class Chat {
       : chat.slice();
   }
 
-  addChat(roomId: string, content: string, sender: IMember) {
 
+  addChat(roomId: string, content: string, sender: IMember) {
     const chat = this.chats.get(roomId)
 
     if (!chat) {
       throw new Error("Chat not found")
     }
 
+    const id = (globalChatId++).toString();
+    const date = new Date();
     chat.push({
-      id: (globalChatId++).toString(),
+      id,
       content,
       sender,
       upvotes: [],
-      date: new Date(),
+      date,
       isDeleted: false
     })
+
+    // Note: Update last message in user state
+    const community = communities.getCommunity(id);
+    user.updateChatHistory(sender.userId, id, community.name, { content, date })
 
     this.chats.set(roomId, chat)
   }
@@ -108,10 +114,3 @@ class Chat {
 }
 
 export default new Chat();
-
-/*
-1. Store connection in user manager,
-2. Store connection in room manager,
-3. Use connection from global wss obj
-*/
-

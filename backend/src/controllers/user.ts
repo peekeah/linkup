@@ -11,7 +11,19 @@ export interface IUser {
   mobile: string;
   password: string;
   address: IAddress;
+  chatHistory: ChatHistory[];
   // connection: WebSocket;
+}
+
+interface LastMessage {
+  content: string;
+  date: Date;
+}
+
+// Note: Add for private message
+interface ChatHistory extends LastMessage {
+  communityId: string;
+  communityName: string;
 }
 
 interface IAddress {
@@ -93,7 +105,39 @@ class User {
       throw new Error("user not found")
     }
 
-    return user;
+    const { chatHistory, password, ...userData } = user;
+
+    return userData;
+
+  }
+
+  updateChatHistory(id: UserId, communityId: string, communityName: string, message: LastMessage) {
+
+    let user = this.users.find(el => el.id === id)
+
+    if (!user) {
+      return null
+    }
+
+    user.chatHistory = user.chatHistory.filter(el => el.communityId !== communityId);
+
+    const newMsg = {
+      communityId,
+      communityName,
+      ...message,
+    }
+
+    user.chatHistory = [newMsg, ...user.chatHistory]
+  }
+
+  getChatHistory(id: UserId) {
+    const user = this.users.find(el => el.id === id)
+
+    if (!user) {
+      throw new Error("user not found")
+    }
+
+    return user.chatHistory;
 
   }
 }

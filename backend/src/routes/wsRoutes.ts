@@ -1,4 +1,3 @@
-import { WebSocket } from "ws"
 import { IncomingMessage, SupportedChatMessages } from "../schema/chat"
 import chat from "../controllers/chat"
 import { SupportedCommunityMessages } from "../schema/community";
@@ -6,6 +5,8 @@ import communities from "../controllers/communities";
 import { authenticate, authorize, UserType } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
+import { SupportedUserMessages } from "../schema/user";
+import user from "../controllers/user";
 
 const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenData: TokenData) => {
   try {
@@ -14,10 +15,15 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
 
     let userType: UserType | null = null;
 
-    // Chat routes
     const { type, payload } = message;
 
     switch (type) {
+      // User Routes
+      case SupportedUserMessages.ChatHistory:
+        ws.send(JSON.stringify(user.getChatHistory(tokenData.userId)))
+        break;
+
+      // Chat routes
       case SupportedChatMessages.GetChat:
         ws.send(JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset)))
         break;
@@ -97,6 +103,7 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
         userType = authorize(payload.roomId, tokenData.userId, ["owner", "admin"]);
         communities.clearTimeout(payload.roomId, payload.userId)
         break;
+
 
       default:
         throw new Error("Invalid request")

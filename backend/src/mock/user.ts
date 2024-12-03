@@ -13,7 +13,8 @@ export const userMockData: IUser[] = [
       city: "Springfield",
       state: "Illinois",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u002",
@@ -27,7 +28,8 @@ export const userMockData: IUser[] = [
       city: "Lincoln",
       state: "Nebraska",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u003",
@@ -41,7 +43,8 @@ export const userMockData: IUser[] = [
       city: "Albany",
       state: "New York",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u004",
@@ -55,7 +58,8 @@ export const userMockData: IUser[] = [
       city: "Seattle",
       state: "Washington",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u005",
@@ -69,7 +73,8 @@ export const userMockData: IUser[] = [
       city: "Denver",
       state: "Colorado",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u006",
@@ -83,7 +88,8 @@ export const userMockData: IUser[] = [
       city: "Miami",
       state: "Florida",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u007",
@@ -97,7 +103,8 @@ export const userMockData: IUser[] = [
       city: "Los Angeles",
       state: "California",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u008",
@@ -111,7 +118,8 @@ export const userMockData: IUser[] = [
       city: "Boston",
       state: "Massachusetts",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u009",
@@ -125,7 +133,8 @@ export const userMockData: IUser[] = [
       city: "Phoenix",
       state: "Arizona",
       country: "USA"
-    }
+    },
+    chatHistory: []
   },
   {
     id: "u010",
@@ -139,6 +148,7 @@ export const userMockData: IUser[] = [
       city: "Houston",
       state: "Texas",
       country: "USA"
-    }
+    },
+    chatHistory: []
   }
 ];
