@@ -5,23 +5,44 @@ import { userList } from "@/mock";
 import ProfilePicture from "@/assets/person-messaging.png";
 import Image from "next/image";
 import { Separator } from "@/components/ui/separator";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ChatContext } from "@/store/chat";
+import { cx } from "class-variance-authority";
 
 const ListPanel = () => {
 
   const { chatHistory } = useContext(ChatContext);
+  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!chatHistory?.length) {
+      return
+    }
+    setSelectedChat(() => {
+      return chatHistory[0]?.communityId
+    })
+  }, [chatHistory])
 
   return (
-    <div className="h-full p-3 py-5 space-y-3">
-      <Search className="rounded-full h-12" placeholder="Search" />
-      <div className="overflow-y-auto">
+    <div className="h-full space-y-3">
+      <div className="p-3 py-5">
+        <Search className="rounded-full h-12" placeholder="Search" />
+      </div>
+      <Separator orientation="horizontal" />
+      <div className="overflow-y-auto m-0">
         {
           !chatHistory?.length ?
             <div>No recent chats</div> :
             chatHistory?.map((item, index) => (
-              <div key={item.communityId} className="">
-                <div className="flex gap-3">
+              <div key={item.communityId} className={
+                cx(
+                  "cursor-pointer",
+                  selectedChat === item.communityId ? "bg-gray-300" : ""
+                )
+              }
+                onClick={() => setSelectedChat(item.communityId)}
+              >
+                <div className="flex gap-3 p-3">
                   <Avatar className="shadow-md p-3">
                     <Image src={ProfilePicture} alt="Profile pic" />
                   </Avatar>
@@ -34,7 +55,7 @@ const ListPanel = () => {
                   </div>
                 </div>
                 {/* #Fixme: Fix Saperator */}
-                {index !== userList.length - 1 ? <Separator className="m-2" /> : null}
+                {index !== userList.length - 1 ? <Separator /> : null}
               </div>
             ))
         }
