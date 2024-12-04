@@ -30,9 +30,18 @@ export enum SupportedUserMessages {
   ChatHistory = "CHAT_HISTORY"
 }
 
+export enum SupportedOutgoingUserMessages {
+  ChatHistory = "CHAT_HISTORY"
+}
+
 export type IncomingUserMessage = {
   type: SupportedUserMessages.ChatHistory,
   payload: null,
+}
+
+export type OutgoingUserMessage = {
+  type: SupportedOutgoingUserMessages;
+  data: string & { __json_string_brand: never }
 }
 
 export default UserSchema;

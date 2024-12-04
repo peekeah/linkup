@@ -2,6 +2,7 @@ import { createServer } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
 import express from 'express';
 
+import url from "url";
 import requestHandler from "./routes/wsRoutes";
 import { getEnv } from "./config";
 import httpRoutes from "./routes/httpRoutes";
@@ -31,8 +32,10 @@ function heartbeat(this: CustomWebsocket) {
 wss.on('connection', function connection(ws: CustomWebsocket, req) {
   ws.isAlive = true;
 
-  const header = req.headers["authorization"]?.split(" ");
-  const token = header?.[1] || "";
+  // const header = req.headers["authorization"]?.split(" ");
+  // const token = header?.[1] || "";
+  const params = url.parse(req.url || "", true);
+  const token = params?.query?.token as string || "";
 
   let tokenData: TokenData;
 

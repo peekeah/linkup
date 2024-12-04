@@ -21,7 +21,7 @@ interface LastMessage {
 }
 
 // Note: Add for private message
-interface ChatHistory extends LastMessage {
+export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
 }

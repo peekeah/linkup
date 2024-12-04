@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { IncomingCommunityMessages, Member } from "./community";
-import { IncomingUserMessage } from "./user";
+import { IncomingUserMessage, OutgoingUserMessage } from "./user";
 
 export enum SupportedChatMessages {
   GetChat = "GET_CHAT",

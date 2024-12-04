@@ -5,7 +5,7 @@ import communities from "../controllers/communities";
 import { authenticate, authorize, UserType } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
-import { SupportedUserMessages } from "../schema/user";
+import { OutgoingUserMessage, SupportedOutgoingUserMessages, SupportedUserMessages } from "../schema/user";
 import user from "../controllers/user";
 
 const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenData: TokenData) => {
@@ -20,7 +20,10 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
     switch (type) {
       // User Routes
       case SupportedUserMessages.ChatHistory:
-        ws.send(JSON.stringify(user.getChatHistory(tokenData.userId)))
+        ws.send(JSON.stringify({
+          type: SupportedOutgoingUserMessages.ChatHistory,
+          data: JSON.stringify(user.getChatHistory(tokenData.userId))
+        }))
         break;
 
       // Chat routes

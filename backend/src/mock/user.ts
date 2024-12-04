@@ -2,153 +2,301 @@ import { IUser } from "../controllers/user";
 
 export const userMockData: IUser[] = [
   {
-    id: "u001",
+    id: "user1",
     name: "Alice Johnson",
     email: "alice.johnson@example.com",
     mobile: "123-456-7890",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_1",
     address: {
-      street: "123 Maple St",
-      area: "Downtown",
-      city: "Springfield",
-      state: "Illinois",
-      country: "USA"
+      street: "123 Tech Street",
+      area: "Innovation District",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
     },
-    chatHistory: []
+    chatHistory: [
+      {
+        communityId: "community1",
+        communityName: "Tech Enthusiasts",
+        content: "Hello, everyone!",
+        date: new Date("2024-12-01T09:30:00"),
+      },
+      {
+        communityId: "community6",
+        communityName: "Art Lovers",
+        content: "This topic is fascinating! Let’s dive deeper.",
+        date: new Date("2024-12-01T15:00:00"),
+      },
+      {
+        communityId: "community8",
+        communityName: "Coding Gurus",
+        content: "What’s everyone working on these days?",
+        date: new Date("2024-12-02T10:45:00"),
+      },
+      {
+        communityId: "community3",
+        communityName: "Book Lovers",
+        content: "I’d love to recommend my favorite book on tech history.",
+        date: new Date("2024-12-02T14:30:00"),
+      },
+      {
+        communityId: "community10",
+        communityName: "Foodies United",
+        content: "Anyone tried the new vegan recipes trending online?",
+        date: new Date("2024-12-03T08:15:00"),
+      },
+    ],
   },
   {
-    id: "u002",
+    id: "user2",
     name: "Bob Smith",
     email: "bob.smith@example.com",
     mobile: "234-567-8901",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_2",
     address: {
-      street: "456 Oak St",
-      area: "Uptown",
-      city: "Lincoln",
-      state: "Nebraska",
-      country: "USA"
+      street: "456 Code Lane",
+      area: "Innovation District",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
     },
-    chatHistory: []
+    chatHistory: [
+      {
+        communityId: "community1",
+        communityName: "Tech Enthusiasts",
+        content: "Welcome, Alice! Looking forward to your insights.",
+        date: new Date("2024-12-01T10:00:00"),
+      },
+      {
+        communityId: "community7",
+        communityName: "Movie Fans",
+        content: "Does anyone have recommendations for sci-fi movies?",
+        date: new Date("2024-12-03T12:00:00"),
+      },
+    ],
   },
   {
-    id: "u003",
+    id: "user3",
     name: "Charlie Brown",
     email: "charlie.brown@example.com",
     mobile: "345-678-9012",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_3",
     address: {
-      street: "789 Pine St",
-      area: "Midtown",
-      city: "Albany",
-      state: "New York",
-      country: "USA"
-    },
-    chatHistory: []
-  },
-  {
-    id: "u004",
-    name: "David Lee",
-    email: "david.lee@example.com",
-    mobile: "456-789-0123",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
-    address: {
-      street: "321 Birch St",
-      area: "West End",
-      city: "Seattle",
-      state: "Washington",
-      country: "USA"
-    },
-    chatHistory: []
-  },
-  {
-    id: "u005",
-    name: "Eve Torres",
-    email: "eve.torres@example.com",
-    mobile: "567-890-1234",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
-    address: {
-      street: "654 Cedar Ave",
-      area: "Old Town",
-      city: "Denver",
-      state: "Colorado",
-      country: "USA"
-    },
-    chatHistory: []
-  },
-  {
-    id: "u006",
-    name: "Frank Green",
-    email: "frank.green@example.com",
-    mobile: "678-901-2345",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
-    address: {
-      street: "987 Elm Rd",
-      area: "Newport",
-      city: "Miami",
-      state: "Florida",
-      country: "USA"
-    },
-    chatHistory: []
-  },
-  {
-    id: "u007",
-    name: "Grace Kim",
-    email: "grace.kim@example.com",
-    mobile: "789-012-3456",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
-    address: {
-      street: "159 Maple Ave",
-      area: "South Side",
-      city: "Los Angeles",
+      street: "789 Java Avenue",
+      area: "Downtown",
+      city: "Tech City",
       state: "California",
-      country: "USA"
+      country: "USA",
     },
-    chatHistory: []
+    chatHistory: [
+      {
+        communityId: "community1",
+        communityName: "Tech Enthusiasts",
+        content: "Great topic, Alice! Let’s discuss.",
+        date: new Date("2024-12-01T11:00:00"),
+      },
+      {
+        communityId: "community3",
+        communityName: "Book Lovers",
+        content: "I second Alice's recommendation. A great read!",
+        date: new Date("2024-12-02T15:00:00"),
+      },
+      {
+        communityId: "community10",
+        communityName: "Foodies United",
+        content: "Looking forward to trying out new recipes.",
+        date: new Date("2024-12-03T09:00:00"),
+      },
+    ],
   },
   {
-    id: "u008",
-    name: "Hannah White",
-    email: "hannah.white@example.com",
+    id: "user4",
+    name: "Daisy Miller",
+    email: "daisy.miller@example.com",
+    mobile: "456-789-0123",
+    password: "hashed_password_4",
+    address: {
+      street: "321 Ruby Road",
+      area: "Downtown",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
+    },
+    chatHistory: [
+      {
+        communityId: "community7",
+        communityName: "Movie Fans",
+        content: "I just watched a fantastic documentary on AI!",
+        date: new Date("2024-12-03T13:30:00"),
+      },
+    ],
+  },
+  {
+    id: "user5",
+    name: "Eve Summers",
+    email: "eve.summers@example.com",
+    mobile: "567-890-1234",
+    password: "hashed_password_5",
+    address: {
+      street: "654 Python Drive",
+      area: "Suburbs",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
+    },
+    chatHistory: [
+      {
+        communityId: "community10",
+        communityName: "Foodies United",
+        content: "I’ve tried some recipes recently, Alice!",
+        date: new Date("2024-12-03T08:30:00"),
+      },
+      {
+        communityId: "community6",
+        communityName: "Art Lovers",
+        content: "Loving the new art styles being discussed here.",
+        date: new Date("2024-12-01T16:00:00"),
+      },
+    ],
+  },
+  {
+    id: "user6",
+    name: "Frank Ocean",
+    email: "frank.ocean@example.com",
+    mobile: "678-901-2345",
+    password: "hashed_password_6",
+    address: {
+      street: "987 Go Road",
+      area: "Midtown",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
+    },
+    chatHistory: [
+      {
+        communityId: "community6",
+        communityName: "Art Lovers",
+        content: "Love your enthusiasm, Alice.",
+        date: new Date("2024-12-01T15:15:00"),
+      },
+      {
+        communityId: "community2",
+        communityName: "Gaming World",
+        content: "Does anyone want to team up for the new RPG?",
+        date: new Date("2024-12-02T18:45:00"),
+      },
+    ],
+  },
+  {
+    id: "user7",
+    name: "Grace Hopper",
+    email: "grace.hopper@example.com",
+    mobile: "789-012-3456",
+    password: "hashed_password_7",
+    address: {
+      street: "111 Code Blvd",
+      area: "Tech Park",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
+    },
+    chatHistory: [
+      {
+        communityId: "community8",
+        communityName: "Coding Gurus",
+        content: "Great question, Alice. I’m building a web app.",
+        date: new Date("2024-12-02T11:00:00"),
+      },
+      {
+        communityId: "community3",
+        communityName: "Book Lovers",
+        content: "Looking forward to the next book club meeting!",
+        date: new Date("2024-12-02T16:00:00"),
+      },
+    ],
+  },
+  {
+    id: "user8",
+    name: "Hank Pym",
+    email: "hank.pym@example.com",
     mobile: "890-123-4567",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_8",
     address: {
-      street: "753 Walnut St",
-      area: "East End",
-      city: "Boston",
-      state: "Massachusetts",
-      country: "USA"
+      street: "222 Tech Terrace",
+      area: "Downtown",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
     },
-    chatHistory: []
+    chatHistory: [
+      {
+        communityId: "community6",
+        communityName: "Art Lovers",
+        content: "That’s a great suggestion, Alice.",
+        date: new Date("2024-12-01T15:45:00"),
+      },
+      {
+        communityId: "community8",
+        communityName: "Coding Gurus",
+        content: "Excited to see the new projects here!",
+        date: new Date("2024-12-02T12:30:00"),
+      },
+    ],
   },
   {
-    id: "u009",
-    name: "Ivan Black",
-    email: "ivan.black@example.com",
+    id: "user9",
+    name: "Ivy Woods",
+    email: "ivy.woods@example.com",
     mobile: "901-234-5678",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_9",
     address: {
-      street: "852 Spruce Ln",
-      area: "North Side",
-      city: "Phoenix",
-      state: "Arizona",
-      country: "USA"
+      street: "333 Web Way",
+      area: "Innovation District",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
     },
-    chatHistory: []
+    chatHistory: [
+      {
+        communityId: "community10",
+        communityName: "Foodies United",
+        content: "Looking forward to the next cooking challenge!",
+        date: new Date("2024-12-03T09:15:00"),
+      },
+      {
+        communityId: "community7",
+        communityName: "Movie Fans",
+        content: "Any recommendations for horror movies?",
+        date: new Date("2024-12-03T14:00:00"),
+      },
+    ],
   },
   {
-    id: "u010",
-    name: "Judy Orange",
-    email: "judy.orange@example.com",
+    id: "user10",
+    name: "Jack Sparrow",
+    email: "jack.sparrow@example.com",
     mobile: "012-345-6789",
-    password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
+    password: "hashed_password_10",
     address: {
-      street: "159 Chestnut Dr",
-      area: "Harbor Area",
-      city: "Houston",
-      state: "Texas",
-      country: "USA"
+      street: "444 Pirate Place",
+      area: "Coastal Area",
+      city: "Tech City",
+      state: "California",
+      country: "USA",
     },
-    chatHistory: []
-  }
+    chatHistory: [
+      {
+        communityId: "community10",
+        communityName: "Foodies United",
+        content: "Anyone tried the new seafood recipes?",
+        date: new Date("2024-12-03T10:00:00"),
+      },
+      {
+        communityId: "community9",
+        communityName: "Travel Junkies",
+        content: "Planning a trip to Japan next spring!",
+        date: new Date("2024-12-04T09:00:00"),
+      },
+    ],
+  },
 ];
