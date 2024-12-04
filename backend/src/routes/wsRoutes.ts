@@ -1,11 +1,11 @@
-import { IncomingMessage, SupportedChatMessages } from "../schema/chat"
+import { IncomingMessage, SupportedChatMessages, OutgoingChatMessages } from "../schema/chat"
 import chat from "../controllers/chat"
 import { SupportedCommunityMessages } from "../schema/community";
 import communities from "../controllers/communities";
 import { authenticate, authorize, UserType } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
-import { OutgoingUserMessage, SupportedOutgoingUserMessages, SupportedUserMessages } from "../schema/user";
+import { SupportedOutgoingUserMessages, SupportedUserMessages } from "../schema/user";
 import user from "../controllers/user";
 
 const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenData: TokenData) => {
@@ -28,7 +28,10 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
 
       // Chat routes
       case SupportedChatMessages.GetChat:
-        ws.send(JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset)))
+        ws.send(JSON.stringify({
+          type: OutgoingChatMessages.GetChat,
+          data: JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset))
+        }))
         break;
       case SupportedChatMessages.AddChat:
         const sender = {

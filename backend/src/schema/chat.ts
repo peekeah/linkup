@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { IncomingCommunityMessages, Member } from "./community";
-import { IncomingUserMessage, OutgoingUserMessage } from "./user";
+import { IncomingCommunityMessages } from "./community";
+import { IncomingUserMessage } from "./user";
+import { IChat } from "../controllers/chat";
 
 export enum SupportedChatMessages {
   GetChat = "GET_CHAT",
@@ -21,6 +22,10 @@ export type IncomingChatMessages = {
 } | {
   type: SupportedChatMessages.UpvoteMessage,
   payload: UpvoteMessageType
+}
+
+export enum OutgoingChatMessages {
+  GetChat = "GET_CHAT"
 }
 
 export const GetChat = z.object({
