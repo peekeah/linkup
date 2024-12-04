@@ -1,13 +1,15 @@
 "use client";
-import { useContext, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
 import ListPanel from "./ListPanel";
 import Sidebar from "./sidebar";
 import Topbar from "./Topbar";
-import { AuthContext } from "@/store/auth";
 import ProfileDetails from "./ProfileDetails";
+import { getToken } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import useHandleMessage from "@/hooks/useHandleMessage";
 
 export interface MemberDetails {
   name: string;
@@ -24,6 +26,11 @@ type ProfileDrawer = {
 }
 
 const Dashboard = () => {
+
+  const ws = useRef<null | WebSocket>(null);
+  const router = useRouter();
+  const { handleMessage } = useHandleMessage();
+
   const [profileDrawer, setProfileDrawer] = useState<ProfileDrawer>({
     open: false,
     data: null
@@ -49,6 +56,59 @@ const Dashboard = () => {
       }
     })
   }
+
+  const sendMessage = (message: string) => {
+    try {
+      if (ws?.current && ws?.current?.readyState === WebSocket.OPEN) {
+        ws.current.send(message)
+      }
+    } catch (err) {
+      console.log("connection is broken", err)
+    }
+  }
+
+  useEffect(() => {
+    try {
+      const uri = process.env.NEXT_PUBLIC_WS_HOST || "ws://localhost:5000";
+      const token = getToken();
+
+      // #Todo: Logout and clear token
+      if (!token) {
+        return router.push("/");
+      }
+
+      ws.current = new WebSocket(`${uri}?token=${token}`);
+
+      if (!ws || !ws?.current) {
+        return
+      }
+
+      ws.current.onopen = () => {
+        sendMessage(JSON.stringify({
+          type: "CHAT_HISTORY",
+        }))
+      };
+
+      ws.current.onmessage = (event) => {
+        handleMessage(event.data)
+      }
+
+      ws.current.onerror = (err) => {
+        console.log("error", err)
+      }
+
+      ws.current.onclose = () => {
+        console.log("connection is closed")
+      }
+
+      return () => {
+        ws.current?.close();
+      }
+
+    } catch (err) {
+      console.log("err", err)
+    }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-white font-serif">

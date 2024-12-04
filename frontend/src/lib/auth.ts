@@ -5,6 +5,10 @@ export const getToken = () => {
   return localStorage.getItem("token");
 }
 
+export const updateToken = (value: string) => {
+  return localStorage.setItem("token", value)
+}
+
 // Login
 export const login = async (email: string, password: string) => {
   const res = await api.login(email, password)
@@ -16,7 +20,7 @@ export const login = async (email: string, password: string) => {
 }
 
 // Logout
-export const logout = () => {
-  return null;
+export const handleLogout = () => {
+  return localStorage.clearItem("token")
 }
 

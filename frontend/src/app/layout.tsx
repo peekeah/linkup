@@ -1,8 +1,9 @@
-import { useContext } from "react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import Navbar from "./Navbar";
+import { Store } from "lucide-react";
+import Auth from "@/store/auth";
+import Chat from "@/store/chat";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +30,13 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={"flex flex-col h-screen w-full"}
-      >{children}</body>
+      >
+        <Auth>
+          <Chat>
+            {children}
+          </Chat>
+        </Auth>
+      </body>
     </html>
   );
 }

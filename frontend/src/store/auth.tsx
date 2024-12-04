@@ -1,9 +1,11 @@
+"use client"
 import { createContext, ReactNode, useState } from "react"
 
 interface AuthContextType {
   auth: boolean;
   updateAuth: (status: boolean) => void
 }
+
 export const AuthContext = createContext<AuthContextType>({
   auth: false,
   updateAuth: () => { }

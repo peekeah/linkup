@@ -10,6 +10,8 @@ import GoogleLogo from "@/assets/google-logo.svg";
 import api from "@/services/api";
 import { AuthContext } from "@/store/auth";
 import { useRouter } from "next/navigation";
+import { updateToken } from "@/lib/auth";
+import { currentUserMock } from "@/mock";
 
 interface FormData {
   email: string;
@@ -24,8 +26,8 @@ const Login = () => {
   const { updateAuth } = useContext(AuthContext);
 
   const [formData, setFormData] = useState<FormData>({
-    email: "charlie.brown@example.com",
-    password: "test_password"
+    email: currentUserMock.email,
+    password: currentUserMock.password
   })
 
   const onChange = (e: OnInputChange) => {
@@ -43,7 +45,8 @@ const Login = () => {
     try {
       const res = await api.login(formData.email, formData.password)
       if (res?.data?.status) {
-        updateAuth(true)
+        updateAuth(true);
+        updateToken(res?.data?.data?.token)
         router.push("/dashboard")
       }
     } catch (err) {

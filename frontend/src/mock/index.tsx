@@ -8,7 +8,7 @@ export interface UserList {
 }
 
 export const currentUserMock = {
-  email: "charlie.brown@example.com",
+  email: "alice.johnson@example.com",
   password: "test_password"
 }
 
