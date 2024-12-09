@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useContext, useEffect } from "react";
 
 import Hero from "@/assets/hero.png";
 import Communities from "@/assets/communities.png";
@@ -9,28 +8,10 @@ import MessagingPerson from "@/assets/person-messaging.png";
 import Security from "@/assets/security.png";
 
 import { Button } from "@/components/ui/button";
-import { AuthContext } from "@/store/auth";
-import { getToken } from "@/lib/auth";
 
 const Home = () => {
 
   const router = useRouter();
-  const { auth, updateAuth } = useContext(AuthContext);
-
-  useEffect(() => {
-    // Read token from localstorage
-    if (auth) {
-      router.push("/dashboard")
-    }
-
-    const token = getToken();
-
-    if (token) {
-      // login
-      updateAuth(true)
-      router.push("/dashboard")
-    }
-  }, [auth])
 
   return (
     <div className="bg-background">

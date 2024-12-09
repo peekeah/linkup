@@ -2,40 +2,53 @@
 import { createContext, ReactNode, useState } from "react";
 
 interface AuthContextType {
-  state: State;
-  updateAuth: (status: boolean) => void,
+  state: AuthState;
+  updateAuth: (payload: AuthState) => void,
   updateConnection: (ws: WebSocket) => void,
+  clearAuth: () => void,
 }
 
 export const AuthContext = createContext<AuthContextType>({
   state: {
-    auth: false,
+    userId: "",
+    userName: "",
+    email: "",
+    token: "",
     ws: null
   },
   updateAuth: () => { },
-  updateConnection: () => { }
+  updateConnection: () => { },
+  clearAuth: () => { }
 })
 
 interface AuthProps {
   children: ReactNode;
 }
 
-interface State {
-  auth: boolean;
-  ws: null | WebSocket;
+export interface AuthState {
+  userId: string;
+  userName: string;
+  email: string;
+  token: string;
+  ws?: null | WebSocket;
 }
 
 const Auth = ({ children }: AuthProps) => {
 
-  const [state, setState] = useState<State>({
-    auth: false,
+  const initialValues = {
+    userId: "",
+    userName: "",
+    token: "",
+    email: "",
     ws: null
-  })
+  }
 
-  const updateAuth = (status: boolean) => {
-    setState(prev => ({
-      ...prev,
-      ["auth"]: status
+  const [state, setState] = useState<AuthState>(initialValues)
+
+  const updateAuth = (payload: AuthState) => {
+    setState((prev) => ({
+      ws: prev?.ws || state?.ws,
+      ...payload
     }))
   }
 
@@ -46,10 +59,14 @@ const Auth = ({ children }: AuthProps) => {
     }))
   }
 
+  const clearAuth = () => {
+    setState(() => initialValues)
+  }
+
   return (
     <AuthContext.Provider
       value={{
-        state, updateAuth, updateConnection
+        state, updateAuth, updateConnection, clearAuth
       }}
     > {children} </AuthContext.Provider>
   )

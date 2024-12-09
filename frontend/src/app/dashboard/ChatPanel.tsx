@@ -11,6 +11,7 @@ import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
+import { AuthContext } from "@/store/auth";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -34,16 +35,18 @@ const formatMessages = (message: Message[]) => {
 
 const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
-  const userId = "user3"; // NOTE: Need to update dynamically
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
   const [text, setText] = useState<string>("");
 
   const { state } = useContext(ChatContext);
+  const { state: authState } = useContext(AuthContext);
+
+  const userId = authState?.userId;
+
   const { selectedChat, messages } = state;
   const sendMessage = useSendMessage();
 
   useEffect(() => {
-    console.log("mm", messages)
     if (selectedChat) {
       const currentMessages = messages?.get(selectedChat?.communityId);
       if (currentMessages?.length) {

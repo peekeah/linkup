@@ -7,7 +7,6 @@ import ListPanel from "./ListPanel";
 import Sidebar from "./sidebar";
 import Topbar from "./Topbar";
 import ProfileDetails from "./ProfileDetails";
-import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import useHandleMessage from "@/hooks/useHandleMessage";
 import { ChatContext } from "@/store/chat";
@@ -87,7 +86,8 @@ const Dashboard = () => {
   useEffect(() => {
     try {
       const uri = process.env.NEXT_PUBLIC_WS_HOST || "ws://localhost:5000";
-      const token = getToken();
+      // const token = getToken();
+      const token = authState?.token;
 
       // #Todo: Logout and clear token
       if (!token) {

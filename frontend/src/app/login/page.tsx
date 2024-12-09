@@ -8,10 +8,10 @@ import Image from "next/image";
 import FacebookLogo from "@/assets/facebook-logo.svg";
 import GoogleLogo from "@/assets/google-logo.svg";
 import api from "@/services/api";
-import { AuthContext } from "@/store/auth";
+import { AuthState } from "@/store/auth";
 import { useRouter } from "next/navigation";
-import { updateToken } from "@/lib/auth";
 import { currentUserMock } from "@/mock";
+import useAuth from "@/hooks/useAuth";
 
 interface FormData {
   email: string;
@@ -23,7 +23,7 @@ type OnInputChange = ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSe
 const Login = () => {
 
   const router = useRouter();
-  const { updateAuth } = useContext(AuthContext);
+  const { handleLogin } = useAuth();
 
   const [formData, setFormData] = useState<FormData>({
     email: currentUserMock.email,
@@ -45,8 +45,15 @@ const Login = () => {
     try {
       const res = await api.login(formData.email, formData.password)
       if (res?.data?.status) {
-        updateAuth(true);
-        updateToken(res?.data?.data?.token)
+        const payload = res?.data?.data as AuthState;
+
+        handleLogin({
+          userId: payload?.userId,
+          email: payload?.email,
+          userName: payload?.userName,
+          token: payload?.token
+        })
+
         router.push("/dashboard")
       }
     } catch (err) {

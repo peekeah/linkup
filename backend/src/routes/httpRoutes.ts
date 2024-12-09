@@ -36,11 +36,11 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password }: LoginType = req.body;
 
-    const token = await user.login(email, password)
+    const userData = await user.login(email, password)
 
     res.send({
       status: true,
-      data: { token }
+      data: userData
     })
   } catch (err) {
     const { statusCode, errMessage } = errorHandler(err)

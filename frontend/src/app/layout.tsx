@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { Store } from "lucide-react";
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
 

@@ -69,11 +69,18 @@ class User {
         throw new Error("Password is incorrect")
       }
 
-      return generateToken({
+      const userData = {
         userId: user.id,
+        userName: user.name,
         email: user.email,
-        userName: user.name
-      })
+        token: generateToken({
+          userId: user.id,
+          email: user.email,
+          userName: user.name
+        })
+      }
+
+      return userData
     } catch (err) {
       throw err
     }
