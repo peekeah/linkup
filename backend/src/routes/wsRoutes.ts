@@ -30,7 +30,10 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
       case SupportedChatMessages.GetChat:
         ws.send(JSON.stringify({
           type: OutgoingChatMessages.GetChat,
-          data: JSON.stringify(chat.getChats(payload.roomId, payload.limit, payload.offset))
+          data: JSON.stringify({
+            roomId: payload.roomId,
+            messages: chat.getChats(payload.roomId, payload.limit, payload.offset)
+          })
         }))
         break;
       case SupportedChatMessages.AddChat:
