@@ -203,7 +203,10 @@ class Community {
       const conn = activeClients.get(member.userId)
       const response: OutgoingCommunityMessages = {
         type: SupportedCommunityMessages.BrodcastMessages,
-        data: messages
+        data: {
+          roomId: roomId,
+          messages: messages
+        }
       }
       if (conn) {
         conn.send(JSON.stringify(response))
@@ -229,7 +232,11 @@ class Community {
       if (conn) {
         const response: OutgoingCommunityMessages = {
           type: SupportedCommunityMessages.BroadcastUpvote,
-          data: message
+          data: {
+            roomId,
+            messageId,
+            message
+          }
         }
         conn.send(JSON.stringify(response))
       }

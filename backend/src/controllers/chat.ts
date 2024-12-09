@@ -62,10 +62,9 @@ class Chat {
       isDeleted: false
     })
 
-    // Note: Update last message in user state
-    const community = communities.getCommunity(id);
-    user.updateChatHistory(sender.userId, id, community.name, { content, date })
-
+    // Update last message in user state
+    const community = communities.getCommunity(roomId);
+    user.updateChatHistory(sender.userId, roomId, community.name, { content, date })
     this.chats.set(roomId, chat)
   }
 

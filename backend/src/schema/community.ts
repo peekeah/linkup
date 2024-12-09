@@ -64,10 +64,17 @@ export type IncomingCommunityMessages = {
 
 export type OutgoingCommunityMessages = {
   type: SupportedCommunityMessages.BrodcastMessages,
-  data: BrodcastMessages,
+  data: {
+    roomId: string;
+    messages: BrodcastMessages
+  },
 } | {
   type: SupportedCommunityMessages.BroadcastUpvote,
-  data: BrodcastUpvotes
+  data: {
+    roomId: string;
+    messageId: string;
+    message: IChat;
+  }
 }
 
 const CreateCommunity = z.object({
