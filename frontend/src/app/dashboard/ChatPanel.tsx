@@ -9,6 +9,8 @@ import InfoIcon from "@/assets/info-circle.png";
 import SendIcon from "@/assets/send-icon.svg";
 import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
+import { SupportedChatMessages } from "@/@types/chat";
+import useSendMessage from "@/hooks/useSendMessage";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -38,19 +40,35 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const { state } = useContext(ChatContext);
   const { selectedChat, messages } = state;
+  const sendMessage = useSendMessage();
 
   useEffect(() => {
+    console.log("mm", messages)
     if (selectedChat) {
       const currentMessages = messages?.get(selectedChat?.communityId);
       if (currentMessages?.length) {
         const newMessages = formatMessages(currentMessages);
         setChatMessages(newMessages)
+        setText(() => "")
       }
     }
   }, [state])
 
-  const sendMessage = () => {
-    console.log("send me!", text)
+  const onClick = () => {
+    try {
+      if (selectedChat?.communityId) {
+        sendMessage({
+          type: SupportedChatMessages.AddChat,
+          payload: {
+            roomId: selectedChat?.communityId,
+            content: text,
+          }
+        })
+      }
+
+    } catch (err) {
+      console.log("error while adding chat", err)
+    }
   }
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +118,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           />
           <ButtonIcon
             className="rounded-full bg-[#FFECFA] p-3"
-            onClick={sendMessage}
+            onClick={onClick}
             icon={SendIcon}
           />
         </div>

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { UserId } from "./user";
+import { Message } from "@/store/chat";
 
 export enum SupportedCommunityMessages {
   CreateCommunity = "CREATE_COMMUNITY",
@@ -13,10 +14,11 @@ export enum SupportedCommunityMessages {
   LeaveCommunity = "LEAVE_COMMUNITY",
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT",
+}
 
+export enum SupportedIncomingCommunityMessage {
   BrodcastMessages = "BROADCAST_MESSAGE",
   BroadcastUpvote = "UPVOTE_MESSAGE"
-
 }
 
 export interface Member {
@@ -77,11 +79,18 @@ export type OutgoingCommunityMessage = {
 };
 
 export type IncomingCommunityMessage = {
-  type: SupportedCommunityMessages.BrodcastMessages,
-  data: BrodcastMessages,
+  type: SupportedIncomingCommunityMessage.BrodcastMessages,
+  data: {
+    roomId: string;
+    messages: BrodcastMessages
+  },
 } | {
-  type: SupportedCommunityMessages.BroadcastUpvote,
-  data: BrodcastUpvotes
+  type: SupportedIncomingCommunityMessage.BroadcastUpvote,
+  data: {
+    roomId: string;
+    messageId: string;
+    message: Message;
+  }
 }
 
 export const CreateCommunity = z.object({
@@ -159,5 +168,5 @@ export type RemoveAdminType = z.infer<typeof RemoveAdmin>;
 export type GiveTimeoutType = z.infer<typeof GiveTimeout>;
 export type ClearTimeoutType = z.infer<typeof ClearTimeout>;
 
-export type BrodcastMessages = IChat[];
-export type BrodcastUpvotes = IChat;
+export type BrodcastMessages = Message[];
+export type BrodcastUpvotes = Message;

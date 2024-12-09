@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { SupportedIncomingUserMessages } from "./user";
 import { Message } from "@/store/chat";
 
 export enum SupportedChatMessages {
@@ -11,7 +10,7 @@ export enum SupportedChatMessages {
 
 export type OutgoingChatMessage = {
   type: SupportedChatMessages.GetChat,
-  data: GetChatType
+  payload: GetChatType
 } | {
   type: SupportedChatMessages.AddChat,
   payload: AddChatType

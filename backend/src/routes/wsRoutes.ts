@@ -22,7 +22,7 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
       case SupportedUserMessages.ChatHistory:
         ws.send(JSON.stringify({
           type: SupportedOutgoingUserMessages.ChatHistory,
-          data: JSON.stringify(user.getChatHistory(tokenData.userId))
+          data: user.getChatHistory(tokenData.userId)
         }))
         break;
 
@@ -30,10 +30,10 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
       case SupportedChatMessages.GetChat:
         ws.send(JSON.stringify({
           type: OutgoingChatMessages.GetChat,
-          data: JSON.stringify({
+          data: {
             roomId: payload.roomId,
             messages: chat.getChats(payload.roomId, payload.limit, payload.offset)
-          })
+          }
         }))
         break;
       case SupportedChatMessages.AddChat:

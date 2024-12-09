@@ -1,31 +1,55 @@
 "use client"
-import { createContext, ReactNode, useState } from "react"
+import { createContext, ReactNode, useState } from "react";
 
 interface AuthContextType {
-  auth: boolean;
-  updateAuth: (status: boolean) => void
+  state: State;
+  updateAuth: (status: boolean) => void,
+  updateConnection: (ws: WebSocket) => void,
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  auth: false,
-  updateAuth: () => { }
+  state: {
+    auth: false,
+    ws: null
+  },
+  updateAuth: () => { },
+  updateConnection: () => { }
 })
 
 interface AuthProps {
   children: ReactNode;
 }
 
+interface State {
+  auth: boolean;
+  ws: null | WebSocket;
+}
+
 const Auth = ({ children }: AuthProps) => {
-  const [auth, setAuth] = useState(false);
+
+  const [state, setState] = useState<State>({
+    auth: false,
+    ws: null
+  })
 
   const updateAuth = (status: boolean) => {
-    setAuth(status)
+    setState(prev => ({
+      ...prev,
+      ["auth"]: status
+    }))
+  }
+
+  const updateConnection = (ws: WebSocket) => {
+    setState(prev => ({
+      ...prev,
+      ["ws"]: ws
+    }))
   }
 
   return (
     <AuthContext.Provider
       value={{
-        auth, updateAuth
+        state, updateAuth, updateConnection
       }}
     > {children} </AuthContext.Provider>
   )

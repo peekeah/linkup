@@ -4,11 +4,7 @@ import { SupportedIncomingUserMessages } from "@/@types/user";
 import { IncomingMessage } from "@/@types";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { SupportedIncomingChatMessages } from "@/@types/chat";
-
-interface RawMessage {
-  type: string;
-  data: string;
-}
+import { SupportedIncomingCommunityMessage } from "@/@types/community";
 
 const useHandleMessage = () => {
 
@@ -16,15 +12,11 @@ const useHandleMessage = () => {
 
   const handleMessage = async (rawMessage: string) => {
     try {
-      const parsedRawMessage: RawMessage = JSON.parse(rawMessage);
-      const parsedData = JSON.parse(parsedRawMessage.data)
-
-      const message = {
-        type: parsedRawMessage.type,
-        data: parsedData,
-      } as IncomingMessage;
-
+      const message = JSON.parse(rawMessage) as IncomingMessage;
       console.log("received message:", message)
+
+      let roomId = "";
+      let messages = [];
 
       switch (message.type) {
         // Incoming user messages
@@ -33,9 +25,16 @@ const useHandleMessage = () => {
           updateChatHistory(chatHistory)
           break;
         case SupportedIncomingChatMessages.GetChat:
-          const messages = message.data?.messages;
-          const roomId = message?.data?.roomId;
+          messages = message.data?.messages;
+          roomId = message?.data?.roomId;
           updateChatMessages(roomId, messages)
+          break;
+        case SupportedIncomingCommunityMessage.BrodcastMessages:
+          roomId = message.data?.roomId;
+          messages = message?.data?.messages;
+          updateChatMessages(roomId, messages)
+          break;
+        case SupportedIncomingCommunityMessage.BroadcastUpvote:
           break;
         default:
           console.log("unsupported message:", message)

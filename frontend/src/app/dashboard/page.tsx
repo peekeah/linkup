@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
@@ -11,6 +11,10 @@ import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import useHandleMessage from "@/hooks/useHandleMessage";
 import { ChatContext } from "@/store/chat";
+import { AuthContext } from "@/store/auth";
+import useSendMessage from "@/hooks/useSendMessage";
+import { SupportedChatMessages } from "@/@types/chat";
+import { SupportedOutgoingUserMessages } from "@/@types/user";
 
 export interface MemberDetails {
   name: string;
@@ -28,9 +32,13 @@ type ProfileDrawer = {
 
 const Dashboard = () => {
 
-  const ws = useRef<null | WebSocket>(null);
+  const { state: authState, updateConnection } = useContext(AuthContext)
+  // const ws = useRef<null | WebSocket>(null);
+  const ws = authState?.ws;
+
   const router = useRouter();
   const { handleMessage } = useHandleMessage();
+  const sendMessage = useSendMessage();
 
   const { state } = useContext(ChatContext);
   const { selectedChat } = state;
@@ -61,26 +69,15 @@ const Dashboard = () => {
     })
   }
 
-  const sendMessage = (message: string) => {
-    try {
-      if (ws?.current && ws?.current?.readyState === WebSocket.OPEN) {
-        ws.current.send(message)
-      }
-    } catch (err) {
-      console.log("connection is broken", err)
-    }
-  }
-
   useEffect(() => {
     if (selectedChat && selectedChat?.communityId) {
       try {
-        const req = JSON.stringify({
-          type: "GET_CHAT",
+        sendMessage({
+          type: SupportedChatMessages.GetChat,
           payload: {
             roomId: selectedChat.communityId
           }
         })
-        sendMessage(req)
       } catch (err) {
         console.log("error while parsing json", err)
       }
@@ -97,38 +94,37 @@ const Dashboard = () => {
         return router.push("/");
       }
 
-      ws.current = new WebSocket(`${uri}?token=${token}`);
+      if (ws) {
+        ws.onopen = () => {
+          console.log("open")
+          sendMessage({
+            type: SupportedOutgoingUserMessages.ChatHistory
+          })
 
-      if (!ws || !ws?.current) {
-        return
-      }
+          ws.onmessage = (event) => {
+            handleMessage(event.data)
+          }
 
-      ws.current.onopen = () => {
-        sendMessage(JSON.stringify({
-          type: "CHAT_HISTORY",
-        }))
-      };
+          ws.onerror = (err) => {
+            console.log("error", err)
+          }
 
-      ws.current.onmessage = (event) => {
-        handleMessage(event.data)
-      }
-
-      ws.current.onerror = (err) => {
-        console.log("error", err)
-      }
-
-      ws.current.onclose = () => {
-        console.log("connection is closed")
+          ws.onclose = () => {
+            console.log("connection is closed")
+          }
+        }
+      } else {
+        updateConnection(new WebSocket(`${uri}?token=${token}`));
       }
 
       return () => {
-        ws.current?.close();
+        ws?.close();
       }
 
     } catch (err) {
       console.log("err", err)
     }
-  }, [])
+  }, [authState?.ws])
 
   return (
     <div className="!h-screen !w-screen flex flex-col bg-white font-serif">

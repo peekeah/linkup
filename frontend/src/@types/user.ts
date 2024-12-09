@@ -39,7 +39,6 @@ export enum SupportedOutgoingUserMessages {
 
 export type OutgoingUserMessage = {
   type: SupportedOutgoingUserMessages.ChatHistory,
-  payload: null,
 }
 
 export type IncomingUserMessage = {
