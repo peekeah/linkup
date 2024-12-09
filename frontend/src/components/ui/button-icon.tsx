@@ -8,7 +8,7 @@ interface IconButton {
   icon: any;
   alt?: string;
   active?: boolean;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 
 }
 

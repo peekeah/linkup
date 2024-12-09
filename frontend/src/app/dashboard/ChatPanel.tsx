@@ -3,10 +3,12 @@ import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
-import { useContext, useEffect, useState } from "react";
+import { ChangeEvent, useContext, useEffect, useState } from "react";
 import ButtonIcon from "@/components/ui/button-icon";
 import InfoIcon from "@/assets/info-circle.png";
+import SendIcon from "@/assets/send-icon.svg";
 import { ChatContext, Message } from "@/store/chat";
+import { Input } from "@/components/ui/input";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -32,6 +34,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const userId = "user3"; // NOTE: Need to update dynamically
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
+  const [text, setText] = useState<string>("");
 
   const { state } = useContext(ChatContext);
   const { selectedChat, messages } = state;
@@ -46,8 +49,16 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     }
   }, [state])
 
+  const sendMessage = () => {
+    console.log("send me!", text)
+  }
+
+  const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setText(() => e.target.value)
+  }
+
   return (
-    <div className="p-5">
+    <div className="p-5 h-full w-full relative">
       {/* Chat header */}
       <div className="flex gap-3 items-center h-12">
         <Avatar className="shadow-md p-3">
@@ -78,6 +89,21 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             </div>
           ))
         }
+      </div>
+      <div className="!flex-1">
+        <div className="flex  justify-center items-center py-5 rounded-xl absolute bottom-0 flex gap-3 w-full">
+          <Input
+            value={text}
+            onChange={onInputChange}
+            className="border-primary h-12 !rounded-full max-w-[600px]"
+            placeholder="Message"
+          />
+          <ButtonIcon
+            className="rounded-full bg-[#FFECFA] p-3"
+            onClick={sendMessage}
+            icon={SendIcon}
+          />
+        </div>
       </div>
     </div>
   )
