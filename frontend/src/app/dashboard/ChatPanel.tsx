@@ -40,8 +40,6 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     if (selectedChat) {
       const currentMessages = messages?.get(selectedChat?.communityId);
       if (currentMessages?.length) {
-
-        console.log("messages", selectedChat?.communityId, currentMessages)
         const newMessages = formatMessages(currentMessages);
         setChatMessages(newMessages)
       }
@@ -65,7 +63,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
       </div>
 
       {/* Chat body */}
-      <div className="space-y-10 overflow-y-scroll">
+      <div className="space-y-10 overflow-y-auto">
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>

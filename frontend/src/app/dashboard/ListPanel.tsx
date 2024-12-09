@@ -16,8 +16,7 @@ const ListPanel = () => {
 
   useEffect(() => {
     if (chatHistory && chatHistory?.length) {
-      console.log("hh", chatHistory)
-      // updateSelectedChat(chatHistory[0])
+      updateSelectedChat(chatHistory[0])
     }
   }, [chatHistory])
 
