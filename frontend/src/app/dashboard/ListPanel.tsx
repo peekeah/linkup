@@ -1,27 +1,29 @@
-import { Avatar } from "@/components/ui/avatar";
+import { useContext, useEffect } from "react";
 import { Search } from "@/components/ui/search";
-import { userList } from "@/mock";
+import { Avatar } from "@/components/ui/avatar";
+import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
-import Image from "next/image";
+import { userList } from "@/mock";
 import { Separator } from "@/components/ui/separator";
-import { useContext, useEffect, useState } from "react";
-import { ChatContext } from "@/store/chat";
+import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
 
 const ListPanel = () => {
 
-  const { chatHistory } = useContext(ChatContext);
-  const [selectedChat, setSelectedChat] = useState<string | null>(null);
+  const { state, updateSelectedChat } = useContext(ChatContext);
+  const { chatHistory, selectedChat } = state;
 
   useEffect(() => {
-    if (!chatHistory?.length) {
-      return
+    if (chatHistory && chatHistory?.length) {
+      console.log("hh", chatHistory)
+      // updateSelectedChat(chatHistory[0])
     }
-    setSelectedChat(() => {
-      return chatHistory[0]?.communityId
-    })
   }, [chatHistory])
+
+  const handleActiveTab = (chat: ChatHistory) => {
+    updateSelectedChat(chat)
+  }
 
   return (
     <div className="h-full space-y-3">
@@ -29,18 +31,18 @@ const ListPanel = () => {
         <Search className="rounded-full h-12" placeholder="Search" />
       </div>
       <Separator orientation="horizontal" />
-      <div className="overflow-y-auto m-0">
+      <div className="!m-0">
         {
           !chatHistory?.length ?
             <div>No recent chats</div> :
             chatHistory?.map((item, index) => (
               <div key={item.communityId} className={
                 cx(
-                  "cursor-pointer",
-                  selectedChat === item.communityId ? "bg-gray-300" : ""
+                  "cursor-pointer hover:bg-gray-200",
+                  selectedChat?.communityId === item.communityId ? "bg-gray-300 hover:bg-gray-300" : ""
                 )
               }
-                onClick={() => setSelectedChat(item.communityId)}
+                onClick={() => handleActiveTab(item)}
               >
                 <div className="flex gap-3 p-3">
                   <Avatar className="shadow-md p-3">

@@ -19,7 +19,7 @@ export enum SupportedCommunityMessages {
 
 }
 
-export interface IMember {
+export interface Member {
   userId: UserId,
   name: string;
 }
@@ -27,7 +27,7 @@ export interface IMember {
 export interface IChat {
   id: string;
   content: string;
-  sender: IMember;
+  sender: Member;
   upvotes: UserId[],
   date: Date;
   isDeleted: boolean;

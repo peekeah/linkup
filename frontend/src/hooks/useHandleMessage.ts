@@ -3,6 +3,7 @@ import { useContext } from "react";
 import { SupportedIncomingUserMessages } from "@/@types/user";
 import { IncomingMessage } from "@/@types";
 import { ChatContext, ChatHistory } from "@/store/chat";
+import { SupportedIncomingChatMessages } from "@/@types/chat";
 
 interface RawMessage {
   type: string;
@@ -11,7 +12,7 @@ interface RawMessage {
 
 const useHandleMessage = () => {
 
-  const { updateChatHistory, setChatHistory } = useContext(ChatContext);
+  const { updateChatHistory, updateChatMessages } = useContext(ChatContext);
 
   const handleMessage = async (rawMessage: string) => {
     try {
@@ -30,7 +31,11 @@ const useHandleMessage = () => {
         case SupportedIncomingUserMessages.ChatHistory:
           const chatHistory = message.data as ChatHistory[];
           updateChatHistory(chatHistory)
-          setChatHistory(() => chatHistory)
+          break;
+        case SupportedIncomingChatMessages.GetChat:
+          const messages = message.data?.messages;
+          const roomId = message?.data?.roomId;
+          updateChatMessages(roomId, messages)
           break;
         default:
           console.log("unsupported message:", message)

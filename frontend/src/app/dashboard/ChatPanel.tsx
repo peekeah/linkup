@@ -1,53 +1,52 @@
-
 "use client";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
-import { useEffect, useState } from "react";
-import { chatMessagesMock } from "@/mock";
+import { useContext, useEffect, useState } from "react";
 import ButtonIcon from "@/components/ui/button-icon";
 import InfoIcon from "@/assets/info-circle.png";
-
-interface Member {
-  userId: string;
-  name: string;
-}
-interface Message {
-  id: string;
-  content: string;
-  sender: Member;
-  upvotes: string[],
-  date: string;
-  isDeleted: boolean;
-}
+import { ChatContext, Message } from "@/store/chat";
 
 type ChatMessages = Map<Date, Message[]>;
+
+const formatMessages = (message: Message[]) => {
+  return message.reduce((acc, entry) => {
+    const dateKey = entry.date.split("T")[0];
+
+    const newEntry = {
+      ...entry,
+      date: dateKey
+    }
+
+    if (acc.has(dateKey)) {
+      acc.set(dateKey, [...acc.get(dateKey), newEntry])
+    } else {
+      acc.set(dateKey, [newEntry])
+    }
+    return acc;
+  }, new Map());
+}
 
 const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const userId = "user3"; // NOTE: Need to update dynamically
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
 
+  const { state } = useContext(ChatContext);
+  const { selectedChat, messages } = state;
+
   useEffect(() => {
-    const newChats = chatMessagesMock.reduce((acc, entry) => {
-      const dateKey = entry.date.toISOString().split("T")[0];
+    if (selectedChat) {
+      const currentMessages = messages?.get(selectedChat?.communityId);
+      if (currentMessages?.length) {
 
-      const newEntry = {
-        ...entry,
-        date: dateKey
+        console.log("messages", selectedChat?.communityId, currentMessages)
+        const newMessages = formatMessages(currentMessages);
+        setChatMessages(newMessages)
       }
-
-      if (acc.has(dateKey)) {
-        acc.set(dateKey, [...acc.get(dateKey), newEntry])
-      } else {
-        acc.set(dateKey, [newEntry])
-      }
-      return acc;
-    }, new Map());
-
-    setChatMessages(() => newChats)
-  }, []);
+    }
+  }, [state])
 
   return (
     <div className="p-5">
@@ -59,7 +58,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         </Avatar>
         <div className="w-full">
           <div className="flex items-center gap-3">
-            <div className="text-heading">{"User name"}</div>
+            <div className="text-heading">{selectedChat?.communityName}</div>
             <ButtonIcon onClick={toggleDrawer} icon={InfoIcon} />
           </div>
         </div>

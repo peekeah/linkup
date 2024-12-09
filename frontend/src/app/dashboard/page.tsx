@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
@@ -10,6 +10,7 @@ import ProfileDetails from "./ProfileDetails";
 import { getToken } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import useHandleMessage from "@/hooks/useHandleMessage";
+import { ChatContext } from "@/store/chat";
 
 export interface MemberDetails {
   name: string;
@@ -30,6 +31,9 @@ const Dashboard = () => {
   const ws = useRef<null | WebSocket>(null);
   const router = useRouter();
   const { handleMessage } = useHandleMessage();
+
+  const { state } = useContext(ChatContext);
+  const { selectedChat } = state;
 
   const [profileDrawer, setProfileDrawer] = useState<ProfileDrawer>({
     open: false,
@@ -66,6 +70,22 @@ const Dashboard = () => {
       console.log("connection is broken", err)
     }
   }
+
+  useEffect(() => {
+    if (selectedChat && selectedChat?.communityId) {
+      try {
+        const req = JSON.stringify({
+          type: "GET_CHAT",
+          payload: {
+            roomId: selectedChat.communityId
+          }
+        })
+        sendMessage(req)
+      } catch (err) {
+        console.log("error while parsing json", err)
+      }
+    }
+  }, [selectedChat])
 
   useEffect(() => {
     try {
