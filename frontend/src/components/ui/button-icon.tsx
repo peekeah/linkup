@@ -2,10 +2,11 @@
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import { StaticImport } from "next/dist/shared/lib/get-img-props";
 
 interface IconButton {
   className?: string;
-  icon: any;
+  icon: string | StaticImport;
   alt?: string;
   active?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;

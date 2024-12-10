@@ -1,6 +1,5 @@
 import { OutgoingMessage } from "@/@types";
 import { SupportedChatMessages } from "@/@types/chat";
-import { SupportedCommunityMessages } from "@/@types/community";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { AuthContext } from "@/store/auth";
 import { useContext } from "react";

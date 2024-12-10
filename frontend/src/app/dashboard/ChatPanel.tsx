@@ -3,7 +3,7 @@ import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
-import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useContext, useEffect, useState } from "react";
 import ButtonIcon from "@/components/ui/button-icon";
 import InfoIcon from "@/assets/info-circle.png";
 import SendIcon from "@/assets/send-icon.svg";
@@ -78,6 +78,12 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     setText(() => e.target.value)
   }
 
+  const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e?.key === "Enter") {
+      onClick();
+    }
+  }
+
   return (
     <div className="p-5 h-full w-full relative">
       {/* Chat header */}
@@ -116,6 +122,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           <Input
             value={text}
             onChange={onInputChange}
+            onKeyDown={onKeyDown}
             className="border-primary h-12 !rounded-full max-w-[600px]"
             placeholder="Message"
           />

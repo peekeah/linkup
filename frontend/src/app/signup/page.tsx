@@ -1,5 +1,5 @@
 "use client";
-import { ChangeEvent, FormEvent, useState, useContext } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -8,8 +8,6 @@ import Image from "next/image";
 import FacebookLogo from "@/assets/facebook-logo.svg";
 import GoogleLogo from "@/assets/google-logo.svg";
 import api from "@/services/api";
-import { AuthContext } from "@/store/auth";
-import { useRouter } from "next/navigation";
 
 export interface SignupPayload {
   name: string;
@@ -23,9 +21,6 @@ export interface SignupPayload {
 type OnInputChange = ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
 
 const Signup = () => {
-
-  const router = useRouter();
-  const { updateAuth } = useContext(AuthContext);
 
   const [formData, setFormData] = useState<SignupPayload>({
     name: "",
@@ -51,8 +46,7 @@ const Signup = () => {
     try {
       const res = await api.signup(formData)
       if (res?.data?.status) {
-        updateAuth(true)
-        router.push("/dashboard")
+        alert("Account created successfully, please login using credentials")
       }
     } catch (err) {
       console.log("err", err)
