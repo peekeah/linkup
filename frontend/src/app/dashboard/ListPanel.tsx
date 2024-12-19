@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { Search } from "@/components/ui/search";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
@@ -8,11 +8,19 @@ import { userList } from "@/mock";
 import { Separator } from "@/components/ui/separator";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
+import AddCommunity from "./AddCommunity";
+import { useToast } from "@/hooks/use-toast";
+import useSendMessage from "@/hooks/useSendMessage";
+import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 
 const ListPanel = () => {
 
   const { state, updateSelectedChat } = useContext(ChatContext);
   const { chatHistory, selectedChat } = state;
+
+  const { toast } = useToast();
+  const sendMessage = useSendMessage();
+  const [community, setCommunity] = useState("");
 
   useEffect(() => {
     if (chatHistory && chatHistory?.length) {
@@ -24,10 +32,38 @@ const ListPanel = () => {
     updateSelectedChat(chat)
   }
 
+  const handleAddCommunity = () => {
+    sendMessage({
+      type: SupportedOutgoingCommunityMessages.CreateCommunity,
+      payload: {
+        name: community,
+      }
+    })
+    toast({
+      title: "Community",
+      description: "Community created Successfully"
+    })
+    setCommunity("")
+  }
+
+  const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setCommunity(e.target.value)
+  }
+
+  const onModalClose = () => {
+    setCommunity("")
+  }
+
   return (
     <div className="h-full space-y-3">
-      <div className="p-3 py-5">
-        <Search className="rounded-full h-12" placeholder="Search" />
+      <div className="p-3 py-5 flex items-center gap-3 justify-between">
+        <Search className="rounded-full h-12 flex-1" placeholder="Search" />
+        <AddCommunity
+          value={community}
+          onChange={onInputChange}
+          onSubmit={handleAddCommunity}
+          onClose={onModalClose}
+        />
       </div>
       <Separator orientation="horizontal" />
       <div className="!m-0">
@@ -55,7 +91,6 @@ const ListPanel = () => {
                     <div className="text-[#1E1E1E] opacity-60">{item.content}</div>
                   </div>
                 </div>
-                {/* #Fixme: Fix Saperator */}
                 {index !== userList.length - 1 ? <Separator /> : null}
               </div>
             ))

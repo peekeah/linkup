@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,7 +21,8 @@ export default function RootLayout({
       >
         <Auth>
           <Chat>
-            {children}
+            <main>{children}</main>
+            <Toaster />
           </Chat>
         </Auth>
       </body>

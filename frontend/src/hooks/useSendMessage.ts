@@ -64,6 +64,12 @@ const useSendMessage = () => {
           payload: message.payload
         })
 
+      case SupportedOutgoingCommunityMessages.CreateCommunity:
+        return sendMessage({
+          type: SupportedOutgoingCommunityMessages.CreateCommunity,
+          payload: message.payload
+        })
+
       // Community messages
       default:
         console.error("error while sending message")

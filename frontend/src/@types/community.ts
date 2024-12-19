@@ -110,7 +110,7 @@ export type IncomingCommunityMessage = {
 
 export const CreateCommunity = z.object({
   name: z.string(),
-  owner: Member
+  // owner: Member
 })
 
 export const UpdateCommunity = z.object({

@@ -59,7 +59,7 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
 
       // Community routes
       case SupportedCommunityMessages.CreateCommunity:
-        communities.create(payload.name, payload.owner)
+        communities.create(payload.name, { userId: tokenData.userId, name: tokenData.userName })
         break;
 
       // Todo(Auth) - Owner only
