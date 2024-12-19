@@ -50,6 +50,7 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
       case SupportedChatMessages.DeleteChat:
         userType = authorize(payload.roomId, tokenData.userId, ["user", "admin", "owner"])
         chat.deleteChat(payload.roomId, payload.chatId, tokenData.userId, userType);
+        communities.broadcastMessage(payload.roomId)
         break;
 
       case SupportedChatMessages.UpvoteMessage:

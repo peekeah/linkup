@@ -1,6 +1,7 @@
 "use client";
 import { Avatar } from "@/components/ui/avatar";
 import Image from "next/image";
+import { Pencil, Trash2 as Trash, ArrowBigUp as ArrowUp, ArrowBigDown as ArrowDown } from "lucide-react";
 
 import ProfilePicture from "@/assets/person-messaging.png";
 import { ChangeEvent, KeyboardEvent, useContext, useEffect, useState } from "react";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import { AuthContext } from "@/store/auth";
+import { useToast } from "@/hooks/use-toast";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -45,6 +47,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const { selectedChat, messages } = state;
   const sendMessage = useSendMessage();
+
+  const { toast } = useToast();
 
   useEffect(() => {
     if (selectedChat) {
@@ -84,6 +88,50 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     }
   }
 
+
+  const handleEditMessage = () => {
+    try {
+      console.log("edit message")
+    } catch (err) {
+      console.log("error while editing message", err)
+    }
+  }
+
+  const handleDeleteMessage = (communityId: string, chatId: string) => {
+    try {
+      console.log("delete message")
+      sendMessage({
+        type: SupportedChatMessages.DeleteChat,
+        payload: {
+          roomId: communityId,
+          chatId
+        }
+      })
+      toast({
+        title: "Message",
+        description: "Successfully deleted message"
+      })
+    } catch (err) {
+      console.log("error while editing message", err)
+    }
+  }
+
+  const handleUpvoteMessage = () => {
+    try {
+      console.log("upvote message")
+    } catch (err) {
+      console.log("error while editing message", err)
+    }
+  }
+
+  const handleDownVoteMessage = () => {
+    try {
+      console.log("downvote message")
+    } catch (err) {
+      console.log("error while editing message", err)
+    }
+  }
+
   return (
     <div className="p-5 h-full w-full relative">
       {/* Chat header */}
@@ -109,7 +157,39 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (
-                    <div key={message.id} className={`max-w-[700px] ${message.sender.userId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl p-3" : "bg-primary text-white rounded-xl rounded-bl-xl p-3 self-end"}`}>{message.content}</div>
+                    <div key={message.id} className={`max-w-[700px] space-y-1 !overflow-hidden ${message.sender.userId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                      <div className="p-3">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
+                      {
+                        !message?.isDeleted && message?.sender.userId === userId ?
+                          <div className="flex items-center gap-1 bg-red-300 p-1">
+                            <ArrowUp
+                              width={20}
+                              height={20}
+                              className="cursor-pointer"
+                              onClick={handleUpvoteMessage}
+                            />
+                            <div className="">{message.upvotes?.length}</div>
+                            <ArrowDown
+                              width={20}
+                              height={20}
+                              className="cursor-pointer"
+                              onClick={handleDownVoteMessage}
+                            />
+                            <Trash
+                              width={20}
+                              height={20}
+                              className="cursor-pointer"
+                              onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
+                            />
+                            <Pencil
+                              width={20}
+                              height={20}
+                              className="cursor-pointer"
+                              onClick={handleEditMessage}
+                            />
+                          </div> : null
+                      }
+                    </div>
                   ))
                 }
               </div>
