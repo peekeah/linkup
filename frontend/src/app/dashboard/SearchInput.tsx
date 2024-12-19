@@ -1,11 +1,4 @@
-import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
-  User,
-} from "lucide-react"
+import { Calendar } from "lucide-react";
 
 import {
   Command,
@@ -15,23 +8,40 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command"
-import { useState } from "react"
+import { useContext, useState } from "react"
+import useSendMessage from "@/hooks/useSendMessage"
+import { SupportedOutgoingUserMessages } from "@/@types/user"
+import { ChatContext } from "@/store/chat"
 
 const SearchInput = () => {
 
+  const sendMessage = useSendMessage();
   const [searchText, setSearchText] = useState<string>("");
 
-  const onChange = (value: string) => {
-    console.log("valuee", value, typeof value)
+  const { state } = useContext(ChatContext);
+  const { searchContent } = state;
+
+  const onChange = async (value: string) => {
     setSearchText(() => value)
+    sendMessage({
+      type: SupportedOutgoingUserMessages.Search,
+      payload: {
+        search: value
+      }
+    });
+  }
+
+  const handleJoin = (communityId: string) => {
+    console.log("join", communityId)
   }
 
   return (
     <div className="relative">
+      {/* <ButtonIcon svg={MessageCircle} onClick={() => console.log("ell")} /> */}
       <Command className="rounded-lg border shadow-md md:min-w-[450px]">
         <CommandInput
+          // value={searchText}
           value={searchText}
           onValueChange={onChange}
           placeholder="Search communites & people"
@@ -41,38 +51,21 @@ const SearchInput = () => {
           searchText ?
             <CommandList className="absolute top-full left-0 z-10 max-h-60 w-full overflow-auto rounded-lg border bg-white shadow-lg">
               <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup heading="Suggestions">
-                <CommandItem>
-                  <Calendar />
-                  <span>Calendar</span>
-                </CommandItem>
-                <CommandItem>
-                  <Smile />
-                  <span>Search Emoji</span>
-                </CommandItem>
-                <CommandItem disabled>
-                  <Calculator />
-                  <span>Calculator</span>
-                </CommandItem>
+              <CommandGroup heading="Communities">
+                {
+                  searchContent?.map(el => (
+                    <CommandItem key={el.id} className="flex justify-between w-full">
+                      <div className="flex items-center gap-2">
+                        <Calendar />
+                        <span>{el.name}</span>
+                      </div>
+                      <button onClick={() => handleJoin(el.id)}>Join</button>
+                      {/* <ButtonIcon svg={MessageCircle} onClick={() => handleJoin(el.id)} /> */}
+                    </CommandItem>
+                  ))
+                }
               </CommandGroup>
               <CommandSeparator />
-              <CommandGroup heading="Settings">
-                <CommandItem>
-                  <User />
-                  <span>Profile</span>
-                  <CommandShortcut>⌘P</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <CreditCard />
-                  <span>Billing</span>
-                  <CommandShortcut>⌘B</CommandShortcut>
-                </CommandItem>
-                <CommandItem>
-                  <Settings />
-                  <span>Settings</span>
-                  <CommandShortcut>⌘S</CommandShortcut>
-                </CommandItem>
-              </CommandGroup>
             </CommandList> :
             <CommandList></CommandList>
         }

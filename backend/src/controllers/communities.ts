@@ -157,6 +157,10 @@ class Community {
 
   }
 
+  searchCommunity(search: string){
+    return this.communities.filter(community => community.name?.toLowerCase().includes(search?.toLowerCase()))
+  }
+
   // Todo: Add authorization
   giveTimeout(id: string, userId: UserId, timeout: number) {
 

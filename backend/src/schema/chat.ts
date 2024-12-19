@@ -1,7 +1,4 @@
 import { z } from "zod";
-import { IncomingCommunityMessages } from "./community";
-import { IncomingUserMessage } from "./user";
-import { IChat } from "../controllers/chat";
 
 export enum SupportedChatMessages {
   GetChat = "GET_CHAT",
@@ -57,8 +54,6 @@ export const UpvoteMessage = z.object({
   roomId: z.string(),
   chatId: z.string()
 })
-
-export type IncomingMessage = IncomingChatMessages | IncomingCommunityMessages | IncomingUserMessage;
 
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;

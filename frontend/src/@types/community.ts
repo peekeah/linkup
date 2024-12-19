@@ -12,6 +12,7 @@ export enum SupportedCommunityMessages {
   RemoveAdmin = "REMOVE_ADMIN",
   JoinCommunity = "JOIN_COMMUNITY",
   LeaveCommunity = "LEAVE_COMMUNITY",
+  Search = "SEARCH",
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT",
 }
@@ -33,6 +34,20 @@ export interface IChat {
   upvotes: UserId[],
   date: Date;
   isDeleted: boolean;
+}
+
+export interface Community {
+  id: string;
+  name: string;
+  owner: Member;
+  admin: Member[];
+  member: Member[];
+  timeouts: Timeout[];
+}
+
+interface Timeout {
+  userId: UserId,
+  timeout: number
 }
 
 export const Member = z.object({

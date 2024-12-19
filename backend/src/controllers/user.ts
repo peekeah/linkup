@@ -137,6 +137,16 @@ class User {
     user.chatHistory = [newMsg, ...user.chatHistory]
   }
 
+  searchUser(search: string){
+    return this.users.flatMap((user) => {
+       user.name.toLowerCase().includes(search?.toLowerCase()) ? ({
+        id: user.id,
+        name: user.name,
+        avatar: user.email
+      }) : []
+    })
+  }
+
   getChatHistory(id: UserId) {
     const user = this.users.find(el => el.id === id)
 

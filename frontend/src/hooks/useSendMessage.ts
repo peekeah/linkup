@@ -23,43 +23,44 @@ const useSendMessage = () => {
     switch (message.type) {
       // Chat messages
       case SupportedChatMessages.AddChat:
-        sendMessage({
+        return sendMessage({
           type: SupportedChatMessages.AddChat,
           payload: message.payload
         })
-        break;
 
       case SupportedChatMessages.GetChat:
-        sendMessage({
+        return sendMessage({
           type: SupportedChatMessages.GetChat,
           payload: message.payload
         })
-        break;
 
       case SupportedChatMessages.DeleteChat:
-        sendMessage({
+        return sendMessage({
           type: SupportedChatMessages.DeleteChat,
           payload: message.payload
         })
-        break;
       case SupportedChatMessages.UpvoteMessage:
-        sendMessage({
+        return sendMessage({
           type: SupportedChatMessages.UpvoteMessage,
           payload: message.payload
         })
-        break;
 
       // User messages
       case SupportedOutgoingUserMessages.ChatHistory:
-        sendMessage({
+        return sendMessage({
           type: SupportedOutgoingUserMessages.ChatHistory,
         })
-        break;
+
+      case SupportedOutgoingUserMessages.Search:
+        return sendMessage({
+          type: SupportedOutgoingUserMessages.Search,
+          payload: message.payload
+        })
 
       // Community messages
-
       default:
         console.error("error while sending message")
+        return null
     }
   }
 }

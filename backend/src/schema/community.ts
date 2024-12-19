@@ -11,6 +11,7 @@ export enum SupportedCommunityMessages {
   RemoveAdmin = "REMOVE_ADMIN",
   JoinCommunity = "JOIN_COMMUNITY",
   LeaveCommunity = "LEAVE_COMMUNITY",
+  Search = "SEARCH",
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT",
 
@@ -54,6 +55,9 @@ export type IncomingCommunityMessages = {
 } | {
   type: SupportedCommunityMessages.LeaveCommunity,
   payload: LeaveCommunityType
+} | {
+  type: SupportedCommunityMessages.Search,
+  payload: SearchCommunityType
 } | {
   type: SupportedCommunityMessages.GiveTimeout,
   payload: GiveTimeoutType
@@ -104,13 +108,15 @@ const GetCommunity = z.object({
 
 const JoinCommunity = z.object({
   roomId: z.string(),
-  // userId: z.string(),
   userName: z.string(),
 })
 
 const LeaveCommunity = z.object({
   roomId: z.string(),
-  // userId: z.string(),
+})
+
+const SearchCommunity = z.object({
+  search: z.string(),
 })
 
 const AddAdmin = z.object({
@@ -147,6 +153,7 @@ export type DeleteCommunityType = z.infer<typeof DeleteCommunity>;
 export type GetCommunityType = z.infer<typeof GetCommunity>;
 export type JoinCommunityType = z.infer<typeof JoinCommunity>;
 export type LeaveCommunityType = z.infer<typeof LeaveCommunity>;
+export type SearchCommunityType = z.infer<typeof SearchCommunity>;
 export type AddAdminType = z.infer<typeof AddAdmin>;
 export type RemoveAdminType = z.infer<typeof RemoveAdmin>;
 export type GiveTimeoutType = z.infer<typeof GiveTimeout>;

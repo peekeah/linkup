@@ -1,4 +1,5 @@
-import { IncomingMessage, SupportedChatMessages, OutgoingChatMessages } from "../schema/chat"
+import { IncomingMessage } from "../schema";
+import { SupportedChatMessages, OutgoingChatMessages } from "../schema/chat"
 import chat from "../controllers/chat"
 import { SupportedCommunityMessages } from "../schema/community";
 import communities from "../controllers/communities";
@@ -81,6 +82,13 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
         ws.send(JSON.stringify(communities.getCommunities()))
         break;
 
+      case SupportedCommunityMessages.Search:
+        ws.send(JSON.stringify({
+          type: "SEARCH",
+          data: communities.searchCommunity(payload.search)
+        }))
+        break;
+
       // Todo(Auth) - Owner only
       case SupportedCommunityMessages.AddAdmin:
         userType = authorize(payload.roomId, tokenData.userId, ["owner"]);
@@ -112,7 +120,6 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
         userType = authorize(payload.roomId, tokenData.userId, ["owner", "admin"]);
         communities.clearTimeout(payload.roomId, payload.userId)
         break;
-
 
       default:
         throw new Error("Invalid request")

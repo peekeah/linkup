@@ -1,5 +1,5 @@
 "use client";
-import { Member } from "@/@types/community";
+import { Community, Member } from "@/@types/community";
 import { UserId } from "@/@types/user";
 import { createContext, ReactNode, useState } from "react";
 
@@ -8,12 +8,14 @@ interface ChatContextType {
   updateChatHistory: (chatHistory: ChatHistory[]) => void;
   updateSelectedChat: (chat: ChatHistory) => void;
   updateChatMessages: (communityId: string, newMessages: Message[]) => void;
+  updateSearchContent: (content: Community[]) => void;
 }
 
 interface State {
   chatHistory: ChatHistory[];
   selectedChat: ChatHistory | null;
-  messages: Map<string, Message[]>
+  messages: Map<string, Message[]>;
+  searchContent: Community[]
 }
 
 export interface Message {
@@ -42,10 +44,12 @@ export const ChatContext = createContext<ChatContextType>({
     chatHistory: [],
     selectedChat: null,
     messages: new Map(),
+    searchContent: [],
   },
   updateChatHistory: () => { },
   updateSelectedChat: () => { },
   updateChatMessages: () => { },
+  updateSearchContent: () => { },
 });
 
 
@@ -54,6 +58,7 @@ const Chat = ({ children }: { children: ReactNode }) => {
     chatHistory: [],
     selectedChat: null,
     messages: new Map(),
+    searchContent: [],
   });
 
   const updateChatHistory = (chatHistory: ChatHistory[]) => {
@@ -99,12 +104,22 @@ const Chat = ({ children }: { children: ReactNode }) => {
   */
   }
 
+  const updateSearchContent = (content: Community[]) => {
+    setState(prev => {
+      return ({
+        ...prev,
+        searchContent: content
+      })
+    })
+  }
+
   return (
     <ChatContext.Provider value={{
       state,
       updateChatHistory,
       updateSelectedChat,
       updateChatMessages,
+      updateSearchContent,
     }}>{children}</ChatContext.Provider>
   )
 }

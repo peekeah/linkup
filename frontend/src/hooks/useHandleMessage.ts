@@ -8,7 +8,7 @@ import { SupportedIncomingCommunityMessage } from "@/@types/community";
 
 const useHandleMessage = () => {
 
-  const { updateChatHistory, updateChatMessages } = useContext(ChatContext);
+  const { updateChatHistory, updateChatMessages, updateSearchContent } = useContext(ChatContext);
 
   const handleMessage = async (rawMessage: string) => {
     try {
@@ -36,6 +36,11 @@ const useHandleMessage = () => {
           break;
         case SupportedIncomingCommunityMessage.BroadcastUpvote:
           break;
+
+        case SupportedIncomingUserMessages.Search:
+          updateSearchContent(message?.data)
+          break;
+
         default:
           console.log("unsupported message:", message)
       }

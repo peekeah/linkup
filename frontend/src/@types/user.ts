@@ -1,5 +1,6 @@
 import { ChatHistory } from "@/store/chat";
 import { z } from "zod";
+import { Community } from "./community";
 
 // Define the schema for the address
 const AddressSchema = z.object({
@@ -30,20 +31,30 @@ export type UserId = string;
 export type LoginType = z.infer<typeof Login>
 
 export enum SupportedIncomingUserMessages {
-  ChatHistory = "CHAT_HISTORY"
+  ChatHistory = "CHAT_HISTORY",
+  Search = "SEARCH"
 }
 
 export enum SupportedOutgoingUserMessages {
-  ChatHistory = "CHAT_HISTORY"
+  ChatHistory = "CHAT_HISTORY",
+  Search = "SEARCH"
 }
 
 export type OutgoingUserMessage = {
   type: SupportedOutgoingUserMessages.ChatHistory,
+} | {
+  type: SupportedOutgoingUserMessages.Search,
+  payload: {
+    search: string;
+  }
 }
 
 export type IncomingUserMessage = {
   type: SupportedIncomingUserMessages.ChatHistory;
   data: ChatHistory[];
+} | {
+  type: SupportedIncomingUserMessages.Search;
+  data: Community[]
 }
 
 export default UserSchema;
