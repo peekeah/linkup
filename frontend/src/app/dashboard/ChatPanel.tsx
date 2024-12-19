@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Pencil, Trash2 as Trash, ArrowBigUp as ArrowUp, ArrowBigDown as ArrowDown } from "lucide-react";
 
 import ProfilePicture from "@/assets/person-messaging.png";
-import { ChangeEvent, KeyboardEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useState } from "react";
 import ButtonIcon from "@/components/ui/button-icon";
 import InfoIcon from "@/assets/info-circle.png";
 import SendIcon from "@/assets/send-icon.svg";
@@ -14,6 +14,7 @@ import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import { AuthContext } from "@/store/auth";
 import { useToast } from "@/hooks/use-toast";
+import InputAlert from "./InputAlert";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -39,6 +40,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
   const [text, setText] = useState<string>("");
+
+  const [newMessage, setNewMessage] = useState("");
 
   const { state } = useContext(ChatContext);
   const { state: authState } = useContext(AuthContext);
@@ -88,10 +91,31 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     }
   }
 
+  const onModalClose = () => {
+    setNewMessage("")
+  }
 
-  const handleEditMessage = () => {
+  const onMessageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setNewMessage(e.target.value)
+  }
+
+  const onEditMessage = (chatId: string) => {
     try {
-      console.log("edit message")
+      if (selectedChat?.communityId && newMessage) {
+        sendMessage({
+          type: SupportedChatMessages.UpdateChat,
+          payload: {
+            roomId: selectedChat?.communityId,
+            chatId,
+            content: newMessage
+          }
+        })
+        toast({
+          title: "Message",
+          description: "Successfully updated message"
+        })
+      }
+      setNewMessage("")
     } catch (err) {
       console.log("error while editing message", err)
     }
@@ -99,7 +123,6 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const handleDeleteMessage = (communityId: string, chatId: string) => {
     try {
-      console.log("delete message")
       sendMessage({
         type: SupportedChatMessages.DeleteChat,
         payload: {
@@ -176,16 +199,25 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                               onClick={handleDownVoteMessage}
                             />
                             <Trash
-                              width={20}
-                              height={20}
+                              width={16}
+                              height={16}
                               className="cursor-pointer"
                               onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
                             />
-                            <Pencil
-                              width={20}
-                              height={20}
-                              className="cursor-pointer"
-                              onClick={handleEditMessage}
+                            <InputAlert
+                              title="Edit message"
+                              placeholder="Message"
+                              value={newMessage}
+                              triggerButton={
+                                <Pencil
+                                  width={16}
+                                  height={16}
+                                  className="cursor-pointer"
+                                />
+                              }
+                              onChange={onMessageChange}
+                              onSubmit={() => onEditMessage(message.id)}
+                              onClose={onModalClose}
                             />
                           </div> : null
                       }

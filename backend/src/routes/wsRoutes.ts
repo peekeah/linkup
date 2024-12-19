@@ -53,6 +53,12 @@ const wsRequestHandler = (ws: CustomWebsocket, message: IncomingMessage, tokenDa
         communities.broadcastMessage(payload.roomId)
         break;
 
+      case SupportedChatMessages.UpdateChat:
+        userType = authorize(payload.roomId, tokenData.userId, ["user"])
+        chat.updateChat(payload.roomId, payload.chatId, payload.content, tokenData.userId, userType);
+        communities.broadcastMessage(payload.roomId)
+        break;
+
       case SupportedChatMessages.UpvoteMessage:
         chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
         communities.broadcastUpvotes(payload.roomId, payload.chatId)

@@ -8,10 +8,12 @@ import { userList } from "@/mock";
 import { Separator } from "@/components/ui/separator";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
-import AddCommunity from "./AddCommunity";
 import { useToast } from "@/hooks/use-toast";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
+import InputAlert from "./InputAlert";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const ListPanel = () => {
 
@@ -58,8 +60,15 @@ const ListPanel = () => {
     <div className="h-full space-y-3">
       <div className="p-3 py-5 flex items-center gap-3 justify-between">
         <Search className="rounded-full h-12 flex-1" placeholder="Search" />
-        <AddCommunity
+        <InputAlert
+          title="Add community"
+          placeholder="Community name"
           value={community}
+          triggerButton={
+            <Button className="rounded-full">
+              <Plus />
+            </Button>
+          }
           onChange={onInputChange}
           onSubmit={handleAddCommunity}
           onClose={onModalClose}

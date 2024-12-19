@@ -3,6 +3,7 @@ import { z } from "zod";
 export enum SupportedChatMessages {
   GetChat = "GET_CHAT",
   AddChat = "ADD_CHAT",
+  UpdateChat = "UPDATE_CHAT",
   DeleteChat = "DELETE_CHAT",
   UpvoteMessage = "UPVOTE_MESSAGE",
 }
@@ -13,6 +14,9 @@ export type IncomingChatMessages = {
 } | {
   type: SupportedChatMessages.AddChat,
   payload: AddChatType
+} | {
+  type: SupportedChatMessages.UpdateChat,
+  payload: UpdateChatType
 } | {
   type: SupportedChatMessages.DeleteChat,
   payload: DeleteChatType
@@ -44,6 +48,12 @@ export const AddChat = z.object({
   // sender: Member
 })
 
+export const UpdateChat = z.object({
+  roomId: z.string(),
+  chatId: z.string(),
+  content: z.string()
+})
+
 export const DeleteChat = z.object({
   roomId: z.string(),
   chatId: z.string()
@@ -57,5 +67,6 @@ export const UpvoteMessage = z.object({
 
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;
+export type UpdateChatType = z.infer<typeof UpdateChat>;
 export type DeleteChatType = z.infer<typeof DeleteChat>;
 export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;

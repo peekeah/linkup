@@ -68,6 +68,28 @@ class Chat {
     this.chats.set(roomId, chat)
   }
 
+  updateChat(roomId: string, chatId: string, content: string, userId: UserId, userType: UserType) {
+    const chat = this.chats.get(roomId);
+    if (!chat) {
+      throw new Error("Chat not found")
+    }
+
+    let messageId = chat.findIndex(({ id }) => id === chatId);
+
+    if (messageId === -1) {
+      throw new Error("message not found")
+    }
+
+    if (userType === "user" && userId !== chat[messageId].sender.userId) {
+      throw new Error("Unauthorized access")
+    }
+
+    chat[messageId] = {
+      ...chat[messageId],
+      content
+    }
+  }
+
   deleteChat(roomId: string, chatId: string, userId: UserId, userType: UserType) {
 
     const chat = this.chats.get(roomId)

@@ -35,6 +35,12 @@ const useSendMessage = () => {
           payload: message.payload
         })
 
+      case SupportedChatMessages.UpdateChat:
+        return sendMessage({
+          type: SupportedChatMessages.UpdateChat,
+          payload: message.payload
+        })
+
       case SupportedChatMessages.DeleteChat:
         return sendMessage({
           type: SupportedChatMessages.DeleteChat,
