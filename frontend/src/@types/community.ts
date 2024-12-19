@@ -2,7 +2,7 @@ import { z } from "zod";
 import { UserId } from "./user";
 import { Message } from "@/store/chat";
 
-export enum SupportedCommunityMessages {
+export enum SupportedOutgoingCommunityMessages {
   CreateCommunity = "CREATE_COMMUNITY",
   DeleteCommunity = "DELETE_COMMUNITY",
   UpdateCommunity = "UPDATE_COMMUNITY",
@@ -56,40 +56,40 @@ export const Member = z.object({
 })
 
 export type OutgoingCommunityMessage = {
-  type: SupportedCommunityMessages.CreateCommunity,
+  type: SupportedOutgoingCommunityMessages.CreateCommunity,
   payload: CreateCommunityType
 } | {
-  type: SupportedCommunityMessages.UpdateCommunity,
+  type: SupportedOutgoingCommunityMessages.UpdateCommunity,
   payload: UpdateCommunityType
 } | {
-  type: SupportedCommunityMessages.DeleteCommunity,
+  type: SupportedOutgoingCommunityMessages.DeleteCommunity,
   payload: DeleteCommunityType
 } | {
-  type: SupportedCommunityMessages.GetCommunity,
+  type: SupportedOutgoingCommunityMessages.GetCommunity,
   payload: GetCommunityType
 } | {
-  type: SupportedCommunityMessages.GetCommunities,
+  type: SupportedOutgoingCommunityMessages.GetCommunities,
   payload: null
 } | {
-  type: SupportedCommunityMessages.UpdateCommunity,
+  type: SupportedOutgoingCommunityMessages.UpdateCommunity,
   payload: UpdateCommunityType
 } | {
-  type: SupportedCommunityMessages.AddAdmin,
+  type: SupportedOutgoingCommunityMessages.AddAdmin,
   payload: AddAdminType
 } | {
-  type: SupportedCommunityMessages.RemoveAdmin,
+  type: SupportedOutgoingCommunityMessages.RemoveAdmin,
   payload: RemoveAdminType
 } | {
-  type: SupportedCommunityMessages.JoinCommunity,
+  type: SupportedOutgoingCommunityMessages.JoinCommunity,
   payload: JoinCommunityType
 } | {
-  type: SupportedCommunityMessages.LeaveCommunity,
+  type: SupportedOutgoingCommunityMessages.LeaveCommunity,
   payload: LeaveCommunityType
 } | {
-  type: SupportedCommunityMessages.GiveTimeout,
+  type: SupportedOutgoingCommunityMessages.GiveTimeout,
   payload: GiveTimeoutType
 } | {
-  type: SupportedCommunityMessages.ClearTimeout,
+  type: SupportedOutgoingCommunityMessages.ClearTimeout,
   payload: ClearTimeoutType
 };
 

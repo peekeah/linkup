@@ -13,14 +13,23 @@ import { useContext, useState } from "react"
 import useSendMessage from "@/hooks/useSendMessage"
 import { SupportedOutgoingUserMessages } from "@/@types/user"
 import { ChatContext } from "@/store/chat"
+import { SupportedOutgoingCommunityMessages } from "@/@types/community";
+import { AuthContext } from "@/store/auth";
+
 
 const SearchInput = () => {
 
   const sendMessage = useSendMessage();
   const [searchText, setSearchText] = useState<string>("");
 
-  const { state } = useContext(ChatContext);
-  const { searchContent } = state;
+  const { state, updateSelectedChat } = useContext(ChatContext);
+  const { state: authContext } = useContext(AuthContext);
+
+  const { searchContent, chatHistory } = state;
+
+  const isChatJoined = (communityId: string) => {
+    return Boolean(chatHistory.find(el => el.communityId === communityId))
+  }
 
   const onChange = async (value: string) => {
     setSearchText(() => value)
@@ -32,8 +41,30 @@ const SearchInput = () => {
     });
   }
 
+  const messageChat = (communityId: string) => {
+    setSearchText("")
+    const selectedChat = state.chatHistory.find(el => el.communityId === communityId);
+
+    if (selectedChat) {
+      updateSelectedChat(selectedChat)
+    }
+  }
+
   const handleJoin = (communityId: string) => {
-    console.log("join", communityId)
+    try {
+      sendMessage({
+        type: SupportedOutgoingCommunityMessages.JoinCommunity,
+        payload: {
+          userName: authContext.userName,
+          roomId: communityId,
+        }
+      })
+
+      setSearchText("")
+
+    } catch (err) {
+      console.log("err while joining community", err)
+    }
   }
 
   return (
@@ -59,7 +90,11 @@ const SearchInput = () => {
                         <Calendar />
                         <span>{el.name}</span>
                       </div>
-                      <button onClick={() => handleJoin(el.id)}>Join</button>
+                      {
+                        isChatJoined(el.id) ?
+                          <button onClick={() => messageChat(el.id)}>Message</button> :
+                          <button onClick={() => handleJoin(el.id)}>Join</button>
+                      }
                       {/* <ButtonIcon svg={MessageCircle} onClick={() => handleJoin(el.id)} /> */}
                     </CommandItem>
                   ))

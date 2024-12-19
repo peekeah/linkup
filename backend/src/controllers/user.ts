@@ -1,6 +1,9 @@
 import { userMockData } from "../mock/user";
+import { SupportedOutgoingUserMessages } from "../schema/user";
+import { activeClients } from "../store/clients";
 import { generateHash, verifyHash } from "../utils/bcrypt";
 import { generateToken } from "../utils/jwt";
+import communities from "./communities";
 
 export type UserId = string;
 
@@ -20,7 +23,7 @@ interface LastMessage {
   date: Date;
 }
 
-// Note: Add for private message
+// #NOTE: Add for private message
 export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
@@ -76,7 +79,7 @@ class User {
         token: generateToken({
           userId: user.id,
           email: user.email,
-          userName: user.name
+          userName: user.name,
         })
       }
 
@@ -135,11 +138,25 @@ class User {
     }
 
     user.chatHistory = [newMsg, ...user.chatHistory]
+
+    const community = communities.getCommunity(communityId);
+
+    // Broadcast recent chats to all clients
+    community.member.forEach(member => {
+      const conn = activeClients.get(member.userId)
+      if (conn) {
+        conn.send(JSON.stringify({
+          type: SupportedOutgoingUserMessages.ChatHistory,
+          data: user.chatHistory
+        }))
+      }
+    });
+
   }
 
-  searchUser(search: string){
+  searchUser(search: string) {
     return this.users.flatMap((user) => {
-       user.name.toLowerCase().includes(search?.toLowerCase()) ? ({
+      user.name.toLowerCase().includes(search?.toLowerCase()) ? ({
         id: user.id,
         name: user.name,
         avatar: user.email

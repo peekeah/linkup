@@ -1,5 +1,6 @@
 import { OutgoingMessage } from "@/@types";
 import { SupportedChatMessages } from "@/@types/chat";
+import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { AuthContext } from "@/store/auth";
 import { useContext } from "react";
@@ -54,6 +55,12 @@ const useSendMessage = () => {
       case SupportedOutgoingUserMessages.Search:
         return sendMessage({
           type: SupportedOutgoingUserMessages.Search,
+          payload: message.payload
+        })
+
+      case SupportedOutgoingCommunityMessages.JoinCommunity:
+        return sendMessage({
+          type: SupportedOutgoingCommunityMessages.JoinCommunity,
           payload: message.payload
         })
 

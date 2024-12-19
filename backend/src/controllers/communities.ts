@@ -2,7 +2,7 @@ import { communitiesMockData } from "../mock/communities";
 import { OutgoingCommunityMessages, SupportedCommunityMessages } from "../schema/community";
 import { activeClients } from "../store/clients";
 import chat from "./chat";
-import { UserId } from "./user";
+import user, { UserId } from "./user";
 
 export interface ICommunity {
   id: string;
@@ -96,11 +96,19 @@ class Community {
       throw new Error("Community not found")
     }
 
-    const existUser = this.communities[idx]?.member?.find(user => user.userId === userId)
+    const community = this.communities[idx];
+
+    const existUser = community?.member?.find(user => user.userId === userId)
 
     if (existUser) throw new Error("user already joined");
 
-    this.communities[idx].member.push({ userId, name: userName })
+    community?.member.push({ userId, name: userName })
+
+    const chats = chat.getChats(community.id)
+    const message = chats[chats.length - 1];
+
+    // Add to recent chat
+    user.updateChatHistory(userId, id, community.name, message)
   }
 
   leaveCommunity(id: string, userId: UserId) {
@@ -157,7 +165,7 @@ class Community {
 
   }
 
-  searchCommunity(search: string){
+  searchCommunity(search: string) {
     return this.communities.filter(community => community.name?.toLowerCase().includes(search?.toLowerCase()))
   }
 
