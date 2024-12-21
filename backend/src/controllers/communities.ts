@@ -232,7 +232,6 @@ class Community {
     if (!community) throw new Error("Community not found")
 
     const messages = chat.getChats(roomId)
-
     const message = messages.find(el => el.id === messageId)
 
     if (!message) {

@@ -8,6 +8,7 @@ interface ChatContextType {
   updateChatHistory: (chatHistory: ChatHistory[]) => void;
   updateSelectedChat: (chat: ChatHistory) => void;
   updateChatMessages: (communityId: string, newMessages: Message[]) => void;
+  updateSingleChatMessage: (communityId: string, messageId: string, newMessage: Message) => void;
   updateSearchContent: (content: Community[]) => void;
 }
 
@@ -48,6 +49,7 @@ export const ChatContext = createContext<ChatContextType>({
   },
   updateChatHistory: () => { },
   updateSelectedChat: () => { },
+  updateSingleChatMessage: () => { },
   updateChatMessages: () => { },
   updateSearchContent: () => { },
 });
@@ -68,6 +70,29 @@ const Chat = ({ children }: { children: ReactNode }) => {
   const updateSelectedChat = (chat: ChatHistory) => {
     setState(prev => ({ ...prev, ["selectedChat"]: chat }))
   }
+
+  const updateSingleChatMessage = (communityId: string, messageId: string, newMessage: Message) => {
+    setState(prev => {
+      const messagesCopy = prev.messages;
+      const communityMessages = messagesCopy.get(communityId);
+
+      if (!communityMessages) return prev;
+
+      const idx = communityMessages?.findIndex(el => el.id === messageId);
+
+      if (idx === -1) {
+        return prev
+      }
+
+      communityMessages[idx] = newMessage;
+      messagesCopy.set(communityId, communityMessages);
+
+      return ({
+        ...prev,
+        messages: messagesCopy
+      })
+    })
+  };
 
   const updateChatMessages = (communityId: string, newMessages: Message[]) => {
     setState(prev => {
@@ -119,6 +144,7 @@ const Chat = ({ children }: { children: ReactNode }) => {
       updateChatHistory,
       updateSelectedChat,
       updateChatMessages,
+      updateSingleChatMessage,
       updateSearchContent,
     }}>{children}</ChatContext.Provider>
   )

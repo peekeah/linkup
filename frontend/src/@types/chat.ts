@@ -69,7 +69,6 @@ export const DeleteChat = z.object({
 })
 
 export const UpvoteMessage = z.object({
-  userId: z.string(),
   roomId: z.string(),
   chatId: z.string()
 })

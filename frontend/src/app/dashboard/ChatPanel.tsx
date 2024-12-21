@@ -36,6 +36,10 @@ const formatMessages = (message: Message[]) => {
   }, new Map());
 }
 
+const isUpvoted = (upvotes: string[], userId: string) => {
+  return Boolean(upvotes?.length && upvotes.includes(userId))
+}
+
 const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
@@ -139,17 +143,17 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     }
   }
 
-  const handleUpvoteMessage = () => {
+  const handleUpvoteMessage = (chatId: string) => {
     try {
-      console.log("upvote message")
-    } catch (err) {
-      console.log("error while editing message", err)
-    }
-  }
-
-  const handleDownVoteMessage = () => {
-    try {
-      console.log("downvote message")
+      if (selectedChat?.communityId) {
+        sendMessage({
+          type: SupportedChatMessages.UpvoteMessage,
+          payload: {
+            roomId: selectedChat.communityId,
+            chatId
+          }
+        })
+      }
     } catch (err) {
       console.log("error while editing message", err)
     }
@@ -184,23 +188,28 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                       <div className="p-3">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                       {
                         !message?.isDeleted && message?.sender.userId === userId ?
-                          <div className="flex items-center gap-1 bg-red-300 p-1">
-                            <ArrowUp
-                              width={20}
-                              height={20}
-                              className="cursor-pointer"
-                              onClick={handleUpvoteMessage}
-                            />
-                            <div className="">{message.upvotes?.length}</div>
-                            <ArrowDown
-                              width={20}
-                              height={20}
-                              className="cursor-pointer"
-                              onClick={handleDownVoteMessage}
-                            />
+                          <div className="flex items-center gap-2 bg-red-300 p-1">
+                            <div className="flex items-center gap-1">
+                              {
+                                !isUpvoted(message.upvotes, userId) ?
+                                  <ArrowUp
+                                    width={20}
+                                    height={20}
+                                    className="cursor-pointer transition ease-in-out delay-150"
+                                    onClick={() => handleUpvoteMessage(message.id)}
+                                  /> :
+                                  <ArrowDown
+                                    width={20}
+                                    height={20}
+                                    className="cursor-pointer transition ease-in-out delay-150"
+                                    onClick={() => handleUpvoteMessage(message.id)}
+                                  />
+                              }
+                              <div>{message.upvotes?.length}</div>
+                            </div>
                             <Trash
-                              width={16}
-                              height={16}
+                              width={15}
+                              height={15}
                               className="cursor-pointer"
                               onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
                             />
@@ -210,8 +219,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                               value={newMessage}
                               triggerButton={
                                 <Pencil
-                                  width={16}
-                                  height={16}
+                                  width={15}
+                                  height={15}
                                   className="cursor-pointer"
                                 />
                               }

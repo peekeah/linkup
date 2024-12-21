@@ -8,7 +8,12 @@ import { SupportedIncomingCommunityMessage } from "@/@types/community";
 
 const useHandleMessage = () => {
 
-  const { updateChatHistory, updateChatMessages, updateSearchContent } = useContext(ChatContext);
+  const {
+    updateChatHistory,
+    updateChatMessages,
+    updateSearchContent,
+    updateSingleChatMessage
+  } = useContext(ChatContext);
 
   const handleMessage = async (rawMessage: string) => {
     try {
@@ -35,6 +40,10 @@ const useHandleMessage = () => {
           updateChatMessages(roomId, messages)
           break;
         case SupportedIncomingCommunityMessage.BroadcastUpvote:
+          roomId = message?.data?.roomId;
+          const newMessage = message?.data?.message;
+          const messageId = message?.data?.messageId;
+          updateSingleChatMessage(roomId, messageId, newMessage)
           break;
 
         case SupportedIncomingUserMessages.Search:

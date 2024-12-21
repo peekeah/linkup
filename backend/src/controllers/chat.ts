@@ -118,7 +118,7 @@ class Chat {
 
     let messageId = chat.findIndex(({ id }) => id === chatId)
 
-    if (!messageId) throw new Error("Message not found")
+    if (messageId === -1) throw new Error("Message not found")
 
     const message = chat[messageId];
 
