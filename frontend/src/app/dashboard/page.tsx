@@ -3,9 +3,6 @@ import { useContext, useEffect, useState } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
-import ListPanel from "./ListPanel";
-import Sidebar from "./sidebar";
-import Topbar from "./Topbar";
 import ProfileDetails from "./ProfileDetails";
 import { useRouter } from "next/navigation";
 import useHandleMessage from "@/hooks/useHandleMessage";
@@ -14,6 +11,7 @@ import { AuthContext } from "@/store/auth";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedChatMessages } from "@/@types/chat";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
+import ListPanel from "./ListPanel";
 
 export interface MemberDetails {
   name: string;
@@ -127,13 +125,9 @@ const Dashboard = () => {
   }, [authState?.ws])
 
   return (
-    <div className="!h-screen !w-screen flex flex-col bg-white font-serif">
-      <Topbar />
-      <Separator />
-      <div className="flex !flex-1">
-        <Sidebar />
-        <Separator orientation="vertical" />
-        <div className="w-[450px] h-full"><ListPanel /></div>
+    <>
+      <div className="flex w-full h-full">
+        <ListPanel />
         <Separator orientation="vertical" />
         <div className="!flex-1"><ChatPanel toggleDrawer={toggleDrawer} /> </div>
         {
@@ -149,7 +143,7 @@ const Dashboard = () => {
             </> : null
         }
       </div>
-    </div>
+    </>
   )
 }
 

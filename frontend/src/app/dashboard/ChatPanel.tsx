@@ -15,6 +15,7 @@ import useSendMessage from "@/hooks/useSendMessage";
 import { AuthContext } from "@/store/auth";
 import { useToast } from "@/hooks/use-toast";
 import InputAlert from "./InputAlert";
+import { Separator } from "@/components/ui/separator";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -160,9 +161,9 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
   }
 
   return (
-    <div className="p-5 h-full w-full relative">
+    <div className="h-full w-full relative">
       {/* Chat header */}
-      <div className="flex gap-3 items-center h-12">
+      <div className="m-5 flex w-full gap-3 items-center h-12">
         <Avatar className="shadow-md p-3">
           <Image src={ProfilePicture} alt="Profile pic" />
           {/* <AvatarFallback>{item.name}</AvatarFallback> */}
@@ -175,8 +176,9 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         </div>
       </div>
 
+      <Separator orientation="horizontal" />
       {/* Chat body */}
-      <div className="space-y-10 overflow-y-auto">
+      <div className="m-5 space-y-10 overflow-y-auto">
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>
