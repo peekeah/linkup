@@ -4,7 +4,7 @@ import { createContext, ReactNode, useState } from "react";
 interface AuthContextType {
   state: AuthState;
   updateAuth: (payload: AuthState) => void,
-  updateConnection: (ws: WebSocket) => void,
+  updateConnection: (ws: WebSocket | null) => void,
   clearAuth: () => void,
 }
 
@@ -13,6 +13,8 @@ export const AuthContext = createContext<AuthContextType>({
     userId: "",
     userName: "",
     email: "",
+    mobile: "",
+    bio: "",
     token: "",
     ws: null
   },
@@ -29,6 +31,8 @@ export interface AuthState {
   userId: string;
   userName: string;
   email: string;
+  mobile: string;
+  bio: string,
   token: string;
   ws?: null | WebSocket;
 }
@@ -40,6 +44,8 @@ const Auth = ({ children }: AuthProps) => {
     userName: "",
     token: "",
     email: "",
+    mobile: "",
+    bio: "",
     ws: null
   }
 
@@ -52,7 +58,7 @@ const Auth = ({ children }: AuthProps) => {
     }))
   }
 
-  const updateConnection = (ws: WebSocket) => {
+  const updateConnection = (ws: WebSocket | null) => {
     setState(prev => ({
       ...prev,
       ["ws"]: ws

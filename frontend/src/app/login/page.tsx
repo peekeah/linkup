@@ -37,7 +37,6 @@ const Login = () => {
       ...prev,
       [name]: value
     }))
-
   }
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -50,7 +49,9 @@ const Login = () => {
         handleLogin({
           userId: payload?.userId,
           email: payload?.email,
+          mobile: payload?.mobile,
           userName: payload?.userName,
+          bio: payload?.bio,
           token: payload?.token
         })
 

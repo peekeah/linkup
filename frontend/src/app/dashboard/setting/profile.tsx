@@ -1,64 +1,30 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { AuthContext } from "@/store/auth";
 import ProfilePicture from "@/assets/people.svg";
 import Image from "next/image";
-import React, { ChangeEventHandler, FormEventHandler, useContext, useState } from "react";
+import React, {
+  ChangeEventHandler,
+  FormEventHandler,
+  useContext,
+  useState
+} from "react";
 import { Separator } from "@/components/ui/separator";
-
-interface InputField {
-  label: string;
-  value: string;
-  name: string;
-}
-
-interface InputElement extends InputField {
-  type: "Input";
-  onChange: ChangeEventHandler<HTMLInputElement>;
-}
-
-interface TextareaElement extends InputField {
-  type: "Textarea";
-  onChange: ChangeEventHandler<HTMLTextAreaElement>;
-}
-
-type InputFieldProps = InputElement | TextareaElement;
-
-const InputField: React.FC<InputFieldProps> = (props) => {
-
-  const { type, label, onChange, ...otherProps } = props;
-
-  return (
-    <div className="space-y-1 text-semibold text-md">
-      <div>{label}</div>
-      {
-        type === "Input" ?
-          <Input
-            onChange={onChange}
-            {...otherProps}
-          /> :
-          <Textarea
-            className="h-[100px] resize-none"
-            onChange={onChange}
-            {...otherProps}
-          />
-      }
-    </div>
-  )
-}
+import api from "@/services/api";
+import { useToast } from "@/hooks/use-toast";
+import InputField from "./InputField";
 
 const Profile = () => {
-  const { state } = useContext(AuthContext);
+
+  const { state, updateAuth } = useContext(AuthContext);
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    bio: ""
+    name: state.userName,
+    email: state.email,
+    mobile: state.mobile,
+    bio: state.bio
   })
 
-  console.log("ss:", state)
+  const { toast } = useToast();
 
   const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
     const { name, value } = e.target;
@@ -68,9 +34,30 @@ const Profile = () => {
     }))
   }
 
-  const onSubmit: FormEventHandler = (e) => {
+  const onSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
-    console.log('values', formData)
+    try {
+      const res = await api.profile({
+        id: state.userId,
+        ...formData
+      })
+
+      if (res?.data?.status) {
+        updateAuth({ ...state, ...res?.data?.data })
+        toast({
+          title: "Success",
+          description: "Profile updated successfully"
+        })
+      }
+
+    } catch (err) {
+      console.log("error while updating profile", err)
+      toast({
+        variant: "destructive",
+        title: "Failure",
+        description: "Error while updating profile"
+      })
+    }
   }
 
   return (
@@ -111,9 +98,9 @@ const Profile = () => {
             <div>
               <InputField
                 type="Input"
-                name="phone"
-                label="Phone"
-                value={formData.phone}
+                name="mobile"
+                label="Mobile"
+                value={formData.mobile}
                 onChange={onChange}
               />
             </div>

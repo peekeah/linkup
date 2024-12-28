@@ -4,20 +4,22 @@ import { useContext } from "react"
 const useAuth = () => {
   const { state, updateAuth, clearAuth } = useContext(AuthContext);
 
-
   const getAuthStatus = () => {
-    try {
-      const rawData = localStorage?.getItem("userDetails");
+    return new Promise((resolve, reject) => {
+      try {
+        const rawData = localStorage?.getItem("userDetails");
 
-      if (!rawData) return false;
+        if (!rawData) return false;
 
-      const userData = JSON.parse(rawData)
-      updateAuth(userData)
-
-      return true
-    } catch (err) {
-      console.log("error while parsing data", err)
-    }
+        const userData = JSON.parse(rawData)
+        updateAuth(userData)
+        resolve(true)
+        return true
+      } catch (err) {
+        console.log("error while parsing data", err)
+        reject(err)
+      }
+    })
   }
 
   const handleLogin = (payload: AuthState) => {

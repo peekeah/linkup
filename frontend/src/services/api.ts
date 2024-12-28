@@ -3,6 +3,13 @@ import axios from "axios";
 import { apiUrl } from "@/constants/apiUrl";
 import { SignupPayload } from "@/app/signup/page";
 
+interface ProfilePayload {
+  id: string;
+  name: string;
+  email: string;
+  mobile: string;
+  bio: string;
+}
 
 class Api {
   private url: string;
@@ -16,6 +23,9 @@ class Api {
   }
   signup(payload: SignupPayload) {
     return axios.post(this.url + "/" + apiUrl.signup, { ...payload })
+  }
+  profile(payload: ProfilePayload) {
+    return axios.post(`${this.url}/${apiUrl.users}/${payload.id}`, payload)
   }
 }
 

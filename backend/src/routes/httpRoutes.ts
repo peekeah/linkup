@@ -69,5 +69,33 @@ router.get("/users", (_req, res) => {
   }
 })
 
+// Update User
+router.post("/users/:id", (req, res) => {
+  try {
+    const { id, name, email, mobile, address } = req.body;
+    const newUserData = {
+      id,
+      name,
+      email,
+      mobile,
+      address,
+    }
+
+    user.update(newUserData)
+
+    res.send({
+      status: true,
+      data: newUserData
+    })
+
+  } catch (err) {
+    const { statusCode, errMessage } = errorHandler(err)
+    res.status(statusCode).send({
+      status: false,
+      messge: errMessage
+    })
+  }
+})
+
 
 export default router;

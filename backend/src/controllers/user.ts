@@ -12,10 +12,18 @@ export interface IUser {
   name: string;
   email: string;
   mobile: string;
+  bio: string;
   password: string;
-  address: IAddress;
+  address?: IAddress;
   chatHistory: ChatHistory[];
   // connection: WebSocket;
+}
+
+export interface UpdateUser {
+  id: UserId,
+  name: string;
+  email: string;
+  mobile: string;
 }
 
 interface LastMessage {
@@ -76,6 +84,8 @@ class User {
         userId: user.id,
         userName: user.name,
         email: user.email,
+        mobile: user.mobile,
+        bio: user.bio,
         token: generateToken({
           userId: user.id,
           email: user.email,
@@ -89,15 +99,15 @@ class User {
     }
   }
 
-  update(user: IUser) {
+  update(user: UpdateUser) {
     const id = this.users.findIndex(({ id }) => id === user.id)
 
-    if (!id) {
+    if (id === -1) {
       throw new Error("user not found")
     }
 
-    // Todo: Prevent password update
-    this.users[id] = user
+    this.users[id] = { ...this.users[id], ...user }
+    return user
   }
 
   delete(id: string) {

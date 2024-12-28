@@ -4,13 +4,9 @@ import { useContext, useEffect, useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
 import ProfileDetails from "./ProfileDetails";
-import { useRouter } from "next/navigation";
-import useHandleMessage from "@/hooks/useHandleMessage";
 import { ChatContext } from "@/store/chat";
-import { AuthContext } from "@/store/auth";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedChatMessages } from "@/@types/chat";
-import { SupportedOutgoingUserMessages } from "@/@types/user";
 import ListPanel from "./ListPanel";
 
 export interface MemberDetails {
@@ -29,14 +25,7 @@ type ProfileDrawer = {
 
 const Dashboard = () => {
 
-  const { state: authState, updateConnection } = useContext(AuthContext)
-  // const ws = useRef<null | WebSocket>(null);
-  const ws = authState?.ws;
-
-  const router = useRouter();
-  const { handleMessage } = useHandleMessage();
   const sendMessage = useSendMessage();
-
   const { state } = useContext(ChatContext);
   const { selectedChat } = state;
 
@@ -80,49 +69,6 @@ const Dashboard = () => {
       }
     }
   }, [selectedChat])
-
-  useEffect(() => {
-    try {
-      const uri = process.env.NEXT_PUBLIC_WS_HOST || "ws://localhost:5000";
-      // const token = getToken();
-      const token = authState?.token;
-
-      // #Todo: Logout and clear token
-      if (!token) {
-        return router.push("/");
-      }
-
-      if (ws) {
-        ws.onopen = () => {
-          console.log("open")
-          sendMessage({
-            type: SupportedOutgoingUserMessages.ChatHistory
-          })
-
-          ws.onmessage = (event) => {
-            handleMessage(event.data)
-          }
-
-          ws.onerror = (err) => {
-            console.log("error", err)
-          }
-
-          ws.onclose = () => {
-            console.log("connection is closed")
-          }
-        }
-      } else {
-        updateConnection(new WebSocket(`${uri}?token=${token}`));
-      }
-
-      return () => {
-        ws?.close();
-      }
-
-    } catch (err) {
-      console.log("err", err)
-    }
-  }, [authState?.ws])
 
   return (
     <>

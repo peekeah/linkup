@@ -6,6 +6,7 @@ export const userMockData: IUser[] = [
     name: "Alice Johnson",
     email: "alice.johnson@example.com",
     mobile: "123-456-7890",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "123 Tech Street",
@@ -52,6 +53,7 @@ export const userMockData: IUser[] = [
     name: "Bob Smith",
     email: "bob.smith@example.com",
     mobile: "234-567-8901",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "456 Code Lane",
@@ -80,6 +82,7 @@ export const userMockData: IUser[] = [
     name: "Charlie Brown",
     email: "charlie.brown@example.com",
     mobile: "345-678-9012",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "789 Java Avenue",
@@ -114,6 +117,7 @@ export const userMockData: IUser[] = [
     name: "Daisy Miller",
     email: "daisy.miller@example.com",
     mobile: "456-789-0123",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "321 Ruby Road",
@@ -136,6 +140,7 @@ export const userMockData: IUser[] = [
     name: "Eve Summers",
     email: "eve.summers@example.com",
     mobile: "567-890-1234",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "654 Python Drive",
@@ -164,6 +169,7 @@ export const userMockData: IUser[] = [
     name: "Frank Ocean",
     email: "frank.ocean@example.com",
     mobile: "678-901-2345",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "987 Go Road",
@@ -192,6 +198,7 @@ export const userMockData: IUser[] = [
     name: "Grace Hopper",
     email: "grace.hopper@example.com",
     mobile: "789-012-3456",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "111 Code Blvd",
@@ -220,6 +227,7 @@ export const userMockData: IUser[] = [
     name: "Hank Pym",
     email: "hank.pym@example.com",
     mobile: "890-123-4567",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "222 Tech Terrace",
@@ -248,6 +256,7 @@ export const userMockData: IUser[] = [
     name: "Ivy Woods",
     email: "ivy.woods@example.com",
     mobile: "901-234-5678",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "333 Web Way",
@@ -276,6 +285,7 @@ export const userMockData: IUser[] = [
     name: "Jack Sparrow",
     email: "jack.sparrow@example.com",
     mobile: "012-345-6789",
+    bio: `💻 Software Developer | 2+ Years of Experience\n🚀 Passionate about building user-friendly apps & scalable systems\n💡 Specializing in Full Stack Development | Always learning\n🌐 Advocate for collaboration, innovation, and clean code`,
     password: "$2b$10$gp3Fjf568JUSDWku4quQZO/Chl08GwfUm6QyPwoKkhUnBeHNaml22",
     address: {
       street: "444 Pirate Place",

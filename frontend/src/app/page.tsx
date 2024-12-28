@@ -13,10 +13,10 @@ export default function Page() {
   const { getAuthStatus } = useAuth();
 
   useEffect(() => {
-    const authStatus = getAuthStatus();
-    if (authStatus) {
-      router.push("/dashboard")
-    }
+    getAuthStatus()
+      .then(() => {
+        router.push("/dashboard")
+      })
   }, [])
 
   return (
