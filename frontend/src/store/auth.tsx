@@ -5,7 +5,7 @@ interface AuthContextType {
   state: AuthState;
   updateAuth: (payload: AuthState) => void,
   updateConnection: (ws: WebSocket | null) => void,
-  clearAuth: () => void,
+  clearAuthStore: () => void,
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -20,7 +20,7 @@ export const AuthContext = createContext<AuthContextType>({
   },
   updateAuth: () => { },
   updateConnection: () => { },
-  clearAuth: () => { }
+  clearAuthStore: () => { }
 })
 
 interface AuthProps {
@@ -65,14 +65,17 @@ const Auth = ({ children }: AuthProps) => {
     }))
   }
 
-  const clearAuth = () => {
+  const clearAuthStore = () => {
+    if (state?.ws) {
+      state?.ws?.close();
+    }
     setState(() => initialValues)
   }
 
   return (
     <AuthContext.Provider
       value={{
-        state, updateAuth, updateConnection, clearAuth
+        state, updateAuth, updateConnection, clearAuthStore
       }}
     > {children} </AuthContext.Provider>
   )

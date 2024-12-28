@@ -1,8 +1,10 @@
 import { AuthContext, AuthState } from "@/store/auth"
+import { ChatContext } from "@/store/chat";
 import { useContext } from "react"
 
 const useAuth = () => {
-  const { state, updateAuth, clearAuth } = useContext(AuthContext);
+  const { updateAuth, clearAuthStore } = useContext(AuthContext);
+  const { clearChatStore } = useContext(ChatContext);
 
   const getAuthStatus = () => {
     return new Promise((resolve, reject) => {
@@ -28,18 +30,12 @@ const useAuth = () => {
   }
 
   const handleLogout = () => {
-
-    // #TODO: Reset Auth and connection
-    if (state?.ws) {
-      state?.ws.close();
-    }
-
-    localStorage.removeItem("token")
-    clearAuth();
+    localStorage.removeItem("userDetails")
+    clearChatStore();
+    clearAuthStore();
   }
 
   return { getAuthStatus, handleLogin, handleLogout }
-
 }
 
 export default useAuth;

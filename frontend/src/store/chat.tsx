@@ -10,6 +10,7 @@ interface ChatContextType {
   updateChatMessages: (communityId: string, newMessages: Message[]) => void;
   updateSingleChatMessage: (communityId: string, messageId: string, newMessage: Message) => void;
   updateSearchContent: (content: Community[]) => void;
+  clearChatStore: () => void;
 }
 
 interface State {
@@ -52,16 +53,18 @@ export const ChatContext = createContext<ChatContextType>({
   updateSingleChatMessage: () => { },
   updateChatMessages: () => { },
   updateSearchContent: () => { },
+  clearChatStore: () => { },
 });
 
+const initialValues = {
+  chatHistory: [],
+  selectedChat: null,
+  messages: new Map(),
+  searchContent: [],
+}
 
 const Chat = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState<State>({
-    chatHistory: [],
-    selectedChat: null,
-    messages: new Map(),
-    searchContent: [],
-  });
+  const [state, setState] = useState<State>(initialValues);
 
   const updateChatHistory = (chatHistory: ChatHistory[]) => {
     setState(prev => ({ ...prev, ["chatHistory"]: chatHistory }))
@@ -138,6 +141,10 @@ const Chat = ({ children }: { children: ReactNode }) => {
     })
   }
 
+  const clearChatStore = () => {
+    setState(() => initialValues)
+  }
+
   return (
     <ChatContext.Provider value={{
       state,
@@ -146,6 +153,7 @@ const Chat = ({ children }: { children: ReactNode }) => {
       updateChatMessages,
       updateSingleChatMessage,
       updateSearchContent,
+      clearChatStore,
     }}>{children}</ChatContext.Provider>
   )
 }

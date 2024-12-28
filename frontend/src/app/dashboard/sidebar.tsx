@@ -6,6 +6,9 @@ import PeopleIcon from "@/assets/people.svg"
 import UserIcon from "@/assets/user.svg"
 import { ComponentType, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut, LucideProps } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import useAuth from "@/hooks/useAuth";
 
 const sidebarTabs = [
   {
@@ -33,6 +36,12 @@ const sidebarTabs = [
     icon: PeopleIcon,
   },
   {
+    id: "logout",
+    title: "Logout",
+    link: "logout",
+    svg: LogOut
+  },
+  {
     id: "setting",
     title: "Setting",
     link: "setting",
@@ -44,19 +53,25 @@ interface Tab {
   id: string;
   title: string;
   link: string;
-  icon: ComponentType | JSX.Element;
+  icon?: ComponentType | JSX.Element;
+  // svg?: ComponentType | JSX.Element;
+  svg?: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>,
 }
 
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<Tab>(sidebarTabs[0])
 
   const router = useRouter();
+  const { handleLogout } = useAuth();
 
   const handleSelectTab = (tab: Tab) => {
     // #NOTE: Update after page development of remaining pages.
+    if (tab.id === "logout") {
+      return handleLogout();
+    }
     if (tab.id === "chats" || tab.id === "setting") {
       setActiveTab(tab)
-      router.push(`/dashboard/${tab.link}`, { scroll: true })
+      router.push(`/dashboard/${tab.link}`)
     }
   }
 
@@ -73,7 +88,8 @@ const Sidebar = () => {
           >
             <ButtonIcon
               key={tab.id}
-              icon={tab.icon}
+              icon={tab?.icon}
+              svg={tab?.svg}
               active={tab.id === activeTab.id}
               onClick={() => handleSelectTab(tab)}
             />
