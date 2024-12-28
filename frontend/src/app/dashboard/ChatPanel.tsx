@@ -16,6 +16,7 @@ import { AuthContext } from "@/store/auth";
 import { useToast } from "@/hooks/use-toast";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
+import { getDate } from "@/lib/utils";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -23,15 +24,10 @@ const formatMessages = (message: Message[]) => {
   return message.reduce((acc, entry) => {
     const dateKey = entry.date.split("T")[0];
 
-    const newEntry = {
-      ...entry,
-      date: dateKey
-    }
-
     if (acc.has(dateKey)) {
-      acc.set(dateKey, [...acc.get(dateKey), newEntry])
+      acc.set(dateKey, [...acc.get(dateKey), entry])
     } else {
-      acc.set(dateKey, [newEntry])
+      acc.set(dateKey, [entry])
     }
     return acc;
   }, new Map());
@@ -182,7 +178,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>
-              <div className="text-center">{date?.toString()}</div>
+              <div className="text-center">{getDate(messages[0]?.date, true)}</div>
               <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (

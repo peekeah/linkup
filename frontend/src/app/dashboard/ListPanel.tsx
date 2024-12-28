@@ -14,6 +14,8 @@ import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import InputAlert from "./InputAlert";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getDate } from "@/lib/utils";
+
 
 const ListPanel = () => {
 
@@ -95,7 +97,7 @@ const ListPanel = () => {
                   <div className="w-full">
                     <div className="flex justify-between">
                       <div className="text-heading">{item.communityName}</div>
-                      <div className="text-[#1E1E1E] opacity-60">{item?.date}</div>
+                      <div className="text-[#1E1E1E] opacity-60">{getDate(item?.date)}</div>
                     </div>
                     <div className="text-[#1E1E1E] opacity-60">{item.content}</div>
                   </div>
