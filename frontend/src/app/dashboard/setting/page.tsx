@@ -4,8 +4,6 @@ import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import Sidebar from "./sidebar";
 import Profile from "./profile";
-import Notification from "./notification";
-import Help from "./help";
 
 const settingTabs = [
   {
@@ -26,13 +24,16 @@ const settingTabs = [
 ]
 
 const Component = ({ tabId }: { tabId: string }) => {
+  // #TODO: Update after development of remaining pages
   switch (tabId) {
     case "profile":
       return <Profile />
+    /*
     case "notification":
       return <Notification />
     case "help":
       return <Help />
+    */
     default:
       return <Profile />
   }
@@ -42,7 +43,10 @@ const Setting = () => {
   const [selectedTab, setSelectedTab] = useState(settingTabs[0].id);
 
   const handleActiveTab = (tabId: string) => {
-    setSelectedTab(tabId)
+    // #TODO: Update after development of remaining pages
+    if (tabId === "profile") {
+      setSelectedTab(tabId)
+    }
   }
   return (
     <div className="flex h-full w-full">
