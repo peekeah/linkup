@@ -35,6 +35,8 @@ const Dashboard = () => {
   })
 
   const toggleDrawer = () => {
+    // #TODO: Need to update while implementation
+    return;
     setProfileDrawer(prev => {
       if (prev.open) {
         return ({

@@ -58,8 +58,11 @@ const Signup = () => {
   return (
     <form onSubmit={onSubmit}>
       <div className="flex gap-3 max-w-[1124px] mx-auto h-full w-full">
-        <div className="w-1/2 m-5 grid place-items-center">
-          <div className="text-3xl text-bold">Logo</div>
+        <div className="w-1/2 m-5">
+          <div className="text-h1 font-bold font-serif mt-[60%]">
+            <span className="text-secondary">Link</span>
+            <span className="text-[#777777]">up</span>
+          </div>
         </div>
         <div className="w-1/2 pt-[12%]">
           <div className="flex flex-col gap-7 p-3">

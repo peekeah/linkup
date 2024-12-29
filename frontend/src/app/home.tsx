@@ -81,7 +81,7 @@ const Home = () => {
             <div>Terms</div>
             <div>Privacy</div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 hidden">
             <div>1.</div>
             <div>2.</div>
             <div>3.</div>
