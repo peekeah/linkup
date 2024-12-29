@@ -71,25 +71,25 @@ const Dashboard = () => {
   }, [selectedChat])
 
   return (
-    <>
-      <div className="flex w-full h-full">
-        <ListPanel />
-        <Separator orientation="vertical" />
-        <div className="!flex-1"><ChatPanel toggleDrawer={toggleDrawer} /> </div>
-        {
-          profileDrawer.open ?
-            <>
-              <Separator orientation="vertical" />
-              <div className="w-3/12">
-                <ProfileDetails
-                  toggleDrawer={toggleDrawer}
-                  memberDetails={profileDrawer.data}
-                />
-              </div>
-            </> : null
-        }
-      </div>
-    </>
+    <div className="flex h-full">
+      <ListPanel />
+      <Separator orientation="vertical" />
+      <div className="flex-1">
+        <ChatPanel toggleDrawer={toggleDrawer} />
+      </div >
+      {
+        profileDrawer.open ?
+          <>
+            <Separator orientation="vertical" />
+            <div className="w-3/12">
+              <ProfileDetails
+                toggleDrawer={toggleDrawer}
+                memberDetails={profileDrawer.data}
+              />
+            </div>
+          </> : null
+      }
+    </div>
   )
 }
 

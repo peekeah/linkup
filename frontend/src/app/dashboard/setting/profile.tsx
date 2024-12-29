@@ -1,8 +1,7 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/store/auth";
-import ProfilePicture from "@/assets/people.svg";
-import Image from "next/image";
+import ProfilePicture from "@/assets/people";
 import React, {
   ChangeEventHandler,
   FormEventHandler,
@@ -67,12 +66,7 @@ const Profile = () => {
       <div className="flex-1 p-5 flex">
         <div className="w-1/3 grid place-content-center">
           <Avatar className="shadow-md p-5 w-[350px] h-[350px]">
-            <Image
-              height={350}
-              width={350}
-              src={ProfilePicture}
-              alt="Profile pic"
-            />
+            <ProfilePicture height={32} width={32} className="h-full w-full" />
           </Avatar>
         </div>
         <div className="flex-1 text-sm flex items-center">

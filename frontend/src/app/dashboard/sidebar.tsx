@@ -1,16 +1,15 @@
-import MessageIcon from "@/assets/message-icon.svg"
+import MessageIcon from "@/assets/message-icon"
 import ButtonIcon from "@/components/ui/button-icon";
-import SettingsIcon from "@/assets/settings.svg"
-import NotificationIcon from "@/assets/notification.svg"
-import PeopleIcon from "@/assets/people.svg"
-import UserIcon from "@/assets/user.svg"
-import { ComponentType, useState } from "react";
+import SettingsIcon, { SvgProps } from "@/assets/settings"
+import NotificationIcon from "@/assets/notification"
+import PeopleIcon from "@/assets/people"
+import UserIcon from "@/assets/user"
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { LogOut, LucideProps } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import useAuth from "@/hooks/useAuth";
 
-const sidebarTabs = [
+const sidebarTabs: Tab[] = [
   {
     id: "chats",
     title: "Chats",
@@ -49,14 +48,21 @@ const sidebarTabs = [
   },
 ]
 
-interface Tab {
+type Tab = {
   id: string;
   title: string;
   link: string;
-  icon?: ComponentType | JSX.Element;
-  // svg?: ComponentType | JSX.Element;
-  svg?: React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>,
-}
+} & (
+    | {
+      icon: React.FC<SvgProps>;
+      svg?: never;
+    } | {
+      icon?: never;
+      svg: React.ForwardRefExoticComponent<
+        Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+      >
+    }
+  )
 
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<Tab>(sidebarTabs[0])
@@ -75,6 +81,8 @@ const Sidebar = () => {
     }
   }
 
+  console.log("active", activeTab)
+
   return (
     <div className="h-full px-3 py-5 flex flex-col gap-4 justify-start relative">
       {
@@ -82,17 +90,20 @@ const Sidebar = () => {
           <div
             key={tab.id}
             className={tab.id === "setting" ? "absolute bottom-5" : ""}
-            style={{
-              justifySelf: tab.id === "setting" ? "flex-end" : ""
-            }}
           >
-            <ButtonIcon
-              key={tab.id}
-              icon={tab?.icon}
-              svg={tab?.svg}
-              active={tab.id === activeTab.id}
-              onClick={() => handleSelectTab(tab)}
-            />
+            {
+              tab.icon ?
+                <ButtonIcon
+                  icon={tab.icon}
+                  active={tab.id === activeTab.id}
+                  onClick={() => handleSelectTab(tab)}
+                /> :
+                <ButtonIcon
+                  svg={tab.svg}
+                  active={tab.id === activeTab.id}
+                  onClick={() => handleSelectTab(tab)}
+                />
+            }
           </div>
         ))
       }

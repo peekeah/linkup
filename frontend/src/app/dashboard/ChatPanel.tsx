@@ -6,8 +6,8 @@ import { Pencil, Trash2 as Trash, ArrowBigUp as ArrowUp, ArrowBigDown as ArrowDo
 import ProfilePicture from "@/assets/person-messaging.png";
 import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useState } from "react";
 import ButtonIcon from "@/components/ui/button-icon";
-import InfoIcon from "@/assets/info-circle.png";
-import SendIcon from "@/assets/send-icon.svg";
+import InfoIcon from "@/assets/info-circle";
+import SendIcon from "@/assets/send-icon";
 import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
@@ -157,9 +157,9 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
   }
 
   return (
-    <div className="h-full w-full relative">
+    <div className="h-full relative">
       {/* Chat header */}
-      <div className="m-5 flex w-full gap-3 items-center h-12">
+      <div className="p-5 flex w-full gap-3 items-center">
         <Avatar className="shadow-md p-3">
           <Image src={ProfilePicture} alt="Profile pic" />
           {/* <AvatarFallback>{item.name}</AvatarFallback> */}
@@ -167,7 +167,12 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         <div className="w-full">
           <div className="flex items-center gap-3">
             <div className="text-heading">{selectedChat?.communityName}</div>
-            <ButtonIcon onClick={toggleDrawer} icon={InfoIcon} />
+            <ButtonIcon
+              noBorder
+              onClick={toggleDrawer}
+              icon={InfoIcon}
+              className="!h-10 !w-10 !p-1.5 rounded-md"
+            />
           </div>
         </div>
       </div>
@@ -246,7 +251,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             placeholder="Message"
           />
           <ButtonIcon
-            className="rounded-full bg-[#FFECFA] p-3"
+            noBorder
+            className="rounded-full h-12 w-12"
             onClick={onClick}
             icon={SendIcon}
           />

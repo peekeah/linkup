@@ -67,8 +67,8 @@ const ListPanel = () => {
           placeholder="Community name"
           value={community}
           triggerButton={
-            <Button className="rounded-full">
-              <Plus />
+            <Button className="rounded-full h-10 w-10">
+              <Plus className="!h-6 !w-6" />
             </Button>
           }
           onChange={onInputChange}
