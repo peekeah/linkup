@@ -5,9 +5,9 @@ import Image from "next/image";
 
 import ProfilePicture from "@/assets/person-messaging.png";
 import { userList } from "@/mock";
-import { Separator } from "@/components/ui/separator";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
+import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
@@ -21,6 +21,8 @@ const ListPanel = () => {
 
   const { state, updateSelectedChat } = useContext(ChatContext);
   const { chatHistory, selectedChat } = state;
+  const [searchFilter, setSearchFilter] = useState("");
+  const [filteredChats, setFilteredChats] = useState<ChatHistory[]>([]);
 
   const { toast } = useToast();
   const sendMessage = useSendMessage();
@@ -29,8 +31,21 @@ const ListPanel = () => {
   useEffect(() => {
     if (chatHistory && chatHistory?.length) {
       updateSelectedChat(chatHistory[0])
+      setFilteredChats(chatHistory)
     }
   }, [chatHistory])
+
+  useEffect(() => {
+    if (!searchFilter) {
+      return setFilteredChats(chatHistory)
+    }
+    setFilteredChats(
+      chatHistory
+        .filter(item =>
+          item.communityName.toLowerCase().includes(searchFilter.toLowerCase())
+        )
+    )
+  }, [searchFilter])
 
   const handleActiveTab = (chat: ChatHistory) => {
     updateSelectedChat(chat)
@@ -58,10 +73,19 @@ const ListPanel = () => {
     setCommunity("")
   }
 
+  const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setSearchFilter(e.target.value)
+  }
+
   return (
     <div className="h-full space-y-3">
       <div className="p-3 py-5 flex items-center gap-3 justify-between">
-        <Search className="rounded-full h-12 flex-1" placeholder="Search" />
+        <Search
+          className="rounded-full h-12 flex-1"
+          placeholder="Search"
+          value={searchFilter}
+          onChange={handleSearchChange}
+        />
         <InputAlert
           title="Add community"
           placeholder="Community name"
@@ -79,9 +103,9 @@ const ListPanel = () => {
       <Separator orientation="horizontal" />
       <div className="!m-0">
         {
-          !chatHistory?.length ?
+          !filteredChats?.length ?
             <div>No recent chats</div> :
-            chatHistory?.map((item, index) => (
+            filteredChats?.map((item, index) => (
               <div key={item.communityId} className={
                 cx(
                   "cursor-pointer hover:bg-gray-200",

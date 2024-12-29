@@ -81,8 +81,6 @@ const Sidebar = () => {
     }
   }
 
-  console.log("active", activeTab)
-
   return (
     <div className="h-full px-3 py-5 flex flex-col gap-4 justify-start relative">
       {
