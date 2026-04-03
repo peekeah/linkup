@@ -1,40 +1,48 @@
-import communities from "../controllers/communities";
-import user, { UserId } from "../controllers/user"
+import { prisma } from "../utils/db";
 
-export type UserType = "admin" | "owner" | "user";
+export type CommunityRole = "ADMIN" | "OWNER" | "USER";
 
-export const authenticate = (userId: string) => {
-  const existUser = user.getUser(userId)
+export const authenticate = async (userId: string) => {
+  const existUser = await prisma.user.findFirst({
+    where: { id: userId },
+  });
 
-  if (!existUser) throw new Error("User not found")
+  if (!existUser) throw new Error("USER not found");
 
   return existUser;
+};
 
-}
+export const authorize = async (
+  communityId: string,
+  userId: string,
+  acceptedRoles: CommunityRole[],
+) => {
+  const community = await prisma.community.findFirst({
+    where: { id: communityId },
+    include: {
+      admins: { select: { id: true } },
+      owner: { select: { id: true } },
+      members: { select: { id: true } },
+    },
+  });
 
-export const authorize = (roomId: string, userId: UserId, userType: UserType[]) => {
-  const existRoom = communities.getCommunity(roomId);
+  if (!community) throw new Error("Community not found");
 
-  if (!existRoom) throw new Error("Community not found");
+  const isOwner = community.owner.id === userId;
+  const isAdmin = community.admins.some((admin) => admin.id === userId);
+  const isMember = community.members.some((member) => member.id === userId);
 
-  for (const role of userType) {
-    if (role === "owner") {
-      if (existRoom.owner.userId === userId) {
-        return "owner"
-      }
-    } if (role === "user") {
-      for (const admin of existRoom.member) {
-        if (admin.userId === userId) {
-          return "user"
-        }
-      }
-    } else {
-      for (const admin of existRoom.admin) {
-        if (admin.userId === userId) {
-          return "admin"
-        }
-      }
-    }
+  if (acceptedRoles.includes("OWNER") && isOwner) {
+    return "OWNER";
   }
-  throw new Error("Unauthorized access")
-}
+
+  if (acceptedRoles.includes("ADMIN") && isAdmin) {
+    return "ADMIN";
+  }
+
+  if (acceptedRoles.includes("USER") && isMember) {
+    return "USER";
+  }
+
+  throw new Error("Unauthorized access");
+};

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { IChat } from "../controllers/chat";
+import { ChatMessage } from "../generated/prisma/client";
 
 export enum SupportedCommunityMessages {
   CreateCommunity = "CREATE_COMMUNITY",
@@ -75,9 +76,9 @@ export type OutgoingCommunityMessages = {
 } | {
   type: SupportedCommunityMessages.BroadcastUpvote,
   data: {
-    roomId: string;
+    communityId: string;
     messageId: string;
-    message: IChat;
+    message: BrodcastUpvotes;
   }
 }
 
@@ -159,5 +160,5 @@ export type RemoveAdminType = z.infer<typeof RemoveAdmin>;
 export type GiveTimeoutType = z.infer<typeof GiveTimeout>;
 export type ClearTimeoutType = z.infer<typeof ClearTimeout>;
 
-export type BrodcastMessages = IChat[];
-export type BrodcastUpvotes = IChat;
+export type BrodcastMessages = ChatMessage[];
+export type BrodcastUpvotes = ChatMessage;

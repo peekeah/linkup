@@ -22,7 +22,7 @@ type ChatMessages = Map<Date, Message[]>;
 
 const formatMessages = (message: Message[]) => {
   return message.reduce((acc, entry) => {
-    const dateKey = entry.date.split("T")[0];
+    const dateKey = entry.createdAt.split("T")[0];
 
     if (acc.has(dateKey)) {
       acc.set(dateKey, [...acc.get(dateKey), entry])
@@ -183,14 +183,14 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>
-              <div className="text-center">{getDate(messages[0]?.date, true)}</div>
+              <div className="text-center">{getDate(messages[0]?.createdAt, true)}</div>
               <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (
-                    <div key={message.id} className={`max-w-[700px] space-y-1 !overflow-hidden ${message.sender.userId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                    <div key={message.id} className={`max-w-[700px] space-y-1 !overflow-hidden ${message.senderId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
                       <div className="p-3">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                       {
-                        !message?.isDeleted && message?.sender.userId === userId ?
+                        !message?.isDeleted && message?.senderId === userId ?
                           <div className="flex items-center gap-2 bg-red-300 p-1">
                             <div className="flex items-center gap-1">
                               {
@@ -242,7 +242,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         }
       </div>
       <div className="!flex-1">
-        <div className="flex  justify-center items-center py-5 rounded-xl absolute bottom-0 flex gap-3 w-full">
+        <div className="flex  justify-center items-center py-5 rounded-xl absolute bottom-0 gap-3 w-full">
           <Input
             value={text}
             onChange={onInputChange}

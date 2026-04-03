@@ -1,136 +1,111 @@
-import { UserType } from "../middlewares/auth";
+import { CommunityRole } from "../middlewares/auth";
 import { chatMockData } from "../mock/chat";
-import communities, { IMember } from "./communities";
-import user, { UserId } from "./user";
+import { prisma } from "../utils/db";
+import { IMember } from "./communities";
+import { UserId } from "./user";
 
 export interface IChat {
   id: string;
   content: string;
   sender: IMember;
-  upvotes: UserId[],
-  date: Date;
+  upvotes: UserId[];
   isDeleted: boolean;
+  createdAt: Date;
 }
 
-let globalChatId = 1;
-
 class Chat {
-  private chats: Map<string, IChat[]>;
+  constructor() {}
 
-  constructor() {
-    // Note: Chat mock data initialization
-    // this.chats = new Map();
-    this.chats = chatMockData;
+  async getChats(
+    communityId: string,
+    limit?: number | undefined,
+    offset?: number | undefined,
+  ) {
+    return await prisma.chatMessage.findMany({
+      where: { communityId },
+      skip: offset,
+      take: limit,
+    });
   }
 
-  initChat(roomId: string) {
-    this.chats.set(roomId, [])
+  async addChat(communityId: string, content: string, senderId: string) {
+    return await prisma.chatMessage.create({
+      data: {
+        senderId,
+        content,
+        communityId,
+      },
+    });
   }
 
-  getChats(roomId: string, limit?: number | undefined, offset?: number | undefined) {
-    const existCommunity = this.chats.has(roomId)
+  async updateChat(chatId: string, content: string, userId: UserId, communityRole: CommunityRole) {
 
-    if (!existCommunity) throw new Error("Community not found")
+    const existChat = await prisma.chatMessage.findFirst({
+      where: { id: chatId },
+    });
 
-    const chat = this.chats.get(roomId)
-
-    if (!chat) {
-      throw new Error("Chat not found")
+    if (!existChat) {
+      throw new Error("chat not found");
     }
 
-    return limit && offset
-      ? chat.slice(-1 * limit, -1 * offset)
-      : chat.slice();
+    if (communityRole === "USER" && userId !== existChat.senderId) {
+      throw new Error("Unauthorized access");
+    }
+
+    return await prisma.chatMessage.update({
+      where: { id: chatId },
+      data: { content },
+    });
   }
 
+  async deleteChat(chatId: string, userId: UserId, userRole: CommunityRole) {
+    const existChat = await prisma.chatMessage.findFirst({
+      where: { id: chatId },
+    });
 
-  addChat(roomId: string, content: string, sender: IMember) {
-    const chat = this.chats.get(roomId)
-
-    if (!chat) {
-      throw new Error("Chat not found")
+    if (userRole === "USER" && existChat?.senderId !== userId) {
+      throw new Error("Unauthorized access");
     }
 
-    const id = (globalChatId++).toString();
-    const date = new Date();
-    chat.push({
-      id,
-      content,
-      sender,
-      upvotes: [],
-      date,
-      isDeleted: false
-    })
-
-    // Update last message in user state
-    const community = communities.getCommunity(roomId);
-    user.updateChatHistory(sender.userId, roomId, community.name, { content, date })
-    this.chats.set(roomId, chat)
+    return await prisma.chatMessage.update({
+      data: { content: "", isDeleted: true },
+      where: { id: chatId },
+    });
   }
 
-  updateChat(roomId: string, chatId: string, content: string, userId: UserId, userType: UserType) {
-    const chat = this.chats.get(roomId);
-    if (!chat) {
-      throw new Error("Chat not found")
+  async upvote(userId: string, roomId: string, chatId: string) {
+    const message = await prisma.chatMessage.findFirst({
+      where: { id: chatId },
+      include: {
+        upvotes: { select: { id: true } },
+      },
+    });
+
+    if (!message) {
+      throw new Error("Message not found");
     }
 
-    let messageId = chat.findIndex(({ id }) => id === chatId);
+    const alreadyUpvoted = message.upvotes.some((user) => user.id === userId);
 
-    if (messageId === -1) {
-      throw new Error("message not found")
-    }
-
-    if (userType === "user" && userId !== chat[messageId].sender.userId) {
-      throw new Error("Unauthorized access")
-    }
-
-    chat[messageId] = {
-      ...chat[messageId],
-      content
-    }
-  }
-
-  deleteChat(roomId: string, chatId: string, userId: UserId, userType: UserType) {
-
-    const chat = this.chats.get(roomId)
-
-    if (!chat) throw new Error("Chat not found")
-
-    let messageId = chat.findIndex(({ id }) => id === chatId)
-
-    if (messageId === -1) throw new Error("Message not found")
-
-    if (userType === "user" && userId !== chat[messageId].sender.userId) {
-      throw new Error("Unauthorized access")
-    }
-
-    chat[messageId] = {
-      ...chat[messageId],
-      content: "",
-      isDeleted: true
-    }
-  }
-
-  upvote(userId: string, roomId: string, chatId: string) {
-    const chat = this.chats.get(roomId)
-
-    if (!chat) throw new Error("Chat not found")
-
-    let messageId = chat.findIndex(({ id }) => id === chatId)
-
-    if (messageId === -1) throw new Error("Message not found")
-
-    const message = chat[messageId];
-
-    const existUpvote = message.upvotes.includes(userId)
-
-    if (!existUpvote) {
-      message.upvotes.push(userId)
-    } else {
-      message.upvotes = message.upvotes.filter(el => el !== userId)
-    }
-    chat[messageId] = message;
-    this.chats.set(roomId, chat)
+    return prisma.chatMessage.update({
+      where: { id: chatId },
+      data: {
+        upvotes: alreadyUpvoted
+          ? {
+              disconnect: [{ id: userId }],
+            }
+          : {
+              connect: [{ id: userId }],
+            },
+      },
+      include: {
+        _count: {
+          select: {
+            upvotes: true,
+          },
+        },
+      },
+    });
   }
 }
 

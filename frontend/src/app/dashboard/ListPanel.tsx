@@ -120,7 +120,7 @@ const ListPanel = () => {
                   </Avatar>
                   <div className="w-full">
                     <div className="flex justify-between">
-                      <div className="text-heading">{item.communityName}</div>
+                      <div className="text-heading">{item.community.name}</div>
                       <div className="text-[#1E1E1E] opacity-60">{getDate(item?.date)}</div>
                     </div>
                     <div className="text-[#1E1E1E] opacity-60">{item.content}</div>

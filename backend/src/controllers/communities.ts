@@ -1,8 +1,10 @@
-import { communitiesMockData } from "../mock/communities";
-import { OutgoingCommunityMessages, SupportedCommunityMessages } from "../schema/community";
+import {
+  OutgoingCommunityMessages,
+  SupportedCommunityMessages,
+} from "../schema/community";
 import { activeClients } from "../store/clients";
-import chat from "./chat";
-import user, { UserId } from "./user";
+import { prisma } from "../utils/db";
+import { UserId } from "./user";
 
 export interface ICommunity {
   id: string;
@@ -13,247 +15,210 @@ export interface ICommunity {
   timeouts: ITimeout[];
 }
 
-export interface IUpdateCommunity {
+export interface UpdateCommunity {
   id: string;
   name: string;
 }
 
 export interface IMember {
-  userId: UserId,
+  userId: UserId;
   name: string;
 }
 
 interface ITimeout {
-  userId: UserId,
-  timeout: number
+  userId: UserId;
+  timeout: number;
 }
 
 let globalCommunityId = 1;
 
 class Community {
-  private communities: ICommunity[]
+  constructor() {}
 
-  constructor() {
-    // Note: Mock data initializaton
-    this.communities = communitiesMockData;
+  async create(name: string, owner: IMember) {
+    return await prisma.community.create({
+      data: {
+        name,
+        owner: {
+          connect: { id: owner.userId },
+        },
+      },
+    });
   }
 
-  create(name: string, owner: IMember) {
-    const id = (globalCommunityId++).toString();
-
-    const newEntry = {
-      id,
-      name,
-      owner,
-      admin: [],
-      member: [],
-      timeouts: [],
-    }
-
-    this.communities.push(newEntry)
-    chat.initChat(id)
-
-    return newEntry
+  async update({ id, name }: UpdateCommunity) {
+    await prisma.community.update({
+      where: { id },
+      data: { name },
+    });
   }
 
-  update(payload: IUpdateCommunity) {
-    const id = this.communities.findIndex(({ id }) => id === payload.id)
-
-    if (!id) {
-      throw new Error("Community not found")
-    }
-
-    let community = this.communities[id];
-
-    this.communities[id] = {
-      ...community,
-      name: payload.name
-    }
+  async delete(id: string) {
+    return prisma.community.delete({
+      where: { id },
+    });
   }
 
-  delete(id: string) {
-    this.communities = this.communities.filter(user => user.id !== id)
+  async getCommunities() {
+    return prisma.community.findMany();
   }
 
-  getCommunities() {
-    return this.communities;
-  }
-
-  getCommunity(id: string) {
-    const community = this.communities.find(el => el.id === id)
+  async getCommunity(id: string) {
+    const community = await prisma.community.findFirst({
+      where: { id },
+    });
 
     if (!community) {
-      throw new Error("entry not found")
+      throw new Error("community not found");
     }
+
     return community;
   }
 
-  joinCommunity(id: string, userId: UserId, userName: string) {
-
-    const idx = this.communities.findIndex((community) => id === community.id)
-
-    if (idx === -1) {
-      throw new Error("Community not found")
-    }
-
-    const community = this.communities[idx];
-
-    const existUser = community?.member?.find(user => user.userId === userId)
-
-    if (existUser) throw new Error("user already joined");
-
-    community?.member.push({ userId, name: userName })
-
-    const chats = chat.getChats(community.id)
-    const message = chats[chats.length - 1];
-
-    // Add to recent chat
-    user.updateChatHistory(userId, id, community.name, message)
+  async joinCommunity(id: string, userId: string, userName: string) {
+    return await prisma.community.update({
+      data: { members: { connect: { id: userId } } },
+      where: { id },
+    });
   }
 
-  leaveCommunity(id: string, userId: UserId) {
-
-    const idx = this.communities.findIndex((community) => id === community.id)
-
-    if (idx === -1) {
-      throw new Error("Community not found")
-    }
-
-    const existUser = this.communities[idx].member.find(user => user.userId === userId)
-
-    if (!existUser) throw new Error("User is not member of community");
-
-    this.communities[idx].member = this.communities[idx].member.filter(user => user.userId !== userId)
-
+  async leaveCommunity(id: string, userId: UserId) {
+    return await prisma.community.update({
+      data: { members: { disconnect: { id: userId } } },
+      where: { id },
+    });
   }
 
-  addAdmin(id: string, userId: UserId, userName: string) {
-    const idx = this.communities.findIndex(community => community.id === id);
-
-    if (idx === -1) {
-      throw new Error("Community not found")
-    }
-
-    const existUser = this.communities[idx].member.find(user => user.userId === userId)
-
-    if (!existUser) throw new Error("User is not member of community");
-
-    const existAdmin = this.communities[idx].admin.find(user => user.userId === userId)
-
-    if (existAdmin) throw new Error("Already admin")
-
-    this.communities[idx].admin.push({ userId, name: userName })
-
+  async addAdmin(id: string, userId: UserId, userName: string) {
+    return await prisma.community.update({
+      data: { admins: { connect: { id: userId } } },
+      where: { id },
+    });
   }
 
-  removeAdmin(id: string, userId: UserId) {
-    const idx = this.communities.findIndex(community => community.id === id);
-
-    if (idx === -1) {
-      throw new Error("Community not found")
-    }
-
-    const existUser = this.communities[idx].member.find(user => user.userId === userId)
-
-    if (!existUser) throw new Error("User is not member of community");
-
-    const existAdmin = this.communities[idx].admin.find(user => user.userId === userId)
-
-    if (!existAdmin) throw new Error("User is not an admin")
-
-    this.communities[idx].admin = this.communities[idx].admin.filter(user => user.userId !== userId)
-
+  async removeAdmin(id: string, userId: UserId) {
+    return await prisma.community.update({
+      data: { admins: { disconnect: { id: userId } } },
+      where: { id },
+    });
   }
 
-  searchCommunity(search: string) {
-    return this.communities.filter(community => community.name?.toLowerCase().includes(search?.toLowerCase()))
+  async searchCommunity(search: string) {
+    return prisma.community.findMany({
+      where: { name: { contains: search } },
+    });
   }
 
   // Todo: Add authorization
-  giveTimeout(id: string, userId: UserId, timeout: number) {
+  async giveTimeout(id: string, userId: string, timeout: number) {
+    const isCommunityMember = await prisma.community.findFirst({
+      where: {
+        id,
+        members: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
 
-    const idx = this.communities.findIndex(community => community.id === id);
-
-    if (idx === -1) {
-      throw new Error("Community not found")
+    if (!isCommunityMember) {
+      throw new Error("User is not a member of the community");
     }
 
-    const existUser = this.communities[idx].member.find(user => user.userId === userId)
-
-    if (!existUser) throw new Error("User is not member of community");
-
-    this.communities[idx].timeouts.push({
-      userId,
-      timeout
-    })
-
+    return await prisma.timeout.create({
+      data: {
+        userId,
+        communityId: id,
+        expiresAt: new Date(Date.now() + timeout * 1000),
+      },
+    });
   }
 
-  clearTimeout(id: string, userId: UserId) {
+  async clearTimeout(id: string, userId: UserId) {
+    const isCommunityMember = await prisma.community.findFirst({
+      where: {
+        id,
+        members: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
 
-    const idx = this.communities.findIndex(community => community.id === id);
-
-    if (idx === -1) {
-      throw new Error("Community not found")
+    if (!isCommunityMember) {
+      throw new Error("User is not a member of the community");
     }
 
-    const existUser = this.communities[idx].member.find(user => user.userId === userId)
-
-    if (!existUser) throw new Error("User is not member of community");
-
-    this.communities[idx].timeouts = this.communities[idx].timeouts.filter(el => el.userId !== userId)
+    await prisma.timeout.deleteMany({
+      where: {
+        userId,
+        communityId: id,
+      },
+    });
   }
 
-  broadcastMessage(roomId: string) {
-    const community = this.communities.find(el => el.id === roomId);
+  async broadcastMessage(communityId: string) {
+    const community = await prisma.community.findFirst({
+      where: { id: communityId },
+      include: { members: true },
+    });
 
-    if (!community) throw new Error("Community not found")
+    if (!community) throw new Error("Community not found");
 
-    const messages = chat.getChats(roomId)
+    const messages = await prisma.chatMessage.findMany({
+      where: { communityId },
+      include: { sender: true, upvotes: true },
+    });
 
-    community.member.forEach(member => {
-      const conn = activeClients.get(member.userId)
+    community.members.forEach((member) => {
+      const conn = activeClients.get(member.id);
       const response: OutgoingCommunityMessages = {
         type: SupportedCommunityMessages.BrodcastMessages,
         data: {
-          roomId: roomId,
-          messages: messages
-        }
-      }
+          roomId: communityId,
+          messages,
+        },
+      };
       if (conn) {
-        conn.send(JSON.stringify(response))
+        conn.send(JSON.stringify(response));
       }
     });
   }
 
-  broadcastUpvotes(roomId: string, messageId: string) {
-    const community = this.communities.find(el => el.id === roomId);
+  async broadcastUpvotes(communityId: string, messageId: string) {
+    const community = await prisma.community.findFirst({
+      where: { id: communityId },
+      include: { members: true },
+    });
 
-    if (!community) throw new Error("Community not found")
+    if (!community) throw new Error("Community not found");
 
-    const messages = chat.getChats(roomId)
-    const message = messages.find(el => el.id === messageId)
+    const message = await prisma.chatMessage.findFirst({
+      where: { id: messageId },
+      include: { sender: true, upvotes: true },
+    });
 
     if (!message) {
-      throw new Error("Message not found")
+      throw new Error("Message not found");
     }
 
-    community.member.forEach(member => {
-      const conn = activeClients.get(member.userId)
+    community.members.forEach((member) => {
+      const conn = activeClients.get(member.id);
       if (conn) {
         const response: OutgoingCommunityMessages = {
           type: SupportedCommunityMessages.BroadcastUpvote,
           data: {
-            roomId,
+            communityId,
             messageId,
-            message
-          }
-        }
-        conn.send(JSON.stringify(response))
+            message,
+          },
+        };
+        conn.send(JSON.stringify(response));
       }
     });
   }
-
 }
 
 export default new Community();

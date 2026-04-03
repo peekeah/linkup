@@ -23,22 +23,26 @@ interface State {
 export interface Message {
   id: string;
   content: string;
-  sender: Member;
+  senderId: string;
   upvotes: UserId[],
-  // date: Date;
-  date: string;
   isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface LastMessage {
+  id: string;
   content: string;
-  date: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Note: Add for private message
 export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
+  date: string;
+  community: Community;
 }
 
 export const ChatContext = createContext<ChatContextType>({

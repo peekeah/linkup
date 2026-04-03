@@ -1,9 +1,8 @@
-import { userMockData } from "../mock/user";
 import { SupportedOutgoingUserMessages } from "../schema/user";
 import { activeClients } from "../store/clients";
 import { generateHash, verifyHash } from "../utils/bcrypt";
+import { prisma } from "../utils/db";
 import { generateToken } from "../utils/jwt";
-import communities from "./communities";
 
 export type UserId = string;
 
@@ -14,13 +13,13 @@ export interface IUser {
   mobile: string;
   bio: string;
   password: string;
-  address?: IAddress;
-  chatHistory: ChatHistory[];
+  // address?: IAddress;
+  // chatHistory: ChatHistory[];
   // connection: WebSocket;
 }
 
 export interface UpdateUser {
-  id: UserId,
+  id: string;
   name: string;
   email: string;
   mobile: string;
@@ -48,36 +47,30 @@ interface IAddress {
 let globalUserId = 1;
 
 class User {
-  private users: IUser[];
-
-  constructor() {
-    // Note: User mock data initialization
-    this.users = userMockData;
-  }
+  constructor() {}
 
   async create(user: IUser) {
-    const newUser = {
+    const data = {
       ...user,
       password: await generateHash(user.password),
-      id: (globalUserId++).toString(),
-    }
-    this.users.push(newUser)
-    return newUser
+    };
+
+    const res = await prisma.user.create({ data });
+    return res;
   }
 
   async login(email: string, password: string) {
     try {
-
-      const user = this.users.find(user => user.email === email)
+      const user = await prisma.user.findFirst({ where: { email } });
 
       if (!user) {
-        throw new Error("User does not exist")
+        throw new Error("User does not exist");
       }
 
-      const comparePassword = await verifyHash(password, user.password)
+      const comparePassword = await verifyHash(password, user.password);
 
       if (!comparePassword) {
-        throw new Error("Password is incorrect")
+        throw new Error("Password is incorrect");
       }
 
       const userData = {
@@ -89,100 +82,115 @@ class User {
         token: generateToken({
           userId: user.id,
           email: user.email,
-          userName: user.name,
-        })
-      }
+          userName: user.name ?? "",
+        }),
+      };
 
-      return userData
+      return userData;
     } catch (err) {
-      throw err
+      throw err;
     }
   }
 
-  update(user: UpdateUser) {
-    const id = this.users.findIndex(({ id }) => id === user.id)
-
-    if (id === -1) {
-      throw new Error("user not found")
-    }
-
-    this.users[id] = { ...this.users[id], ...user }
-    return user
-  }
-
-  delete(id: string) {
-    this.users = this.users.filter(user => user.id !== id)
-  }
-
-  getUsers() {
-    return this.users;
-  }
-
-  getUser(id: string) {
-    const user = this.users.find(el => el.id === id)
-
-    if (!user) {
-      throw new Error("user not found")
-    }
-
-    const { chatHistory, password, ...userData } = user;
-
-    return userData;
-
-  }
-
-  updateChatHistory(id: UserId, communityId: string, communityName: string, message: LastMessage) {
-
-    let user = this.users.find(el => el.id === id)
-
-    if (!user) {
-      return null
-    }
-
-    user.chatHistory = user.chatHistory.filter(el => el.communityId !== communityId);
-
-    const newMsg = {
-      communityId,
-      communityName,
-      ...message,
-    }
-
-    user.chatHistory = [newMsg, ...user.chatHistory]
-
-    const community = communities.getCommunity(communityId);
-
-    // Broadcast recent chats to all clients
-    community.member.forEach(member => {
-      const conn = activeClients.get(member.userId)
-      if (conn) {
-        conn.send(JSON.stringify({
-          type: SupportedOutgoingUserMessages.ChatHistory,
-          data: user.chatHistory
-        }))
-      }
+  async update(user: UpdateUser) {
+    const { id, ...userData } = user;
+    const res = await prisma.user.update({
+      where: { id: user.id },
+      data: userData,
     });
 
+    return res;
   }
 
-  searchUser(search: string) {
-    return this.users.flatMap((user) => {
-      user.name.toLowerCase().includes(search?.toLowerCase()) ? ({
-        id: user.id,
-        name: user.name,
-        avatar: user.email
-      }) : []
-    })
+  async delete(id: string) {
+    await prisma.user.delete({ where: { id } });
   }
 
-  getChatHistory(id: UserId) {
-    const user = this.users.find(el => el.id === id)
+  async getUsers() {
+    return await prisma.user.findMany();
+  }
+
+  async getUser(id: string) {
+    const user = await prisma.user.findFirst({ where: { id } });
 
     if (!user) {
-      throw new Error("user not found")
+      throw new Error("user not found");
     }
 
-    return user.chatHistory;
+    return user;
+  }
 
+  async updateChatHistory(
+    id: UserId,
+    communityId: string,
+    communityName: string,
+    content: string,
+  ) {
+    const community = await prisma.community.findFirst({
+      where: { id: communityId },
+      include: { members: true },
+    });
+
+    if (!community) {
+      return null;
+    }
+
+    let user = await prisma.user.findFirst({ where: { id } });
+
+    if (!user) {
+      return null;
+    }
+
+    const newMsg = await prisma.chatMessage.create({
+      data: {
+        communityId,
+        senderId: user.id,
+        content,
+      },
+    });
+
+    // Broadcast recent chats to all clients
+    community.members.forEach(async ({ id }) => {
+      const conn = activeClients.get(id);
+      if (conn) {
+        conn.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.ChatHistory,
+            data: {
+              communityId,
+              communityName,
+              content,
+            },
+          }),
+        );
+      }
+    });
+  }
+
+  async searchUser(search: string) {
+    return await prisma.user.findMany({
+      where: { name: { contains: search } },
+    });
+  }
+
+  // #TODO: Fix personal messages
+  async getChatHistory(id: UserId) {
+    const user = await prisma.user.findFirst({ where: { id } });
+
+    if (!user) {
+      throw new Error("user not found");
+    }
+
+    const latestMessages = await prisma.$queryRaw`
+      SELECT DISTINCT ON ("communityId")
+        m.*,
+        row_to_json(c.*) AS community
+      FROM "ChatMessage" m
+      JOIN "Community" c ON c.id = m."communityId"
+      ORDER BY "communityId", m."updatedAt" DESC
+    `;
+
+    return latestMessages;
   }
 }
 
