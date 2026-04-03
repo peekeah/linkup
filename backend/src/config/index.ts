@@ -2,6 +2,7 @@ export type Environment = {
   NODE_ENV: "development" | "production";
   API_PORT: string;
   JWT_SECRET: string;
+  DATABASE_URL: string;
 }
 
 export const getEnv = <K extends keyof Environment>(key: K, fallback?: Environment[K]): Environment[K] => {

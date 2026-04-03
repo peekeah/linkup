@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model User {
+  id      String @id @default(uuid())
+  email   String @unique
+  name    String?
+  mobile  String?
+  bio     String?
+  password String
+  role    Role   @default(USER)
+
+  address Address?
+
+  memberOfCommunities Community[] @relation("communityMembership")
+  adminOfCommunities  Community[] @relation("communityAdmin")
+  ownedCommunities    Community[] @relation("communityOwnership")
+  messageUpvotes      ChatMessage[] @relation("messageUpvotes")
+  sentMessages        ChatMessage[] @relation("sentMessages")
+
+  timeouts Timeout[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Address {
+  id      String @id @default(uuid())
+  street  String
+  area    String?
+  city    String
+  state   String
+  country String
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Timeout {
+  id          String @id @default(uuid())
+  userId      String
+  communityId String
+  expiresAt   DateTime
+
+  user      User      @relation(fields: [userId], references: [id])
+  community Community @relation(fields: [communityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Community {
+  id      String @id @default(uuid())
+  name    String @unique
+
+  ownerId String
+  owner   User @relation("communityOwnership", fields: [ownerId], references: [id])
+
+  admins  User[] @relation("communityAdmin")
+  members User[] @relation("communityMembership")
+
+  chatMessages ChatMessage[]
+  timeouts Timeout[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ChatMessage {
+  id          String @id @default(uuid())
+  content     String
+  senderId    String 
+  communityId String
+  upvotes     User[] @relation("messageUpvotes")
+  isDeleted   Boolean @default(false)
+
+  sender    User      @relation("sentMessages", fields: [senderId], references: [id])
+  community Community @relation(fields: [communityId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([communityId])
+  @@index([senderId])
+}
