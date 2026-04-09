@@ -77,6 +77,8 @@ const ListPanel = () => {
     setSearchFilter(e.target.value)
   }
 
+  console.log("chatHistory", chatHistory)
+
   return (
     <div className="h-full space-y-3">
       <div className="p-3 py-5 flex items-center gap-3 justify-between">
@@ -120,10 +122,10 @@ const ListPanel = () => {
                   </Avatar>
                   <div className="w-full">
                     <div className="flex justify-between">
-                      <div className="text-heading">{item.community.name}</div>
+                      <div className="text-heading">{item.communityName}</div>
                       <div className="text-[#1E1E1E] opacity-60">{getDate(item?.date)}</div>
                     </div>
-                    <div className="text-[#1E1E1E] opacity-60">{item.content}</div>
+                    <div className="text-[#1E1E1E] opacity-60">{item.message}</div>
                   </div>
                 </div>
                 {index !== userList.length - 1 ? <Separator /> : null}

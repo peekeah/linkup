@@ -191,16 +191,32 @@ class User {
       throw new Error("user not found");
     }
 
-    const latestMessages = await prisma.$queryRaw`
-      SELECT DISTINCT ON ("communityId")
-        m.*,
-        row_to_json(c.*) AS community
-      FROM "ChatMessage" m
-      JOIN "Community" c ON c.id = m."communityId"
-      ORDER BY "communityId", m."updatedAt" DESC
-    `;
+    const communities = await prisma.community.findMany({
+      where: {
+        members: { some: { id } },
+      },
+      include: {
+        chatMessages: {
+          where: { isDeleted: false },
+          orderBy: { createdAt: "desc" },
+          take: 1, // only the latest message per community
+          include: {
+            sender: { select: { id: true, name: true } },
+          },
+        },
+      },
+    });
 
-    return latestMessages;
+    return communities
+      .filter((c) => c.chatMessages.length > 0)
+      .map((c) => ({
+        communityId: c.id,
+        communityName: c.name,
+        message: c.chatMessages[0].content,
+        sender: c.chatMessages[0].sender.name,
+        createdAt: c.chatMessages[0].createdAt,
+      }))
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 }
 
