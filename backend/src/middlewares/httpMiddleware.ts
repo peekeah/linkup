@@ -5,19 +5,35 @@ import { Role } from "../generated/prisma/enums";
 
 export const requireRole = (role: Role) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) return res.status(401).send({ status: false, message: "Unauthorized" });
-
-    const tokenData = verifyToken(token);
-    const userData = await prisma.user.findFirst({
-      where: { id: tokenData.userId },
-      select: { role: true },
-    });
-
-    if (userData?.role !== role) {
-      return res.status(403).send({ status: false, message: "Forbidden" });
+    try {
+      await validateRole(req, role); 
+      next();
+    } catch (err) {
+      res.status(401).send({
+        status: false,
+        message: err instanceof Error ? err.message : "Unauthorized",
+      });
     }
-
-    next();
   };
+};
+
+export const validateRole = async (req: Request, role: Role) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) throw new Error("Unauthorized");
+
+  const tokenData = verifyToken(token);
+  const userData = await prisma.user.findFirst({
+    where: { id: tokenData.userId },
+    select: { id: true, role: true },
+  });
+
+  if (!userData) throw new Error("Unauthorized");
+
+  // Role hierarchy: ADMIN can do anything USER can do
+  const roleHierarchy: Role[] = ["USER", "ADMIN"];
+  if (roleHierarchy.indexOf(userData.role) < roleHierarchy.indexOf(role)) {
+    throw new Error("Forbidden");
+  }
+
+  return userData;
 };

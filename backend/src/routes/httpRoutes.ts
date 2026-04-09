@@ -4,7 +4,7 @@ import user from "../controllers/user";
 import errorHandler from "../middlewares/error";
 import { prisma } from "../utils/db";
 import { generateHash } from "../utils/bcrypt";
-import { requireRole } from "../middlewares/httpMiddleware";
+import { requireRole, validateRole } from "../middlewares/httpMiddleware";
 
 const router = Router();
 
@@ -78,28 +78,26 @@ router.get("/users", requireRole("ADMIN"), async (req, res) => {
 
 // Update User
 router.post("/users/:id", async (req, res) => {
-  const id = req.params.id;
   try {
-    const { name, email, mobile, address } = req.body;
-    const newUserData = {
-      id,
-      name,
-      email,
-      mobile,
-      address,
-    };
+    const { id } = await validateRole(req, "USER");
 
-    await user.update(newUserData);
+    if (id !== req.params.id) {
+      return res.status(403).send({ status: false, message: "Forbidden" });
+    }
+
+    const { name, email, mobile } = req.body;
+
+    await user.update({ id, name, email, mobile });
 
     res.send({
       status: true,
-      data: newUserData,
+      data: { id, name, email, mobile },
     });
   } catch (err) {
     const { statusCode, errMessage } = errorHandler(err);
     res.status(statusCode).send({
       status: false,
-      messge: errMessage,
+      message: errMessage,
     });
   }
 });
