@@ -1,5 +1,4 @@
 import { CommunityRole } from "../middlewares/auth";
-import { chatMockData } from "../mock/chat";
 import { prisma } from "../utils/db";
 import { IMember } from "./communities";
 import { UserId } from "./user";

@@ -1,140 +1,196 @@
 import { IncomingMessage } from "../schema";
-import { SupportedChatMessages, OutgoingChatMessages } from "../schema/chat"
-import chat from "../controllers/chat"
+import { SupportedChatMessages, OutgoingChatMessages } from "../schema/chat";
+import chat from "../controllers/chat";
 import { SupportedCommunityMessages } from "../schema/community";
 import communities from "../controllers/communities";
-import { authenticate, authorize, CommunityRole} from "../middlewares/auth";
+import { authenticate, authorize, CommunityRole } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
-import { SupportedOutgoingUserMessages, SupportedUserMessages } from "../schema/user";
+import {
+  SupportedOutgoingUserMessages,
+  SupportedUserMessages,
+} from "../schema/user";
 import user from "../controllers/user";
 
-const wsRequestHandler = async(ws: CustomWebsocket, message: IncomingMessage, tokenData: TokenData) => {
+const wsRequestHandler = async (
+  ws: CustomWebsocket,
+  message: IncomingMessage,
+  tokenData: TokenData,
+) => {
   try {
     // Auth
-    authenticate(tokenData.userId)
+    await authenticate(tokenData.userId);
 
-    let communityRole : CommunityRole | null = null;
+    let communityRole: CommunityRole | null = null;
 
     const { type, payload } = message;
 
     switch (type) {
       // User Routes
       case SupportedUserMessages.ChatHistory:
-        ws.send(JSON.stringify({
-          type: SupportedOutgoingUserMessages.ChatHistory,
-          data: await user.getChatHistory(tokenData.userId)
-        }))
+        ws.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.ChatHistory,
+            data: await user.getChatHistory(tokenData.userId),
+          }),
+        );
         break;
 
       // Chat routes
       case SupportedChatMessages.GetChat:
-        ws.send(JSON.stringify({
-          type: OutgoingChatMessages.GetChat,
-          data: {
-            roomId: payload.roomId,
-            messages: await chat.getChats(payload.roomId, payload.limit, payload.offset)
-          }
-        }))
+        ws.send(
+          JSON.stringify({
+            type: OutgoingChatMessages.GetChat,
+            data: {
+              roomId: payload.roomId,
+              messages: await chat.getChats(
+                payload.roomId,
+                payload.limit,
+                payload.offset,
+              ),
+            },
+          }),
+        );
         break;
       case SupportedChatMessages.AddChat:
         const sender = {
           userId: tokenData.userId,
-          name: tokenData.userName
-        }
-        await chat.addChat(payload.roomId, payload.content, sender.userId)
-        await communities.broadcastMessage(payload.roomId)
+          name: tokenData.userName,
+        };
+        await chat.addChat(payload.roomId, payload.content, sender.userId);
+        await communities.broadcastMessage(payload.roomId);
         break;
 
       // Todo(Auth) - OP & Admin & Owner
       case SupportedChatMessages.DeleteChat:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["USER", "ADMIN", "OWNER"])
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "USER",
+          "ADMIN",
+          "OWNER",
+        ]);
         await chat.deleteChat(payload.chatId, tokenData.userId, communityRole);
-        await communities.broadcastMessage(payload.roomId)
+        await communities.broadcastMessage(payload.roomId);
         break;
 
       case SupportedChatMessages.UpdateChat:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["USER"])
-        await chat.updateChat(payload.chatId, payload.content, tokenData.userId, communityRole);
-        await communities.broadcastMessage(payload.roomId)
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "USER",
+        ]);
+        await chat.updateChat(
+          payload.chatId,
+          payload.content,
+          tokenData.userId,
+          communityRole,
+        );
+        await communities.broadcastMessage(payload.roomId);
         break;
 
       case SupportedChatMessages.UpvoteMessage:
-        chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
-        await communities.broadcastUpvotes(payload.roomId, payload.chatId)
+        await chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
+        await communities.broadcastUpvotes(payload.roomId, payload.chatId);
         break;
 
       // Community routes
       case SupportedCommunityMessages.CreateCommunity:
-        await communities.create(payload.name, { userId: tokenData.userId, name: tokenData.userName })
+        await communities.create(payload.name, {
+          userId: tokenData.userId,
+          name: tokenData.userName,
+        });
         break;
 
       // Todo(Auth) - Owner only
       case SupportedCommunityMessages.UpdateCommunity:
-        communityRole = await authorize(payload.id, tokenData.userId, ["OWNER"]);
-        await communities.update(payload)
+        communityRole = await authorize(payload.id, tokenData.userId, [
+          "OWNER",
+        ]);
+        await communities.update(payload);
         break;
 
       // Todo(Auth) - Owner only
       case SupportedCommunityMessages.DeleteCommunity:
-        communityRole = await authorize(payload.id, tokenData.userId, ["OWNER"]);
-        await communities.delete(payload.id)
+        communityRole = await authorize(payload.id, tokenData.userId, [
+          "OWNER",
+        ]);
+        await communities.delete(payload.id);
         break;
 
       case SupportedCommunityMessages.GetCommunity:
-        ws.send(JSON.stringify(await communities.getCommunity(payload.id)))
+        ws.send(JSON.stringify(await communities.getCommunity(payload.id)));
         break;
 
       case SupportedCommunityMessages.GetCommunities:
-        ws.send(JSON.stringify(communities.getCommunities()))
+        ws.send(JSON.stringify(await communities.getCommunities()));
         break;
 
       case SupportedCommunityMessages.Search:
-        ws.send(JSON.stringify({
-          type: "SEARCH",
-          data: await communities.searchCommunity(payload.search)
-        }))
+        ws.send(
+          JSON.stringify({
+            type: "SEARCH",
+            data: await communities.searchCommunity(payload.search),
+          }),
+        );
         break;
 
       // Todo(Auth) - Owner only
       case SupportedCommunityMessages.AddAdmin:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["OWNER"]);
-        await communities.addAdmin(payload.roomId, payload.userId, payload.userName)
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "OWNER",
+        ]);
+        await communities.addAdmin(
+          payload.roomId,
+          payload.userId,
+          payload.userName,
+        );
         break;
 
       // Todo(Auth) - Owner only
       case SupportedCommunityMessages.RemoveAdmin:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["OWNER"]);
-        await communities.removeAdmin(payload.roomId, payload.userId)
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "OWNER",
+        ]);
+        await communities.removeAdmin(payload.roomId, payload.userId);
         break;
 
       case SupportedCommunityMessages.JoinCommunity:
-        await communities.joinCommunity(payload.roomId, tokenData.userId, payload.userName)
+        await communities.joinCommunity(
+          payload.roomId,
+          tokenData.userId,
+          payload.userName,
+        );
         break;
 
       case SupportedCommunityMessages.LeaveCommunity:
-        await communities.leaveCommunity(payload.roomId, tokenData.userId)
+        await communities.leaveCommunity(payload.roomId, tokenData.userId);
         break;
 
-      // Todo(Auth) - Admin & Owner 
+      // Todo(Auth) - Admin & Owner
       case SupportedCommunityMessages.GiveTimeout:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["OWNER", "ADMIN"]);
-        await communities.giveTimeout(payload.roomId, payload.userId, payload.timeout)
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "OWNER",
+          "ADMIN",
+        ]);
+        await communities.giveTimeout(
+          payload.roomId,
+          payload.userId,
+          payload.timeout,
+        );
         break;
 
-      // Todo(Auth) - Admin & Owner 
+      // Todo(Auth) - Admin & Owner
       case SupportedCommunityMessages.ClearTimeout:
-        communityRole = await authorize(payload.roomId, tokenData.userId, ["OWNER", "ADMIN"]);
-        await communities.clearTimeout(payload.roomId, payload.userId)
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "OWNER",
+          "ADMIN",
+        ]);
+        await communities.clearTimeout(payload.roomId, payload.userId);
         break;
 
       default:
-        throw new Error("Invalid request")
+        throw new Error("Invalid request");
     }
-
   } catch (err) {
-    console.log("err", err)
+    console.log("err", err);
   }
-}
+};
 
 export default wsRequestHandler;

@@ -44,8 +44,6 @@ interface IAddress {
   country: string;
 }
 
-let globalUserId = 1;
-
 class User {
   constructor() {}
 
@@ -107,7 +105,15 @@ class User {
   }
 
   async getUsers() {
-    return await prisma.user.findMany();
+    return await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        mobile: true,
+        bio: true,
+      },
+    });
   }
 
   async getUser(id: string) {
@@ -117,7 +123,9 @@ class User {
       throw new Error("user not found");
     }
 
-    return user;
+    const { password: _, ...userData } = user;
+
+    return userData;
   }
 
   async updateChatHistory(
@@ -135,13 +143,15 @@ class User {
       return null;
     }
 
-    let user = await prisma.user.findFirst({ where: { id } });
+    let user = await prisma.user.findFirst({
+      where: { id },
+    });
 
     if (!user) {
       return null;
     }
 
-    const newMsg = await prisma.chatMessage.create({
+    await prisma.chatMessage.create({
       data: {
         communityId,
         senderId: user.id,
@@ -169,7 +179,7 @@ class User {
 
   async searchUser(search: string) {
     return await prisma.user.findMany({
-      where: { name: { contains: search } },
+      where: { name: { contains: search, mode: "insensitive" } },
     });
   }
 

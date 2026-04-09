@@ -3,6 +3,7 @@ import UserSchema, { LoginType } from "../schema/user";
 import user from "../controllers/user";
 import errorHandler from "../middlewares/error";
 import { prisma } from "../utils/db";
+import { generateHash } from "../utils/bcrypt";
 
 const router = Router();
 
@@ -17,13 +18,17 @@ router.post("/signup", async (req, res) => {
 
     // User validation
     UserSchema.parse(userData);
+    const hashedPassword = await generateHash(userData.password);
 
-    const newUser = await prisma.user.create({
-      data: userData,
+    const { password: _, ...newUser } = await prisma.user.create({
+      data: {
+        ...userData,
+        password: hashedPassword,
+      },
     });
 
     res.send({
-      statue: true,
+      status: true,
       data: newUser,
     });
   } catch (err) {
@@ -55,9 +60,9 @@ router.post("/login", async (req, res) => {
 });
 
 // Todo: Admin only route
-router.get("/users", (_req, res) => {
+router.get("/users", async (_req, res) => {
   try {
-    const users = user.getUsers();
+    const users = await user.getUsers();
     res.send({
       status: true,
       data: users,
@@ -72,9 +77,10 @@ router.get("/users", (_req, res) => {
 });
 
 // Update User
-router.post("/users/:id", (req, res) => {
+router.post("/users/:id", async (req, res) => {
+  const id = req.params.id;
   try {
-    const { id, name, email, mobile, address } = req.body;
+    const { name, email, mobile, address } = req.body;
     const newUserData = {
       id,
       name,
@@ -83,7 +89,7 @@ router.post("/users/:id", (req, res) => {
       address,
     };
 
-    user.update(newUserData);
+    await user.update(newUserData);
 
     res.send({
       status: true,

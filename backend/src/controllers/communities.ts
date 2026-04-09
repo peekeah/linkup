@@ -30,8 +30,6 @@ interface ITimeout {
   timeout: number;
 }
 
-let globalCommunityId = 1;
-
 class Community {
   constructor() {}
 
@@ -105,7 +103,7 @@ class Community {
 
   async searchCommunity(search: string) {
     return prisma.community.findMany({
-      where: { name: { contains: search } },
+      where: { name: { contains: search, mode: "insensitive" } },
     });
   }
 
