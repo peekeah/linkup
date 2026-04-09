@@ -4,6 +4,7 @@ import user from "../controllers/user";
 import errorHandler from "../middlewares/error";
 import { prisma } from "../utils/db";
 import { generateHash } from "../utils/bcrypt";
+import { requireRole } from "../middlewares/httpMiddleware";
 
 const router = Router();
 
@@ -59,8 +60,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// Todo: Admin only route
-router.get("/users", async (_req, res) => {
+router.get("/users", requireRole("ADMIN"), async (req, res) => {
   try {
     const users = await user.getUsers();
     res.send({
