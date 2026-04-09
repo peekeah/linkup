@@ -190,6 +190,12 @@ const wsRequestHandler = async (
     }
   } catch (err) {
     console.log("err", err);
+    ws.send(
+      JSON.stringify({
+        type: "ERROR",
+        message: err instanceof Error ? err.message : "Unknown error",
+      }),
+    );
   }
 };
 

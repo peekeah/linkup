@@ -28,6 +28,17 @@ class Chat {
   }
 
   async addChat(communityId: string, content: string, senderId: string) {
+    // Validate timeout
+    const activeTimeout = await prisma.timeout.findFirst({
+      where: { userId: senderId, communityId, expiresAt: { gt: new Date() } },
+    });
+
+    if (activeTimeout) {
+      throw new Error(
+        "You are in timeout until " + activeTimeout.expiresAt.toISOString(),
+      );
+    }
+
     return await prisma.chatMessage.create({
       data: {
         senderId,
@@ -37,8 +48,12 @@ class Chat {
     });
   }
 
-  async updateChat(chatId: string, content: string, userId: UserId, communityRole: CommunityRole) {
-
+  async updateChat(
+    chatId: string,
+    content: string,
+    userId: UserId,
+    communityRole: CommunityRole,
+  ) {
     const existChat = await prisma.chatMessage.findFirst({
       where: { id: chatId },
     });
