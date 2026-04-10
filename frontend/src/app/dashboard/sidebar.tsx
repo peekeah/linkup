@@ -1,50 +1,46 @@
-import MessageIcon from "@/assets/message-icon"
-import ButtonIcon from "@/components/ui/button-icon";
-import SettingsIcon, { SvgProps } from "@/assets/settings"
-import NotificationIcon from "@/assets/notification"
-import PeopleIcon from "@/assets/people"
-import UserIcon from "@/assets/user"
+import { IconBell, IconLogout, IconMessage, IconSettings, IconUser, IconUsersGroup } from "@tabler/icons-react"
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { LogOut, LucideProps } from "lucide-react";
 import useAuth from "@/hooks/useAuth";
+import clsx from "clsx";
 
 const sidebarTabs: Tab[] = [
   {
     id: "chats",
     title: "Chats",
     link: "",
-    icon: MessageIcon,
+    icon: <IconMessage />,
   },
   {
     id: "personal",
     title: "Personal",
     link: "private",
-    icon: UserIcon,
+    icon: <IconUser />,
   },
   {
     id: "notification",
     title: "Notification",
     link: "notification",
-    icon: NotificationIcon,
+    icon: <IconBell />,
   },
   {
     id: "communities",
     title: "Communities",
     link: "communities",
-    icon: PeopleIcon,
+    icon: <IconUsersGroup />,
   },
   {
     id: "logout",
     title: "Logout",
     link: "logout",
-    svg: LogOut
+    icon: <IconLogout />,
   },
   {
     id: "setting",
     title: "Setting",
     link: "setting",
-    icon: SettingsIcon,
+    icon: <IconSettings />,
   },
 ]
 
@@ -52,17 +48,8 @@ type Tab = {
   id: string;
   title: string;
   link: string;
-} & (
-    | {
-      icon: React.FC<SvgProps>;
-      svg?: never;
-    } | {
-      icon?: never;
-      svg: React.ForwardRefExoticComponent<
-        Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-      >
-    }
-  )
+  icon: JSX.Element;
+}
 
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<Tab>(sidebarTabs[0])
@@ -89,19 +76,15 @@ const Sidebar = () => {
             key={tab.id}
             className={tab.id === "setting" ? "absolute bottom-5" : ""}
           >
-            {
-              tab.icon ?
-                <ButtonIcon
-                  icon={tab.icon}
-                  active={tab.id === activeTab.id}
-                  onClick={() => handleSelectTab(tab)}
-                /> :
-                <ButtonIcon
-                  svg={tab.svg}
-                  active={tab.id === activeTab.id}
-                  onClick={() => handleSelectTab(tab)}
-                />
-            }
+            <Button
+              onClick={() => handleSelectTab(tab)}
+              className={clsx(
+                "bg-secondary/10 text-primary border border-primary/30 transition-all cursor-pointer shadow-lg rounded-md size-12 hover:bg-primary hover:text-secondary hover:border-primary",
+                tab.id === activeTab.id && "bg-primary text-secondary"
+              )}
+            >
+              {tab.icon}
+            </Button>
           </div>
         ))
       }

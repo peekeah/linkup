@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
-import { Toaster } from "@/components/ui/toaster";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Create Next App",

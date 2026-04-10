@@ -1,22 +1,20 @@
 "use client";
-import { Avatar } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
-import { Pencil, Trash2 as Trash, ArrowBigUp as ArrowUp, ArrowBigDown as ArrowDown } from "lucide-react";
 
 import ProfilePicture from "@/assets/person-messaging.png";
 import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useState } from "react";
-import ButtonIcon from "@/components/ui/button-icon";
-import InfoIcon from "@/assets/info-circle";
-import SendIcon from "@/assets/send-icon";
+import { Button } from "@/components/ui/button";
 import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import { AuthContext } from "@/store/auth";
-import { useToast } from "@/hooks/use-toast";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
+import { IconArrowBigDown, IconArrowBigUp, IconInfoCircle, IconPencil, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -51,8 +49,6 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
   const { selectedChat, messages } = state;
   const sendMessage = useSendMessage();
-
-  const { toast } = useToast();
 
   useEffect(() => {
     if (selectedChat) {
@@ -111,8 +107,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             content: newMessage
           }
         })
-        toast({
-          title: "Message",
+        toast("Message", {
           description: "Successfully updated message"
         })
       }
@@ -131,10 +126,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           chatId
         }
       })
-      toast({
-        title: "Message",
-        description: "Successfully deleted message"
-      })
+      toast("Successfully deleted message")
+
     } catch (err) {
       console.log("error while editing message", err)
     }
@@ -160,19 +153,22 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
     <div className="h-full relative">
       {/* Chat header */}
       <div className="p-5 flex w-full gap-3 items-center">
-        <Avatar className="shadow-md p-3">
-          <Image src={ProfilePicture} alt="Profile pic" />
-          {/* <AvatarFallback>{item.name}</AvatarFallback> */}
+        <Avatar className="shadow-md p-3 border border-neutral">
+          <AvatarImage>
+            <Image src={ProfilePicture} alt="Profile pic" />
+          </AvatarImage>
+          <AvatarFallback><IconUser /></AvatarFallback>
         </Avatar>
         <div className="w-full">
           <div className="flex items-center gap-3">
             <div className="text-heading">{selectedChat?.communityName}</div>
-            <ButtonIcon
-              noBorder
+            <Button
               onClick={toggleDrawer}
-              icon={InfoIcon}
-              className="!h-10 !w-10 !p-1.5 rounded-md"
-            />
+              size={"icon"}
+              className="size-9 !p-1.5 rounded-md"
+            >
+              <IconInfoCircle />
+            </Button>
           </div>
         </div>
       </div>
@@ -191,29 +187,23 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                       <div className="p-3">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                       {
                         !message?.isDeleted && message?.senderId === userId ?
-                          <div className="flex items-center gap-2 bg-red-300 p-1">
-                            <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-2 bg-secondary p-1">
+                            <div className="flex items-center">
                               {
                                 !isUpvoted(message.upvotes, userId) ?
-                                  <ArrowUp
-                                    width={20}
-                                    height={20}
-                                    className="cursor-pointer transition ease-in-out delay-150"
+                                  <IconArrowBigUp
+                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
                                     onClick={() => handleUpvoteMessage(message.id)}
                                   /> :
-                                  <ArrowDown
-                                    width={20}
-                                    height={20}
-                                    className="cursor-pointer transition ease-in-out delay-150"
+                                  <IconArrowBigDown
+                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
                                     onClick={() => handleUpvoteMessage(message.id)}
                                   />
                               }
                               <div>{message.upvotes?.length}</div>
                             </div>
-                            <Trash
-                              width={15}
-                              height={15}
-                              className="cursor-pointer"
+                            <IconTrash
+                              className="text-primary size-5 cursor-pointer"
                               onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
                             />
                             <InputAlert
@@ -221,10 +211,8 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
                               placeholder="Message"
                               value={newMessage}
                               triggerButton={
-                                <Pencil
-                                  width={15}
-                                  height={15}
-                                  className="cursor-pointer"
+                                <IconPencil
+                                  className="text-primary size-5 cursor-pointer"
                                 />
                               }
                               onChange={onMessageChange}
@@ -250,12 +238,13 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
             className="border-primary h-12 !rounded-full max-w-[600px]"
             placeholder="Message"
           />
-          <ButtonIcon
-            noBorder
-            className="rounded-full h-12 w-12"
+          <Button
+            className="rounded-full size-12"
+            size={"icon"}
             onClick={onClick}
-            icon={SendIcon}
-          />
+          >
+            <IconSend />
+          </Button>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { MemberDetails } from "./page";
 import Image from "next/image";
 
 import Communities from "@/assets/communities.png";
-import ButtonIcon from "@/components/ui/button-icon";
+import { Button } from "@/components/ui/button";
 import CloseIcon from "@/assets/close";
 
 interface ProfileDetailsProps {
@@ -24,12 +24,13 @@ const ProfileDetails = ({ memberDetails, toggleDrawer }: ProfileDetailsProps) =>
           <div className="pt-3">{memberDetails.bio}</div>
         </div>
         <div className="absolute right-5 top-5">
-          <ButtonIcon
-            noBorder
+          <Button
+            size={"icon"}
             className="!h-10 !w-10 p-1.5 text-primary"
             onClick={toggleDrawer}
-            icon={CloseIcon}
-          />
+          >
+            <CloseIcon />
+          </Button>
         </div>
       </div>
     </>

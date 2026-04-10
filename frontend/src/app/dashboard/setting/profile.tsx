@@ -10,8 +10,8 @@ import React, {
 } from "react";
 import { Separator } from "@/components/ui/separator";
 import api from "@/services/api";
-import { useToast } from "@/hooks/use-toast";
 import InputField from "./InputField";
+import { toast } from "sonner";
 
 const Profile = () => {
 
@@ -23,7 +23,6 @@ const Profile = () => {
     bio: state.bio
   })
 
-  const { toast } = useToast();
 
   const onChange: ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (e) => {
     const { name, value } = e.target;
@@ -43,19 +42,12 @@ const Profile = () => {
 
       if (res?.data?.status) {
         updateAuth({ ...state, ...res?.data?.data })
-        toast({
-          title: "Success",
-          description: "Profile updated successfully"
-        })
+        toast("Profile updated successfully")
       }
 
     } catch (err) {
       console.log("error while updating profile", err)
-      toast({
-        variant: "destructive",
-        title: "Failure",
-        description: "Error while updating profile"
-      })
+      toast.error("Error while updating profile")
     }
   }
 

@@ -1,5 +1,5 @@
 "use client";
-import { Community, Member } from "@/@types/community";
+import { Community } from "@/@types/community";
 import { UserId } from "@/@types/user";
 import { createContext, ReactNode, useState } from "react";
 
@@ -43,6 +43,7 @@ export interface ChatHistory extends LastMessage {
   communityName: string;
   date: string;
   community: Community;
+  message: string;
 }
 
 export const ChatContext = createContext<ChatContextType>({

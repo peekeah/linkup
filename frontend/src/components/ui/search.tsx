@@ -1,8 +1,8 @@
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
-import SearchIcon from "@/assets/SearechIcon.png"
-import Image from "next/image"
+import { Button } from "./button"
+import { IconSearch } from "@tabler/icons-react"
 
 const Search = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
   ({ className, type, ...props }, ref) => {
@@ -23,11 +23,9 @@ const Search = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>
           ref={ref}
           {...props}
         />
-        <button className="absolute top-[10] right-2 bg-primary rounded-full p-[5px]">
-          <div className="bg-primary p-1 rounded-full h-6 w-6">
-            <Image src={SearchIcon} alt="Search" />
-          </div>
-        </button>
+        <Button className="absolute top-[10] right-2 bg-primary rounded-full p-[5px] size-8">
+          <IconSearch />
+        </Button>
       </div>
     )
   }

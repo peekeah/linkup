@@ -8,13 +8,13 @@ import { userList } from "@/mock";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import InputAlert from "./InputAlert";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
+import { toast } from "sonner";
 
 
 const ListPanel = () => {
@@ -24,7 +24,6 @@ const ListPanel = () => {
   const [searchFilter, setSearchFilter] = useState("");
   const [filteredChats, setFilteredChats] = useState<ChatHistory[]>([]);
 
-  const { toast } = useToast();
   const sendMessage = useSendMessage();
   const [community, setCommunity] = useState("");
 
@@ -58,8 +57,8 @@ const ListPanel = () => {
         name: community,
       }
     })
-    toast({
-      title: "Community",
+
+    toast("Community", {
       description: "Community created Successfully"
     })
     setCommunity("")
@@ -76,8 +75,6 @@ const ListPanel = () => {
   const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     setSearchFilter(e.target.value)
   }
-
-  console.log("chatHistory", chatHistory)
 
   return (
     <div className="h-full space-y-3">
