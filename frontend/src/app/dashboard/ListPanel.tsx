@@ -11,10 +11,10 @@ import { Separator } from "@/components/ui/separator";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import InputAlert from "./InputAlert";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
 import { toast } from "sonner";
+import { IconPlus } from "@tabler/icons-react";
 
 
 const ListPanel = () => {
@@ -77,21 +77,25 @@ const ListPanel = () => {
   }
 
   return (
-    <div className="h-full space-y-3">
-      <div className="p-3 py-5 flex items-center gap-3 justify-between">
+    <div className="h-full">
+      <div className="p-2 py-3">
         <Search
           className="rounded-full h-12 flex-1"
           placeholder="Search"
           value={searchFilter}
           onChange={handleSearchChange}
         />
+      </div>
+      <Separator orientation="horizontal" />
+      <div className="flex items-center justify-between p-2">
+        <div className="text-xs text-neutral tracking-widest">COMMUNITIES</div>
         <InputAlert
           title="Add community"
           placeholder="Community name"
           value={community}
           triggerButton={
-            <Button className="rounded-full h-10 w-10">
-              <Plus className="!h-6 !w-6" />
+            <Button size={"icon"} className="rounded-md size-6">
+              <IconPlus />
             </Button>
           }
           onChange={onInputChange}
@@ -99,30 +103,29 @@ const ListPanel = () => {
           onClose={onModalClose}
         />
       </div>
-      <Separator orientation="horizontal" />
-      <div className="!m-0">
+      <div>
         {
           !filteredChats?.length ?
             <div>No recent chats</div> :
             filteredChats?.map((item, index) => (
               <div key={item.communityId} className={
                 cx(
-                  "cursor-pointer hover:bg-gray-200",
-                  selectedChat?.communityId === item.communityId ? "bg-gray-300 hover:bg-gray-300" : ""
+                  "cursor-pointer hover:bg-primary/30",
+                  selectedChat?.communityId === item.communityId ? "bg-primary/70 hover:bg-primay/30" : ""
                 )
               }
                 onClick={() => handleActiveTab(item)}
               >
-                <div className="flex gap-3 p-3">
-                  <Avatar className="shadow-md p-3">
+                <div className="flex gap-3 p-3 items-center">
+                  <Avatar className="shadow-md rounded-xl">
                     <Image src={ProfilePicture} alt="Profile pic" />
                   </Avatar>
                   <div className="w-full">
                     <div className="flex justify-between">
                       <div className="text-heading">{item.communityName}</div>
-                      <div className="text-[#1E1E1E] opacity-60">{getDate(item?.date)}</div>
+                      <div className="text-sm opacity-60">{getDate(item?.date)}</div>
                     </div>
-                    <div className="text-[#1E1E1E] opacity-60">{item.message}</div>
+                    <div className="text-sm opacity-40">{item.message}</div>
                   </div>
                 </div>
                 {index !== userList.length - 1 ? <Separator /> : null}

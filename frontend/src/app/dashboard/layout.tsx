@@ -1,7 +1,6 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import Topbar from "./Topbar";
 import Sidebar from "./sidebar";
 import { useContext, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -70,10 +69,9 @@ export default function RootLayout({
 
   return (
     <main>
-      <div className="!h-screen !w-screen flex flex-col bg-white font-serif">
-        <Topbar />
+      <div className="h-screen w-screen flex flex-col font-serif">
         <Separator orientation="horizontal" />
-        <div className="flex !flex-1">
+        <div className="flex flex-1">
           <Sidebar />
           <Separator orientation="vertical" />
           <div className="w-full h-full">{children}</div>

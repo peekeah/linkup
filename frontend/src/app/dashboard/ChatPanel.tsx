@@ -13,7 +13,7 @@ import { AuthContext } from "@/store/auth";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
-import { IconArrowBigDown, IconArrowBigUp, IconInfoCircle, IconPencil, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { IconArrowBigDown, IconArrowBigUp, IconDots, IconInfoCircle, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 type ChatMessages = Map<Date, Message[]>;
@@ -152,24 +152,23 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
   return (
     <div className="h-full relative">
       {/* Chat header */}
-      <div className="p-5 flex w-full gap-3 items-center">
-        <Avatar className="shadow-md p-3 border border-neutral">
+      <div className="p-4 flex w-full gap-3 items-center">
+        <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
           <AvatarImage>
             <Image src={ProfilePicture} alt="Profile pic" />
           </AvatarImage>
           <AvatarFallback><IconUser /></AvatarFallback>
         </Avatar>
         <div className="w-full">
-          <div className="flex items-center gap-3">
-            <div className="text-heading">{selectedChat?.communityName}</div>
-            <Button
-              onClick={toggleDrawer}
-              size={"icon"}
-              className="size-9 !p-1.5 rounded-md"
-            >
-              <IconInfoCircle />
-            </Button>
-          </div>
+          <div className="text-heading">{selectedChat?.communityName}</div>
+        </div>
+        <div className="flex gap-2.5">
+          <Button size={"icon"} variant={"outline"}><IconSearch /></Button>
+          <Button
+            size={"icon"}
+            variant={"outline"}
+            className="flex items-center justify-center"
+          ><IconDots /></Button>
         </div>
       </div>
 
@@ -179,12 +178,14 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>
-              <div className="text-center">{getDate(messages[0]?.createdAt, true)}</div>
+              <div>
+                <div className="text-center text-xs font-light">{getDate(messages[0]?.createdAt, true)}</div>
+              </div>
               <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (
-                    <div key={message.id} className={`max-w-[700px] space-y-1 !overflow-hidden ${message.senderId !== userId ? "text-left bg-[#EAE8E8] rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
-                      <div className="p-3">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
+                    <div key={message.id} className={`max-w-[700px] space-y-1 overflow-hidden! ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                      <div className="p-3 relative">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                       {
                         !message?.isDeleted && message?.senderId === userId ?
                           <div className="flex items-center gap-2 bg-secondary p-1">
@@ -229,22 +230,20 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
           ))
         }
       </div>
-      <div className="!flex-1">
-        <div className="flex  justify-center items-center py-5 rounded-xl absolute bottom-0 gap-3 w-full">
-          <Input
-            value={text}
-            onChange={onInputChange}
-            onKeyDown={onKeyDown}
-            className="border-primary h-12 !rounded-full max-w-[600px]"
-            placeholder="Message"
-          />
-          <Button
-            className="rounded-full size-12"
-            size={"icon"}
-            onClick={onClick}
-          >
-            <IconSend />
-          </Button>
+      <div className="flex-1!">
+        <div className="absolute bottom-0 w-full p-5">
+          <div className="relative">
+            <Input
+              value={text}
+              onChange={onInputChange}
+              onKeyDown={onKeyDown}
+              className="w-full h-14 rounded-lg!"
+              placeholder={selectedChat?.communityName && `Message ${selectedChat?.communityName}`}
+            />
+            <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick}>
+              <IconSend className="text-white" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
