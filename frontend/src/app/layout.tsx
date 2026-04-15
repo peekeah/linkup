@@ -3,6 +3,7 @@ import "./globals.css";
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -15,16 +16,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={"flex flex-col h-screen w-full"}
       >
-        <Auth>
-          <Chat>
-            <main>{children}</main>
-            <Toaster />
-          </Chat>
-        </Auth>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          forcedTheme="light"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Auth>
+            <Chat>
+              <main>{children}</main>
+              <Toaster />
+            </Chat>
+          </Auth>
+        </ThemeProvider>
       </body>
     </html>
   );
