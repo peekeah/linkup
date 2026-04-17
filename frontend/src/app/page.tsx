@@ -17,7 +17,7 @@ export default function Page() {
       .then(() => {
         router.push("/dashboard")
       })
-  }, [])
+  }, [router])
 
   return (
     <div className="max-w-7xl mx-auto">

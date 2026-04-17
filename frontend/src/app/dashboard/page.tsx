@@ -35,7 +35,7 @@ const Dashboard = () => {
   })
 
   const toggleDrawer = () => {
-    // #TODO: Need to update while implementation
+    // #TODO: Future implementation
     return;
     setProfileDrawer(prev => {
       if (prev.open) {
@@ -77,7 +77,7 @@ const Dashboard = () => {
       <ListPanel />
       <Separator orientation="vertical" />
       <div className="flex-1">
-        <ChatPanel toggleDrawer={toggleDrawer} />
+        <ChatPanel />
       </div >
       {
         profileDrawer.open ?

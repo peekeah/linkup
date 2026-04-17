@@ -1,8 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
 
-import ProfilePicture from "@/assets/person-messaging.png";
 import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChatContext, Message } from "@/store/chat";
@@ -13,7 +11,7 @@ import { AuthContext } from "@/store/auth";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
-import { IconArrowBigDown, IconArrowBigUp, IconDots, IconInfoCircle, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { IconArrowBigDown, IconArrowBigUp, IconDots, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 type ChatMessages = Map<Date, Message[]>;
@@ -35,7 +33,7 @@ const isUpvoted = (upvotes: string[], userId: string) => {
   return Boolean(upvotes?.length && upvotes.includes(userId))
 }
 
-const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
+const ChatPanel = () => {
 
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
   const [text, setText] = useState<string>("");
@@ -155,7 +153,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
       <div className="p-4 flex w-full gap-3 items-center">
         <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
           <AvatarImage>
-            <Image src={ProfilePicture} alt="Profile pic" />
+            <IconUser />
           </AvatarImage>
           <AvatarFallback><IconUser /></AvatarFallback>
         </Avatar>

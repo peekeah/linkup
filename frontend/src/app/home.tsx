@@ -1,17 +1,9 @@
 "use client";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import Hero from "@/assets/hero.png";
-import Communities from "@/assets/communities.png";
-import MessagingPerson from "@/assets/person-messaging.png";
-import Security from "@/assets/security.png";
-
 import { Button } from "@/components/ui/button";
-import { IconArrowRight, IconUser, IconUsers } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { Features } from "@/components/features";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Separator } from "@/components/ui/separator";
 import { HeroIllustration } from "@/components/hero-illustration";
 
 const Home = () => {

@@ -4,14 +4,12 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import FacebookLogo from "@/assets/facebook-logo.svg";
-import GoogleLogo from "@/assets/google-logo.svg";
 import api from "@/services/api";
 import { AuthState } from "@/store/auth";
 import { useRouter } from "next/navigation";
 import { currentUserMock } from "@/mock";
 import useAuth from "@/hooks/useAuth";
+import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
 
 interface FormData {
   email: string;
@@ -66,7 +64,7 @@ const Login = () => {
     <form onSubmit={onSubmit} className="h-screen">
       <div className="flex gap-3 max-w-[1124px] mx-auto h-full w-full">
         <div className="w-1/2 m-5">
-          <div className="text-h1 font-bold font-serif mt-[60%]">
+          <div className="text-5xl font-bold font-serif mt-[60%]">
             <span className="text-secondary">Link</span>
             <span className="text-[#777777]">up</span>
           </div>
@@ -86,11 +84,11 @@ const Login = () => {
 
             <div className="flex gap-10 justify-around w-[80%] mx-auto">
               <div className="flex items-center cursor-pointer rounded-lg hover:bg-primary px-5 py-3">
-                <Image width={50} height={50} src={GoogleLogo} alt="Google Logo" />
+                <IconBrandGoogle />
                 <div>Google</div>
               </div>
               <div className="flex items-center gap-3 cursor-pointer rounded-lg hover:bg-primary px-5 py-3">
-                <Image width={30} height={30} src={FacebookLogo} alt="Google Logo" />
+                <IconBrandFacebook />
                 <div>Facebook</div>
               </div>
             </div>

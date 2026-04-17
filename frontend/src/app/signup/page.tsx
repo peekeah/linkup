@@ -4,10 +4,8 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import FacebookLogo from "@/assets/facebook-logo.svg";
-import GoogleLogo from "@/assets/google-logo.svg";
 import api from "@/services/api";
+import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
 
 export interface SignupPayload {
   name: string;
@@ -83,11 +81,11 @@ const Signup = () => {
 
             <div className="flex gap-10 justify-around w-[80%] mx-auto">
               <div className="flex items-center cursor-pointer rounded-lg hover:bg-primary px-5 py-3">
-                <Image width={50} height={50} src={GoogleLogo} alt="Google Logo" />
+                <div><IconBrandGoogle /></div>
                 <div>Google</div>
               </div>
               <div className="flex items-center gap-3 cursor-pointer rounded-lg hover:bg-primary px-5 py-3">
-                <Image width={30} height={30} src={FacebookLogo} alt="Google Logo" />
+                <div><IconBrandFacebook /></div>
                 <div>Facebook</div>
               </div>
             </div>

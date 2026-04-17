@@ -1,7 +1,6 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/store/auth";
-import ProfilePicture from "@/assets/people";
 import React, {
   ChangeEventHandler,
   FormEventHandler,
@@ -12,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import api from "@/services/api";
 import InputField from "./InputField";
 import { toast } from "sonner";
+import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { IconUser } from "@tabler/icons-react";
 
 const Profile = () => {
 
@@ -58,7 +59,8 @@ const Profile = () => {
       <div className="flex-1 p-5 flex">
         <div className="w-1/3 grid place-content-center">
           <Avatar className="shadow-md p-5 w-[350px] h-[350px]">
-            <ProfilePicture height={32} width={32} className="h-full w-full" />
+            <AvatarImage><IconUser /></AvatarImage>
+            <AvatarFallback><IconUser /></AvatarFallback>
           </Avatar>
         </div>
         <div className="flex-1 text-sm flex items-center">

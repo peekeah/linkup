@@ -1,9 +1,7 @@
 import { ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { Search } from "@/components/ui/search";
-import { Avatar } from "@/components/ui/avatar";
-import Image from "next/image";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-import ProfilePicture from "@/assets/person-messaging.png";
 import { userList } from "@/mock";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
@@ -14,7 +12,8 @@ import InputAlert from "./InputAlert";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
 import { toast } from "sonner";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconUser } from "@tabler/icons-react";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 
 const ListPanel = () => {
@@ -117,8 +116,9 @@ const ListPanel = () => {
                 onClick={() => handleActiveTab(item)}
               >
                 <div className="flex gap-3 p-3 items-center">
-                  <Avatar className="shadow-md rounded-xl">
-                    <Image src={ProfilePicture} alt="Profile pic" />
+                  <Avatar className="shadow-md">
+                    <AvatarImage><IconUser /></AvatarImage>
+                    <AvatarFallback><IconUser /></AvatarFallback>
                   </Avatar>
                   <div className="w-full">
                     <div className="flex justify-between">
