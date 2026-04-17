@@ -77,7 +77,7 @@ const ListPanel = () => {
   }
 
   return (
-    <div className="h-full">
+    <div className="h-full lg:min-w-sm">
       <div className="p-2 py-3">
         <Search
           className="rounded-full h-12 flex-1"

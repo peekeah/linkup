@@ -71,7 +71,7 @@ const Sidebar = () => {
   return (
     <div className="h-full px-3 py-5 flex flex-col gap-4 justify-start relative">
         <div className="mx-auto text-xl font-bold font-serif">
-          <span className="text-[#777777]">Lu</span>
+          <span className="text-primary">Lu</span>
         </div>
       {
         sidebarTabs?.map(tab => (

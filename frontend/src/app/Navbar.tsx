@@ -7,8 +7,8 @@ const Navbar = () => {
       </div>
 
       <div className="flex justify-between gap-3">
-        <div>Home</div>
         <div>About</div>
+        <div>Features</div>
         <div>Login</div>
         <div>Sign up</div>
       </div>

@@ -150,7 +150,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
   }
 
   return (
-    <div className="h-full relative">
+    <div className="h-full flex flex-col">
       {/* Chat header */}
       <div className="p-4 flex w-full gap-3 items-center">
         <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
@@ -174,7 +174,7 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
 
       <Separator orientation="horizontal" />
       {/* Chat body */}
-      <div className="m-5 space-y-10 overflow-y-auto">
+      <div className="m-5 space-y-10 overflow-y-auto flex-1 flex flex-col justify-end">
         {
           Array.from(chatMessages.entries()).map(([date, messages]) => (
             <div key={date?.toString()}>
@@ -184,11 +184,11 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               <div className="gap-3 flex flex-col">
                 {
                   messages.map(message => (
-                    <div key={message.id} className={`max-w-[700px] space-y-1 overflow-hidden! ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                    <div key={message.id} className={`max-w-[700px] group space-y-1 overflow-hidden! ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
                       <div className="p-3 relative">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                       {
                         !message?.isDeleted && message?.senderId === userId ?
-                          <div className="flex items-center gap-2 bg-secondary p-1">
+                          <div className="hidden group-hover:flex absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1">
                             <div className="flex items-center">
                               {
                                 !isUpvoted(message.upvotes, userId) ?
@@ -228,10 +228,9 @@ const ChatPanel = ({ toggleDrawer }: { toggleDrawer: () => void }) => {
               </div>
             </div>
           ))
+
         }
-      </div>
-      <div className="flex-1!">
-        <div className="absolute bottom-0 w-full p-5">
+        <div className="w-full">
           <div className="relative">
             <Input
               value={text}
