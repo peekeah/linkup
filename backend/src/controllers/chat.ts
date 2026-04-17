@@ -1,6 +1,6 @@
 import { CommunityRole } from "../middlewares/auth";
 import { prisma } from "../utils/db";
-import { IMember } from "./communities";
+import communities, { IMember } from "./communities";
 import { UserId } from "./user";
 
 export interface IChat {
@@ -22,6 +22,7 @@ class Chat {
   ) {
     return await prisma.chatMessage.findMany({
       where: { communityId },
+      include: { upvotes: true },
       skip: offset,
       take: limit,
     });
@@ -77,14 +78,20 @@ class Chat {
       where: { id: chatId },
     });
 
+    if (!existChat) {
+      return null;
+    }
+
     if (userRole === "USER" && existChat?.senderId !== userId) {
       throw new Error("Unauthorized access");
     }
 
-    return await prisma.chatMessage.update({
+    await prisma.chatMessage.update({
       data: { content: "", isDeleted: true },
       where: { id: chatId },
     });
+
+    return await communities.broadcastMessage(existChat?.communityId);
   }
 
   async upvote(userId: string, roomId: string, chatId: string) {
@@ -101,7 +108,7 @@ class Chat {
 
     const alreadyUpvoted = message.upvotes.some((user) => user.id === userId);
 
-    return prisma.chatMessage.update({
+    await prisma.chatMessage.update({
       where: { id: chatId },
       data: {
         upvotes: alreadyUpvoted
@@ -120,6 +127,8 @@ class Chat {
         },
       },
     });
+
+    return await communities.broadcastMessage(roomId);
   }
 }
 

@@ -69,7 +69,6 @@ const wsRequestHandler = async (
           "OWNER",
         ]);
         await chat.deleteChat(payload.chatId, tokenData.userId, communityRole);
-        await communities.broadcastMessage(payload.roomId);
         break;
 
       case SupportedChatMessages.UpdateChat:
@@ -87,7 +86,6 @@ const wsRequestHandler = async (
 
       case SupportedChatMessages.UpvoteMessage:
         await chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
-        await communities.broadcastUpvotes(payload.roomId, payload.chatId);
         break;
 
       // Community routes

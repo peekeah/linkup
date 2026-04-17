@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
@@ -29,8 +29,13 @@ const formatMessages = (message: Message[]) => {
   }, new Map());
 }
 
-const isUpvoted = (upvotes: string[], userId: string) => {
-  return Boolean(upvotes?.length && upvotes.includes(userId))
+const isUpvoted = (upvotes: { id: string }[], userId: string) => {
+  for (const el of upvotes) {
+    if (el.id === userId) {
+      return true;
+    }
+  }
+  return false
 }
 
 const ChatPanel = () => {
@@ -211,6 +216,7 @@ const ChatPanel = () => {
                               value={newMessage}
                               triggerButton={
                                 <IconPencil
+                                  onClick={() => setNewMessage(message.content)}
                                   className="text-primary size-5 cursor-pointer"
                                 />
                               }

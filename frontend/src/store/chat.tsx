@@ -24,7 +24,7 @@ export interface Message {
   id: string;
   content: string;
   senderId: string;
-  upvotes: UserId[],
+  upvotes: { id: string }[],
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
