@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import clsx from "clsx";
+import Link from "next/link";
 
 const sidebarTabs: Tab[] = [
   {
@@ -75,8 +76,9 @@ const Sidebar = () => {
         </div>
       {
         sidebarTabs?.map(tab => (
-          <div
+          <Link
             key={tab.id}
+            href={`/dashboard/${tab.link}`}
             className={tab.id === "setting" ? "absolute bottom-5" : ""}
           >
             <Button
@@ -88,7 +90,7 @@ const Sidebar = () => {
             >
               {tab.icon}
             </Button>
-          </div>
+          </Link>
         ))
       }
     </div >

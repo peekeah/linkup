@@ -118,6 +118,7 @@ const LeaveCommunity = z.object({
 
 const SearchCommunity = z.object({
   search: z.string(),
+  category: z.string().optional()
 })
 
 const AddAdmin = z.object({

@@ -52,9 +52,6 @@ export type OutgoingUserMessage = {
 export type IncomingUserMessage = {
   type: SupportedIncomingUserMessages.ChatHistory;
   data: ChatHistory[];
-} | {
-  type: SupportedIncomingUserMessages.Search;
-  data: Community[]
 }
 
 export default UserSchema;

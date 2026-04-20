@@ -74,7 +74,7 @@ export default function RootLayout({
         <div className="flex flex-1">
           <Sidebar />
           <Separator orientation="vertical" />
-          <div className="w-full h-full">{children}</div>
+          <div className="h-full w-full overflow-auto">{children}</div>
         </div>
       </div>
     </main>

@@ -117,14 +117,17 @@ const wsRequestHandler = async (
         break;
 
       case SupportedCommunityMessages.GetCommunities:
-        ws.send(JSON.stringify(await communities.getCommunities()));
+        ws.send(JSON.stringify({
+          type: "GET_COMMUNITIES",
+          data: await communities.getCommunities()
+        }));
         break;
 
       case SupportedCommunityMessages.Search:
         ws.send(
           JSON.stringify({
             type: "SEARCH",
-            data: await communities.searchCommunity(payload.search),
+            data: await communities.searchCommunity(payload.search, payload.category),
           }),
         );
         break;

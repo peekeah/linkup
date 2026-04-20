@@ -58,7 +58,19 @@ class Community {
   }
 
   async getCommunities() {
-    return prisma.community.findMany();
+    const communities = await prisma.community.findMany();
+    const communityCount = communities.length;
+    const memberCount = (await prisma.user.findMany()).length;
+    const onlineMembers = activeClients.size;
+    const categories: string[] = []; // Todo: Add categories for community and return count
+
+    return {
+      communities,
+      communityCount,
+      memberCount,
+      onlineMembers,
+      categories,
+    };
   }
 
   async getCommunity(id: string) {
@@ -101,10 +113,12 @@ class Community {
     });
   }
 
-  async searchCommunity(search: string) {
-    return prisma.community.findMany({
+  // Todo: Add category filter feature
+  async searchCommunity(search: string, category?: string) {
+    const communities = await prisma.community.findMany({
       where: { name: { contains: search, mode: "insensitive" } },
     });
+    return { communities };
   }
 
   // Todo: Add authorization

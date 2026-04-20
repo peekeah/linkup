@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { TypeOf, z } from "zod";
 import { Message } from "@/store/chat";
 
 export enum SupportedChatMessages {
@@ -7,6 +7,7 @@ export enum SupportedChatMessages {
   UpdateChat = "UPDATE_CHAT",
   DeleteChat = "DELETE_CHAT",
   UpvoteMessage = "UPVOTE_MESSAGE",
+  GetCommunities = "GET_COMMUNITIES",
 }
 
 export type OutgoingChatMessage = {
@@ -24,7 +25,9 @@ export type OutgoingChatMessage = {
 } | {
   type: SupportedChatMessages.UpvoteMessage,
   payload: UpvoteMessageType
-}
+} | {
+  type: SupportedChatMessages.GetCommunities
+};
 
 export enum SupportedIncomingChatMessages {
   GetChat = "GET_CHAT",
@@ -73,8 +76,14 @@ export const UpvoteMessage = z.object({
   chatId: z.string()
 })
 
+export const SearchCommunity = z.object({
+  category: z.string().optional(),
+  searchText: z.string().optional()
+})
+
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;
 export type UpdateChatType = z.infer<typeof UpdateChat>;
 export type DeleteChatType = z.infer<typeof DeleteChat>;
 export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;
+export type SearchCommunity = z.infer<typeof SearchCommunity>;

@@ -77,6 +77,10 @@ const useSendMessage = () => {
         })
 
       // Community messages
+      case SupportedOutgoingCommunityMessages.GetCommunities:
+      return sendMessage({
+        type: SupportedOutgoingCommunityMessages.GetCommunities,
+      })
       default:
         console.error("error while sending message")
         return null

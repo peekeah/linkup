@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
+import Communities from "@/store/communities";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 
@@ -29,8 +30,10 @@ export default function RootLayout({
         >
           <Auth>
             <Chat>
-              <main>{children}</main>
-              <Toaster />
+              <Communities>
+                <main>{children}</main>
+                <Toaster />
+              </Communities>
             </Chat>
           </Auth>
         </ThemeProvider>
