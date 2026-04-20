@@ -47,6 +47,13 @@ const CommunitiesPage = () => {
         setSelectedCategory(category);
     }, [])
 
+    const handleJoinCommunity = (roomId: string) => {
+        sendMessage({
+            type: SupportedOutgoingCommunityMessages.JoinCommunity,
+            payload: { roomId }
+        })
+    }
+
     const getAvatarInitial = (name: string) => name?.charAt(0)?.toUpperCase();
 
     const totalMembers = state.memberCount > 1000 ? `${(state.memberCount / 1000).toFixed(1)}k` : state.memberCount;
@@ -138,7 +145,10 @@ const CommunitiesPage = () => {
                                     </div>
 
                                     {/* Join Button */}
-                                    <Button className="shrink-0 bg-primary hover:bg-primary/90 text-white">
+                                    <Button
+                                        className="shrink-0 bg-primary hover:bg-primary/90 text-white"
+                                        onClick={() => handleJoinCommunity(community.id)}
+                                    >
                                         Join
                                     </Button>
                                 </div>

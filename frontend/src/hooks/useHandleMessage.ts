@@ -16,7 +16,6 @@ const useHandleMessage = () => {
   const handleMessage = async (rawMessage: string) => {
     try {
       const message = JSON.parse(rawMessage) as IncomingMessage;
-      console.log("received message:", message);
 
       let roomId = "";
       let messages = [];

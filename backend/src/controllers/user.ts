@@ -199,7 +199,7 @@ class User {
         chatMessages: {
           where: { isDeleted: false },
           orderBy: { createdAt: "desc" },
-          take: 1, // only the latest message per community
+          take: 1,
           include: {
             sender: { select: { id: true, name: true } },
           },
@@ -208,15 +208,24 @@ class User {
     });
 
     return communities
-      .filter((c) => c.chatMessages.length > 0)
-      .map((c) => ({
-        communityId: c.id,
-        communityName: c.name,
-        message: c.chatMessages[0].content,
-        sender: c.chatMessages[0].sender.name,
-        createdAt: c.chatMessages[0].createdAt,
-      }))
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .map((c) => {
+        const latestMessage = c.chatMessages[0];
+
+        return {
+          communityId: c.id,
+          communityName: c.name,
+          message: latestMessage?.content || null,
+          sender: latestMessage?.sender?.name || null,
+          createdAt: latestMessage?.createdAt || null,
+        };
+      })
+      .sort((a, b) => {
+        // Communities with messages come first
+        if (!a.createdAt) return 1;
+        if (!b.createdAt) return -1;
+
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
   }
 }
 

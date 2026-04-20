@@ -51,16 +51,15 @@ const ChatPanel = () => {
   const userId = authState?.userId;
 
   const { selectedChat, messages } = state;
+  const currentMessages = messages?.get(selectedChat?.communityId!) ?? [];
+
   const sendMessage = useSendMessage();
 
   useEffect(() => {
     if (selectedChat) {
-      const currentMessages = messages?.get(selectedChat?.communityId);
-      if (currentMessages?.length) {
-        const newMessages = formatMessages(currentMessages);
-        setChatMessages(newMessages)
-        setText(() => "")
-      }
+      const newMessages = formatMessages(currentMessages);
+      setChatMessages(newMessages)
+      setText(() => "")
     }
   }, [state])
 
@@ -179,60 +178,63 @@ const ChatPanel = () => {
       {/* Chat body */}
       <div className="m-5 space-y-10 overflow-y-auto flex-1 flex flex-col justify-end">
         {
-          Array.from(chatMessages.entries()).map(([date, messages]) => (
-            <div key={date?.toString()}>
-              <div>
-                <div className="text-center text-xs font-light">{getDate(messages[0]?.createdAt, true)}</div>
-              </div>
-              <div className="gap-3 flex flex-col">
-                {
-                  messages.map(message => (
-                    <div key={message.id} className={`max-w-[700px] group space-y-1 overflow-hidden! ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
-                      <div className="p-3 relative">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
-                      {
-                        !message?.isDeleted && message?.senderId === userId ?
-                          <div className="hidden group-hover:flex absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1">
-                            <div className="flex items-center">
-                              {
-                                !isUpvoted(message.upvotes, userId) ?
-                                  <IconArrowBigUp
-                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                    onClick={() => handleUpvoteMessage(message.id)}
-                                  /> :
-                                  <IconArrowBigDown
-                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                    onClick={() => handleUpvoteMessage(message.id)}
+          currentMessages.length === 0 ? (
+            <div className="mx-auto opacity-75 self-center">No messages yet, be the first one to send</div>
+          ) : (
+            Array.from(chatMessages.entries()).map(([date, messages]) => (
+              <div key={date?.toString()}>
+                <div>
+                  <div className="text-center text-xs font-light">{getDate(messages[0]?.createdAt, true)}</div>
+                </div>
+                <div className="gap-3 flex flex-col">
+                  {
+                    messages.map(message => (
+                      <div key={message.id} className={`max-w-175 group space-y-1 overflow-hidden ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                        <div className="p-3 relative">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
+                        {
+                          !message?.isDeleted && message?.senderId === userId ?
+                            <div className="hidden group-hover:flex absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1">
+                              <div className="flex items-center">
+                                {
+                                  !isUpvoted(message.upvotes, userId) ?
+                                    <IconArrowBigUp
+                                      className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                      onClick={() => handleUpvoteMessage(message.id)}
+                                    /> :
+                                    <IconArrowBigDown
+                                      className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                      onClick={() => handleUpvoteMessage(message.id)}
+                                    />
+                                }
+                                <div>{message.upvotes?.length}</div>
+                              </div>
+                              <IconTrash
+                                className="text-primary size-5 cursor-pointer"
+                                onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
+                              />
+                              <InputAlert
+                                title="Edit message"
+                                placeholder="Message"
+                                value={newMessage}
+                                triggerButton={
+                                  <IconPencil
+                                    onClick={() => setNewMessage(message.content)}
+                                    className="text-primary size-5 cursor-pointer"
                                   />
-                              }
-                              <div>{message.upvotes?.length}</div>
-                            </div>
-                            <IconTrash
-                              className="text-primary size-5 cursor-pointer"
-                              onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
-                            />
-                            <InputAlert
-                              title="Edit message"
-                              placeholder="Message"
-                              value={newMessage}
-                              triggerButton={
-                                <IconPencil
-                                  onClick={() => setNewMessage(message.content)}
-                                  className="text-primary size-5 cursor-pointer"
-                                />
-                              }
-                              onChange={onMessageChange}
-                              onSubmit={() => onEditMessage(message.id)}
-                              onClose={onModalClose}
-                            />
-                          </div> : null
-                      }
-                    </div>
-                  ))
-                }
+                                }
+                                onChange={onMessageChange}
+                                onSubmit={() => onEditMessage(message.id)}
+                                onClose={onModalClose}
+                              />
+                            </div> : null
+                        }
+                      </div>
+                    ))
+                  }
+                </div>
               </div>
-            </div>
-          ))
-
+            ))
+          )
         }
         <div className="w-full">
           <div className="relative">

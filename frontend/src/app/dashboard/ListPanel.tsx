@@ -105,7 +105,7 @@ const ListPanel = () => {
       <div>
         {
           !filteredChats?.length ?
-            <div>No recent chats</div> :
+            <div className="p-4 opacity-75">No chats found</div> :
             filteredChats?.map((item, index) => (
               <div key={item.communityId} className={
                 cx(

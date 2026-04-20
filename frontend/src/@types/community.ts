@@ -181,8 +181,6 @@ export const GetCommunity = z.object({
 
 export const JoinCommunity = z.object({
   roomId: z.string(),
-  // userId: z.string(),
-  userName: z.string(),
 });
 
 export const LeaveCommunity = z.object({

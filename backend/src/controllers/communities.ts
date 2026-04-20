@@ -85,7 +85,7 @@ class Community {
     return community;
   }
 
-  async joinCommunity(id: string, userId: string, userName: string) {
+  async joinCommunity(id: string, userId: string) {
     return await prisma.community.update({
       data: { members: { connect: { id: userId } } },
       where: { id },

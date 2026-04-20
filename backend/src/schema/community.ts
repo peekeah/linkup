@@ -109,7 +109,6 @@ const GetCommunity = z.object({
 
 const JoinCommunity = z.object({
   roomId: z.string(),
-  userName: z.string(),
 })
 
 const LeaveCommunity = z.object({

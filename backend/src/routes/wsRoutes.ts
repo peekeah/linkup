@@ -156,7 +156,6 @@ const wsRequestHandler = async (
         await communities.joinCommunity(
           payload.roomId,
           tokenData.userId,
-          payload.userName,
         );
         break;
 
