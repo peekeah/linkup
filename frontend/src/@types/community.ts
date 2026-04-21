@@ -148,8 +148,8 @@ type GetCommunityIncomingPayload = {
     name: string;
     ownerId: string;
   }[];
-  communitiesCount: number;
-  membersCount: number;
+  communityCount: number;
+  memberCount: number;
   onlineMembers: number;
   categories: string[];
 };

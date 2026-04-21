@@ -81,6 +81,12 @@ const useSendMessage = () => {
       return sendMessage({
         type: SupportedOutgoingCommunityMessages.GetCommunities,
       })
+
+      case SupportedOutgoingUserMessages.Search: 
+      return sendMessage({
+        type: SupportedOutgoingUserMessages.Search,
+        payload: message.payload
+      })
       default:
         console.error("error while sending message")
         return null

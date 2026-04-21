@@ -2,7 +2,6 @@ import { ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { Search } from "@/components/ui/search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-import { userList } from "@/mock";
 import { ChatContext, ChatHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
 import { Separator } from "@/components/ui/separator";
@@ -86,7 +85,7 @@ const ListPanel = () => {
         />
       </div>
       <Separator orientation="horizontal" />
-      <div className="flex items-center justify-between p-2">
+      <div className="flex items-center justify-between p-3">
         <div className="text-xs text-neutral tracking-widest">COMMUNITIES</div>
         <InputAlert
           title="Add community"
@@ -115,6 +114,8 @@ const ListPanel = () => {
               }
                 onClick={() => handleActiveTab(item)}
               >
+                {index === 0 && <Separator orientation="horizontal" />}
+
                 <div className="flex gap-3 p-3 items-center">
                   <Avatar className="shadow-md">
                     <AvatarImage><IconUser /></AvatarImage>
@@ -128,7 +129,8 @@ const ListPanel = () => {
                     <div className="text-sm opacity-40">{item.message}</div>
                   </div>
                 </div>
-                {index !== userList.length - 1 ? <Separator /> : null}
+                <Separator />
+                {/* {index !== userList.length - 1 ? <Separator /> : null} */}
               </div>
             ))
         }

@@ -1,4 +1,4 @@
-import { TypeOf, z } from "zod";
+import { z } from "zod";
 import { Message } from "@/store/chat";
 
 export enum SupportedChatMessages {

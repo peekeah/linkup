@@ -1,6 +1,5 @@
 import { ChatHistory } from "@/store/chat";
 import { z } from "zod";
-import { Community } from "./community";
 
 // Define the schema for the address
 const AddressSchema = z.object({
