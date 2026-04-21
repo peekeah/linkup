@@ -46,7 +46,8 @@ const CommunitiesPage = () => {
                 category: selectedCategory === "All" ? "" : selectedCategory
             }
         })
-    }, [debouncedSearchText, selectedCategory, sendMessage, updateSearchText])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedSearchText, selectedCategory, sendMessage])
 
     const onSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         setSearchInput(e.target.value)

@@ -8,7 +8,6 @@ interface ChatContextType {
   updateSelectedChat: (chat: ChatHistory) => void;
   updateChatMessages: (communityId: string, newMessages: Message[]) => void;
   updateSingleChatMessage: (communityId: string, messageId: string, newMessage: Message) => void;
-  updateSearchContent: (content: Community[]) => void;
   clearChatStore: () => void;
 }
 
@@ -16,7 +15,6 @@ interface State {
   chatHistory: ChatHistory[];
   selectedChat: ChatHistory | null;
   messages: Map<string, Message[]>;
-  searchContent: Community[]
 }
 
 export interface Message {
@@ -36,7 +34,7 @@ interface LastMessage {
   updatedAt: string;
 }
 
-// Note: Add for private message
+// NOTE: Add for private message
 export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
@@ -50,13 +48,11 @@ export const ChatContext = createContext<ChatContextType>({
     chatHistory: [],
     selectedChat: null,
     messages: new Map(),
-    searchContent: [],
   },
   updateChatHistory: () => { },
   updateSelectedChat: () => { },
   updateSingleChatMessage: () => { },
   updateChatMessages: () => { },
-  updateSearchContent: () => { },
   clearChatStore: () => { },
 });
 
@@ -64,7 +60,6 @@ const initialValues = {
   chatHistory: [],
   selectedChat: null,
   messages: new Map(),
-  searchContent: [],
 }
 
 const Chat = ({ children }: { children: ReactNode }) => {
@@ -103,7 +98,6 @@ const Chat = ({ children }: { children: ReactNode }) => {
 
   const updateChatMessages = (communityId: string, newMessages: Message[]) => {
     setState(prev => {
-
       const messagesCopy = prev.messages;
       let communityMessages = messagesCopy.get(communityId);
 
@@ -113,34 +107,6 @@ const Chat = ({ children }: { children: ReactNode }) => {
       return ({
         ...prev,
         messages: messagesCopy
-      })
-    })
-
-    /*
-    // #NOTE: Update while lazy load implementation
-    const messagesCopy = prev.messages;
-
-    let communityMessages = messagesCopy.get(communityId);
-
-    if (communityMessages) {
-      communityMessages = [...newMessages, ...communityMessages];
-    } else {
-      communityMessages = newMessages
-    }
-    messagesCopy.set(communityId, communityMessages);
-    return ({
-      ...prev,
-      messages: messagesCopy
-    })
-  })
-  */
-  }
-
-  const updateSearchContent = (content: Community[]) => {
-    setState(prev => {
-      return ({
-        ...prev,
-        searchContent: content
       })
     })
   }
@@ -156,7 +122,6 @@ const Chat = ({ children }: { children: ReactNode }) => {
       updateSelectedChat,
       updateChatMessages,
       updateSingleChatMessage,
-      updateSearchContent,
       clearChatStore,
     }}>{children}</ChatContext.Provider>
   )

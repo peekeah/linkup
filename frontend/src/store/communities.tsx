@@ -1,5 +1,5 @@
 "use client"
-import { createContext, ReactNode, useState } from "react";
+import { createContext, ReactNode, useCallback, useState } from "react";
 
 type Community = {
     id: string;
@@ -46,13 +46,13 @@ export const CommunityContext = createContext<CommunityContext>({
 const Community = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState<State>(initialState)
 
-    const updateCommunities = (state: Partial<State>) => {
-        setState(prev => ({ ...prev, ...state }))
-    }
+    const updateCommunities = useCallback((updates: Partial<State>) => {
+        setState(prev => ({ ...prev, ...updates }))
+    }, [])
 
-    const updateSearchText = (text: string) => {
-        setState(prev => ({ ...prev, ["searchText"]: text }))
-    }
+    const updateSearchText = useCallback((text: string) => {
+        setState(prev => ({ ...prev, searchText: text }))
+    }, [])
 
     return (
         <CommunityContext.Provider value={{

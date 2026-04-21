@@ -144,7 +144,6 @@ const ListPanel = () => {
                   </div>
                 </div>
                 <Separator />
-                {/* {index !== userList.length - 1 ? <Separator /> : null} */}
               </div>
             ))
         }
