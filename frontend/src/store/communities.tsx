@@ -47,7 +47,16 @@ const Community = ({ children }: { children: ReactNode }) => {
     const [state, setState] = useState<State>(initialState)
 
     const updateCommunities = useCallback((updates: Partial<State>) => {
-        setState(prev => ({ ...prev, ...updates }))
+        setState(prev => {
+            if (updates.communities) {
+                // Handle joining communities by merging with existing list to prevent duplicates
+                const existingIds = new Set(prev.communities.map(c => c.id));
+                const newCommunities = updates.communities.filter(c => !existingIds.has(c.id));
+                const mergedCommunities = [...prev.communities, ...newCommunities];
+                return { ...prev, ...updates, communities: mergedCommunities };
+            }
+            return { ...prev, ...updates };
+        })
     }, [])
 
     const updateSearchText = useCallback((text: string) => {

@@ -160,7 +160,7 @@ const CommunitiesPage = () => {
                                     {/* Join Button */}
                                     <Button
                                         className="shrink-0 bg-primary hover:bg-primary/90 text-white"
-                                        onClick={() => handleJoinCommunity(community.id)}
+                                        onClick={() => handleJoinCommunity(community?.id ?? "")}
                                     >
                                         Join
                                     </Button>

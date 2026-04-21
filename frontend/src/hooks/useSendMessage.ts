@@ -9,83 +9,79 @@ const useSendMessage = () => {
 
   const { wsRef } = useContext(AuthContext);
 
-  const sendMessage = useCallback((message: OutgoingMessage) => {
+  return useCallback((message: OutgoingMessage) => {
     try {
       const ws = wsRef.current;
       if (ws && ws?.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(message))
+        switch (message.type) {
+          // Chat messages
+          case SupportedChatMessages.AddChat:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.AddChat,
+              payload: message.payload
+            }))
+
+          case SupportedChatMessages.GetChat:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.GetChat,
+              payload: message.payload
+            }))
+
+          case SupportedChatMessages.UpdateChat:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.UpdateChat,
+              payload: message.payload
+            }))
+
+          case SupportedChatMessages.DeleteChat:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.DeleteChat,
+              payload: message.payload
+            }))
+          case SupportedChatMessages.UpvoteMessage:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.UpvoteMessage,
+              payload: message.payload
+            }))
+
+          // User messages
+          case SupportedOutgoingUserMessages.ChatHistory:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingUserMessages.ChatHistory,
+            }))
+
+          case SupportedOutgoingUserMessages.Search:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingUserMessages.Search,
+              payload: message.payload
+            }))
+
+          case SupportedOutgoingCommunityMessages.JoinCommunity:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingCommunityMessages.JoinCommunity,
+              payload: message.payload
+            }))
+
+          case SupportedOutgoingCommunityMessages.CreateCommunity:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingCommunityMessages.CreateCommunity,
+              payload: message.payload
+            }))
+
+          // Community messages
+          case SupportedOutgoingCommunityMessages.GetCommunities:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingCommunityMessages.GetCommunities,
+            }))
+          default:
+            console.error("error while sending message")
+            return null
+        }
       }
     } catch (err) {
       console.log("connection is broken", err)
     }
   }, [wsRef])
-
-  return useCallback((message: OutgoingMessage) => {
-    switch (message.type) {
-      // Chat messages
-      case SupportedChatMessages.AddChat:
-        return sendMessage({
-          type: SupportedChatMessages.AddChat,
-          payload: message.payload
-        })
-
-      case SupportedChatMessages.GetChat:
-        return sendMessage({
-          type: SupportedChatMessages.GetChat,
-          payload: message.payload
-        })
-
-      case SupportedChatMessages.UpdateChat:
-        return sendMessage({
-          type: SupportedChatMessages.UpdateChat,
-          payload: message.payload
-        })
-
-      case SupportedChatMessages.DeleteChat:
-        return sendMessage({
-          type: SupportedChatMessages.DeleteChat,
-          payload: message.payload
-        })
-      case SupportedChatMessages.UpvoteMessage:
-        return sendMessage({
-          type: SupportedChatMessages.UpvoteMessage,
-          payload: message.payload
-        })
-
-      // User messages
-      case SupportedOutgoingUserMessages.ChatHistory:
-        return sendMessage({
-          type: SupportedOutgoingUserMessages.ChatHistory,
-        })
-
-      case SupportedOutgoingUserMessages.Search:
-        return sendMessage({
-          type: SupportedOutgoingUserMessages.Search,
-          payload: message.payload
-        })
-
-      case SupportedOutgoingCommunityMessages.JoinCommunity:
-        return sendMessage({
-          type: SupportedOutgoingCommunityMessages.JoinCommunity,
-          payload: message.payload
-        })
-
-      case SupportedOutgoingCommunityMessages.CreateCommunity:
-        return sendMessage({
-          type: SupportedOutgoingCommunityMessages.CreateCommunity,
-          payload: message.payload
-        })
-
-      // Community messages
-      case SupportedOutgoingCommunityMessages.GetCommunities:
-        return sendMessage({
-          type: SupportedOutgoingCommunityMessages.GetCommunities,
-        })
-      default:
-        console.error("error while sending message")
-        return null
-    }
-  }, [sendMessage])
 }
 
 export default useSendMessage;

@@ -157,6 +157,9 @@ const wsRequestHandler = async (
           payload.roomId,
           tokenData.userId,
         );
+        ws.send(JSON.stringify({
+          type: "JOIN_COMMUNITY",
+        }))
         break;
 
       case SupportedCommunityMessages.LeaveCommunity:

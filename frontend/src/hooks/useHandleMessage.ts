@@ -6,6 +6,7 @@ import { ChatContext, ChatHistory } from "@/store/chat";
 import { CommunityContext } from "@/store/communities";
 import { SupportedIncomingChatMessages } from "@/@types/chat";
 import { SupportedIncomingCommunityMessage } from "@/@types/community";
+import { toast } from "sonner";
 
 const useHandleMessage = () => {
   const { updateChatHistory, updateChatMessages, updateSingleChatMessage } =
@@ -31,7 +32,7 @@ const useHandleMessage = () => {
           roomId = message?.data?.roomId;
           updateChatMessages(roomId, messages);
           break;
-        case SupportedIncomingCommunityMessage.BrodcastMessages:
+        case SupportedIncomingCommunityMessage.BroadcastMessages:
           roomId = message.data?.roomId;
           messages = message?.data?.messages;
           updateChatMessages(roomId, messages);
@@ -49,6 +50,10 @@ const useHandleMessage = () => {
 
         case SupportedIncomingCommunityMessage.Search:
           updateCommunities({ communities: message?.data?.communities });
+          break;
+
+        case SupportedIncomingCommunityMessage.JoinCommunity:
+          toast("Successfully joined community");
           break;
 
         default:

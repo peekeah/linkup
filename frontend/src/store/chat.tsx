@@ -75,8 +75,7 @@ const Chat = ({ children }: { children: ReactNode }) => {
 
   const updateSingleChatMessage = (communityId: string, messageId: string, newMessage: Message) => {
     setState(prev => {
-      const messagesCopy = prev.messages;
-      const communityMessages = messagesCopy.get(communityId);
+      const communityMessages = prev.messages.get(communityId);
 
       if (!communityMessages) return prev;
 
@@ -86,27 +85,29 @@ const Chat = ({ children }: { children: ReactNode }) => {
         return prev
       }
 
-      communityMessages[idx] = newMessage;
-      messagesCopy.set(communityId, communityMessages);
+      // Create new array with the updated message
+      const updatedMessages = [...communityMessages];
+      updatedMessages[idx] = newMessage;
+
+      // Create new Map with the updated messages
+      const newMessagesMap = new Map(prev.messages);
+      newMessagesMap.set(communityId, updatedMessages);
 
       return ({
         ...prev,
-        messages: messagesCopy
+        messages: newMessagesMap
       })
     })
   };
 
   const updateChatMessages = (communityId: string, newMessages: Message[]) => {
     setState(prev => {
-      const messagesCopy = prev.messages;
-      let communityMessages = messagesCopy.get(communityId);
-
-      communityMessages = newMessages
-      messagesCopy.set(communityId, communityMessages);
+      const newMessagesMap = new Map(prev.messages);
+      newMessagesMap.set(communityId, newMessages);
 
       return ({
         ...prev,
-        messages: messagesCopy
+        messages: newMessagesMap
       })
     })
   }

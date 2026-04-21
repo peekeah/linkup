@@ -18,10 +18,11 @@ export enum SupportedOutgoingCommunityMessages {
 }
 
 export enum SupportedIncomingCommunityMessage {
-  BrodcastMessages = "BROADCAST_MESSAGE",
+  BroadcastMessages = "BROADCAST_MESSAGE",
   BroadcastUpvote = "UPVOTE_MESSAGE",
   GetCommunities = "GET_COMMUNITIES",
   Search = "SEARCH",
+  JoinCommunity = "JOIN_COMMUNITY",
 }
 
 export interface Member {
@@ -113,10 +114,10 @@ export type OutgoingCommunityMessage =
 
 export type IncomingCommunityMessage =
   | {
-      type: SupportedIncomingCommunityMessage.BrodcastMessages;
+      type: SupportedIncomingCommunityMessage.BroadcastMessages;
       data: {
         roomId: string;
-        messages: BrodcastMessages;
+        messages: BroadcastMessages;
       };
     }
   | {
@@ -140,6 +141,9 @@ export type IncomingCommunityMessage =
           ownerId: string;
         }[];
       };
+    }
+  | {
+      type: SupportedIncomingCommunityMessage.JoinCommunity;
     };
 
 type GetCommunityIncomingPayload = {
@@ -232,5 +236,5 @@ export type GiveTimeoutType = z.infer<typeof GiveTimeout>;
 export type ClearTimeoutType = z.infer<typeof ClearTimeout>;
 export type SearchPayload = z.infer<typeof SearchPayload>;
 
-export type BrodcastMessages = Message[];
+export type BroadcastMessages = Message[];
 export type BrodcastUpvotes = Message;
