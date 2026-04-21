@@ -8,7 +8,7 @@ import useHandleMessage from "@/hooks/useHandleMessage";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { AuthContext } from "@/store/auth";
-import { isTokenExpired } from "@/utils/auth";
+import { useSession } from "next-auth/react";
 
 export default function RootLayout({
   children,
@@ -24,20 +24,21 @@ export default function RootLayout({
   const router = useRouter();
   const { handleMessage } = useHandleMessage();
   const sendMessage = useSendMessage();
+  const { data: session } = useSession();
+  const token = session?.user?.token || ""
 
   useEffect(() => {
     const uri = process.env.NEXT_PUBLIC_WS_HOST || "ws://localhost:5000";
-    const token = authState?.token;
-
-    if (!token || isTokenExpired(token)) {
-      router.push("/");
-      return;
-    }
 
     reconnectEnabledRef.current = true;
 
     const connect = () => {
       if (!reconnectEnabledRef.current) {
+        return;
+      }
+
+      // Don't connect WebSocket if token is not available
+      if (!token) {
         return;
       }
 
@@ -89,7 +90,7 @@ export default function RootLayout({
       }
     };
   }, [
-    authState?.token,
+    session,
     handleMessage,
     reconnectEnabledRef,
     router,

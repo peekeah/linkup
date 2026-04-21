@@ -17,7 +17,6 @@ export const AuthContext = createContext<AuthContextType>({
     email: "",
     mobile: "",
     bio: "",
-    token: ""
   },
   wsRef: { current: null },
   reconnectEnabledRef: { current: true },
@@ -36,13 +35,11 @@ export interface AuthState {
   email: string;
   mobile: string;
   bio: string;
-  token: string;
 }
 
 const INITIAL_AUTH_STATE: AuthState = {
   userId: "",
   userName: "",
-  token: "",
   email: "",
   mobile: "",
   bio: ""

@@ -18,7 +18,8 @@ model User {
   name    String?
   mobile  String?
   bio     String?
-  password String
+  image   String?
+  googleId String @unique
   role    Role   @default(USER)
 
   address Address?

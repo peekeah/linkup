@@ -1,25 +1,77 @@
-import { generateHash } from "../src/utils/bcrypt";
 import { prisma } from "../src/utils/db";
 
 async function main() {
   /*
    * ==================================================
-   * USERS
+   * USERS (OAuth-only)
    * ==================================================
    */
-  const password = await generateHash("Test@123")
   await prisma.user.createMany({
     data: [
-      { name: "Alice Johnson", email: "alice.johnson@example.com", bio: "💻 Software Developer | 2+ Years of Experience", password },
-      { name: "Bob Smith", email: "bob.smith@example.com", bio: "💻 Software Developer | 2+ Years of Experience", password },
-      { name: "Charlie Brown", email: "charlie.brown@example.com", bio: "💻 Full Stack Enthusiast", password },
-      { name: "Daisy Miller", email: "daisy.miller@example.com", bio: "🚀 Building scalable systems", password },
-      { name: "Eve Summers", email: "eve.summers@example.com", password },
-      { name: "Frank Ocean", email: "frank.ocean@example.com", password },
-      { name: "Grace Hopper", email: "grace.hopper@example.com", password },
-      { name: "Hank Pym", email: "hank.pym@example.com", password },
-      { name: "Ivy Woods", email: "ivy.woods@example.com", password },
-      { name: "Jack Sparrow", email: "jack.sparrow@example.com", password },
+      { 
+        name: "Alice Johnson", 
+        email: "alice.johnson@example.com", 
+        bio: "Software Developer | 2+ Years of Experience",
+        image: "https://avatars.githubusercontent.com/u/1?v=4",
+        googleId: "google_alice_12345"
+      },
+      { 
+        name: "Bob Smith", 
+        email: "bob.smith@example.com", 
+        bio: "Software Developer | 2+ Years of Experience",
+        image: "https://avatars.githubusercontent.com/u/2?v=4",
+        googleId: "google_bob_23456"
+      },
+      { 
+        name: "Charlie Brown", 
+        email: "charlie.brown@example.com", 
+        bio: "Full Stack Enthusiast",
+        image: "https://avatars.githubusercontent.com/u/3?v=4",
+        googleId: "google_charlie_34567"
+      },
+      { 
+        name: "Daisy Miller", 
+        email: "daisy.miller@example.com", 
+        bio: "Building scalable systems",
+        image: "https://avatars.githubusercontent.com/u/4?v=4",
+        googleId: "google_daisy_45678"
+      },
+      { 
+        name: "Eve Summers", 
+        email: "eve.summers@example.com",
+        image: "https://avatars.githubusercontent.com/u/5?v=4",
+        googleId: "google_eve_56789"
+      },
+      { 
+        name: "Frank Ocean", 
+        email: "frank.ocean@example.com",
+        image: "https://avatars.githubusercontent.com/u/6?v=4",
+        googleId: "google_frank_67890"
+      },
+      { 
+        name: "Grace Hopper", 
+        email: "grace.hopper@example.com",
+        image: "https://avatars.githubusercontent.com/u/7?v=4",
+        googleId: "google_grace_78901"
+      },
+      { 
+        name: "Hank Pym", 
+        email: "hank.pym@example.com",
+        image: "https://avatars.githubusercontent.com/u/8?v=4",
+        googleId: "google_hank_89012"
+      },
+      { 
+        name: "Ivy Woods", 
+        email: "ivy.woods@example.com",
+        image: "https://avatars.githubusercontent.com/u/9?v=4",
+        googleId: "google_ivy_90123"
+      },
+      { 
+        name: "Jack Sparrow", 
+        email: "jack.sparrow@example.com",
+        image: "https://avatars.githubusercontent.com/u/10?v=4",
+        googleId: "google_jack_01234"
+      },
     ],
     skipDuplicates: true,
   });

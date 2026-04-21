@@ -1,14 +1,16 @@
 "use client";
-import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { IconArrowRight } from "@tabler/icons-react";
 import { Features } from "@/components/features";
 import { HeroIllustration } from "@/components/hero-illustration";
+import { signIn } from "next-auth/react";
 
 const Home = () => {
 
-  const router = useRouter();
+  const handleGetStarted = () => {
+    signIn("google", { callbackUrl: "/dashboard" });
+  };
 
   return (
     <div>
@@ -28,15 +30,12 @@ const Home = () => {
   hover:shadow-[0_0_16px_color:var(--primary),0_0_32px_color:var(--primary)]
   hover:border-primary
   transition-all duration-300"
-                  onClick={() => router.push("/login")}
+                  onClick={handleGetStarted}
                 >
-                  <div className="flex gap-1 items-center text-white">Login <IconArrowRight className="text-white" /></div>
+                  <div className="flex gap-2 items-center text-white">
+                    Get Started <IconArrowRight className="text-white" />
+                  </div>
                 </Button>
-                <Button
-                  className="w-28"
-                  variant="outline"
-                  onClick={() => router.push("/signup")}
-                >Signup</Button>
               </div>
             </div>
             <div className="">
@@ -53,11 +52,6 @@ const Home = () => {
             <div className="flex-1">@Linkup {new Date().getFullYear()}</div>
             <div>Terms</div>
             <div>Privacy</div>
-          </div>
-          <div className="flex gap-3 hidden">
-            <div>1.</div>
-            <div>2.</div>
-            <div>3.</div>
           </div>
         </div>
       </div>

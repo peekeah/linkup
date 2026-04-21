@@ -5,6 +5,7 @@ import Chat from "@/store/chat";
 import Communities from "@/store/communities";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import Providers from "@/components/providers/session-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -28,14 +29,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Auth>
-            <Chat>
-              <Communities>
-                <main>{children}</main>
-                <Toaster />
-              </Communities>
-            </Chat>
-          </Auth>
+          <Providers>
+            <Auth>
+              <Chat>
+                <Communities>
+                  <main>{children}</main>
+                  <Toaster />
+                </Communities>
+              </Chat>
+            </Auth>
+          </Providers>
         </ThemeProvider>
       </body>
     </html>

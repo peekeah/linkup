@@ -1,10 +1,11 @@
 import { IconBell, IconLogout, IconMessage, IconSettings, IconUser, IconUsersGroup } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
 import clsx from "clsx";
 import Link from "next/link";
+import { ChatContext } from "@/store/chat";
+import { signOut } from "next-auth/react";
 
 const sidebarTabs: Tab[] = [
   {
@@ -55,13 +56,15 @@ type Tab = {
 const Sidebar = () => {
   const [activeTab, setActiveTab] = useState<Tab>(sidebarTabs[0])
 
+  const {clearChatStore} = useContext(ChatContext);
+
   const router = useRouter();
-  const { handleLogout } = useAuth();
 
   const handleSelectTab = (tab: Tab) => {
-    // #NOTE: Update after page development of remaining pages.
     if (tab.id === "logout") {
-      return handleLogout();
+      clearChatStore();
+      signOut();
+      return;
     }
     if (tab.id === "chats" || tab.id === "setting") {
       setActiveTab(tab)
