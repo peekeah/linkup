@@ -14,7 +14,6 @@ import useSendMessage from "@/hooks/useSendMessage"
 import { SupportedOutgoingUserMessages } from "@/@types/user"
 import { ChatContext } from "@/store/chat"
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
-import { AuthContext } from "@/store/auth";
 
 
 const SearchInput = () => {
@@ -23,7 +22,6 @@ const SearchInput = () => {
   const [searchText, setSearchText] = useState<string>("");
 
   const { state, updateSelectedChat } = useContext(ChatContext);
-  const { state: authContext } = useContext(AuthContext);
 
   const { searchContent, chatHistory } = state;
 
@@ -55,9 +53,11 @@ const SearchInput = () => {
       sendMessage({
         type: SupportedOutgoingCommunityMessages.JoinCommunity,
         payload: {
-          userName: authContext.userName,
           roomId: communityId,
         }
+      })
+      sendMessage({
+        type: SupportedOutgoingUserMessages.ChatHistory
       })
 
       setSearchText("")

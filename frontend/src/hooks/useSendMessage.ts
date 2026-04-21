@@ -3,24 +3,24 @@ import { SupportedChatMessages } from "@/@types/chat";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { AuthContext } from "@/store/auth";
-import { useContext } from "react";
+import { useCallback, useContext } from "react";
 
 const useSendMessage = () => {
 
-  const { state } = useContext(AuthContext);
-  const { ws } = state;
+  const { wsRef } = useContext(AuthContext);
 
-  const sendMessage = (message: OutgoingMessage) => {
+  const sendMessage = useCallback((message: OutgoingMessage) => {
     try {
+      const ws = wsRef.current;
       if (ws && ws?.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message))
       }
     } catch (err) {
       console.log("connection is broken", err)
     }
-  }
+  }, [wsRef])
 
-  return (message: OutgoingMessage) => {
+  return useCallback((message: OutgoingMessage) => {
     switch (message.type) {
       // Chat messages
       case SupportedChatMessages.AddChat:
@@ -78,20 +78,14 @@ const useSendMessage = () => {
 
       // Community messages
       case SupportedOutgoingCommunityMessages.GetCommunities:
-      return sendMessage({
-        type: SupportedOutgoingCommunityMessages.GetCommunities,
-      })
-
-      case SupportedOutgoingUserMessages.Search: 
-      return sendMessage({
-        type: SupportedOutgoingUserMessages.Search,
-        payload: message.payload
-      })
+        return sendMessage({
+          type: SupportedOutgoingCommunityMessages.GetCommunities,
+        })
       default:
         console.error("error while sending message")
         return null
     }
-  }
+  }, [sendMessage])
 }
 
 export default useSendMessage;

@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import api from "@/services/api";
 import { AuthState } from "@/store/auth";
 import { useRouter } from "next/navigation";
-import { currentUserMock } from "@/mock";
 import useAuth from "@/hooks/useAuth";
 import { IconBrandFacebook, IconBrandGoogle } from "@tabler/icons-react";
 
@@ -24,8 +23,8 @@ const Login = () => {
   const { handleLogin } = useAuth();
 
   const [formData, setFormData] = useState<FormData>({
-    email: currentUserMock.email,
-    password: currentUserMock.password
+    email: "",
+    password: ""
   })
 
   const onChange = (e: OnInputChange) => {
@@ -77,9 +76,9 @@ const Login = () => {
             <div className="text-end text-primary">Forget password</div>
 
             <div className="flex items-center">
-              <div className="flex-grow bg bg-gray-300 h-0.5"></div>
-              <div className="flex-grow-0 mx-5 text dark:text-white">Or</div>
-              <div className="flex-grow bg bg-gray-300 h-0.5"></div>
+              <div className="grow bg bg-gray-300 h-0.5"></div>
+              <div className="grow-0 mx-5 text dark:text-white">Or</div>
+              <div className="grow bg bg-gray-300 h-0.5"></div>
             </div>
 
             <div className="flex gap-10 justify-around w-[80%] mx-auto">

@@ -11,8 +11,17 @@ import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { CommunityContext } from "@/store/communities";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
+import { SupportedOutgoingUserMessages } from "@/@types/user";
 
 const categories = ["All", "Technology", "Design", "AI / ML", "Data", "Security", "Career"];
+
+type CommunityCard = {
+    id: string;
+    name: string;
+    description?: string;
+    members?: number;
+    onlineMembers?: number;
+};
 
 const CommunitiesPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("All");
@@ -26,7 +35,7 @@ const CommunitiesPage = () => {
         sendMessage({
             type: SupportedOutgoingCommunityMessages.GetCommunities,
         })
-    }, [])
+    }, [sendMessage])
 
     useEffect(() => {
         updateSearchText(debouncedSearchText);
@@ -37,7 +46,7 @@ const CommunitiesPage = () => {
                 category: selectedCategory === "All" ? "" : selectedCategory
             }
         })
-    }, [debouncedSearchText, selectedCategory])
+    }, [debouncedSearchText, selectedCategory, sendMessage, updateSearchText])
 
     const onSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
         setSearchInput(e.target.value)
@@ -51,7 +60,10 @@ const CommunitiesPage = () => {
         sendMessage({
             type: SupportedOutgoingCommunityMessages.JoinCommunity,
             payload: { roomId }
-        })
+        });
+        sendMessage({
+            type: SupportedOutgoingUserMessages.ChatHistory
+        });
     }
 
     const getAvatarInitial = (name: string) => name?.charAt(0)?.toUpperCase();
@@ -121,7 +133,7 @@ const CommunitiesPage = () => {
             <div className="px-8 py-8">
                 <div className="space-y-3">
                     {state.communities.length > 0 ? (
-                        state.communities.map((community: any) => (
+                        state.communities.map((community: CommunityCard) => (
                             <div
                                 key={community.id}
                                 className="group bg-card border border-border rounded-xl p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"

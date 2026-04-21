@@ -1,39 +1,65 @@
 import { AuthContext, AuthState } from "@/store/auth"
 import { ChatContext } from "@/store/chat";
-import { useContext } from "react"
+import { useCallback, useContext } from "react"
+import { jwtDecode } from "jwt-decode";
+
+const isTokenExpired = (token: string): boolean => {
+  try {
+    const decodedPayload = jwtDecode<{
+      exp?: number;
+    }>(token);
+
+    if (!decodedPayload.exp) {
+      return true;
+    }
+    return decodedPayload.exp * 1000 <= Date.now();
+  } catch {
+    return true;
+  }
+};
 
 const useAuth = () => {
-  const { updateAuth, clearAuthStore } = useContext(AuthContext);
+  const { state, updateAuth, clearAuthStore, reconnectEnabledRef } = useContext(AuthContext);
   const { clearChatStore } = useContext(ChatContext);
 
-  const getAuthStatus = () => {
-    return new Promise((resolve, reject) => {
-      try {
-        const rawData = localStorage?.getItem("userDetails");
+  const getAuthStatus = useCallback(() => {
+    try {
+      const rawData = localStorage?.getItem("userDetails");
 
-        if (!rawData) return false;
-
-        const userData = JSON.parse(rawData)
-        updateAuth(userData)
-        resolve(true)
-        return true
-      } catch (err) {
-        console.log("error while parsing data", err)
-        reject(err)
+      if (!rawData) {
+        return false;
       }
-    })
-  }
 
-  const handleLogin = (payload: AuthState) => {
+      const userData = JSON.parse(rawData) as AuthState;
+      if (isTokenExpired(userData?.token)) {
+        localStorage.removeItem("userDetails");
+        clearChatStore();
+        clearAuthStore();
+        return false;
+      }
+
+      reconnectEnabledRef.current = true;
+      if (state.token !== userData.token) {
+        updateAuth(userData);
+      }
+      return true;
+    } catch (err) {
+      console.log("error while parsing data", err);
+      return false;
+    }
+  }, [clearAuthStore, clearChatStore, reconnectEnabledRef, state.token, updateAuth])
+
+  const handleLogin = useCallback((payload: AuthState) => {
+    reconnectEnabledRef.current = true;
     localStorage.setItem("userDetails", JSON.stringify(payload))
     updateAuth(payload)
-  }
+  }, [reconnectEnabledRef, updateAuth])
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("userDetails")
     clearChatStore();
     clearAuthStore();
-  }
+  }, [clearAuthStore, clearChatStore])
 
   return { getAuthStatus, handleLogin, handleLogout }
 }

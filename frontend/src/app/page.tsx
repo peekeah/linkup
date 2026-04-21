@@ -13,11 +13,11 @@ export default function Page() {
   const { getAuthStatus } = useAuth();
 
   useEffect(() => {
-    getAuthStatus()
-      .then(() => {
-        router.push("/dashboard")
-      })
-  }, [router])
+    const isAuthenticated = getAuthStatus();
+    if (isAuthenticated) {
+      router.push("/dashboard");
+    }
+  }, [router, getAuthStatus])
 
   return (
     <div className="max-w-7xl mx-auto">

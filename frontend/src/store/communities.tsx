@@ -38,8 +38,8 @@ export const CommunityContext = createContext<CommunityContext>({
     state: {
         ...initialState
     },
-    updateCommunities: (state: Partial<State>) => { },
-    updateSearchText: (text: string) => { },
+    updateCommunities: () => { },
+    updateSearchText: () => { },
 });
 
 

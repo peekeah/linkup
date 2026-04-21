@@ -1,6 +1,5 @@
 "use client";
 import { Community } from "@/@types/community";
-import { UserId } from "@/@types/user";
 import { createContext, ReactNode, useState } from "react";
 
 interface ChatContextType {

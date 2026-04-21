@@ -28,6 +28,7 @@ const Dashboard = () => {
   const sendMessage = useSendMessage();
   const { state } = useContext(ChatContext);
   const { selectedChat } = state;
+  const selectedCommunityId = selectedChat?.communityId;
 
   const [profileDrawer, setProfileDrawer] = useState<ProfileDrawer>({
     open: false,
@@ -58,19 +59,19 @@ const Dashboard = () => {
   }
 
   useEffect(() => {
-    if (selectedChat && selectedChat?.communityId) {
+    if (selectedCommunityId) {
       try {
         sendMessage({
           type: SupportedChatMessages.GetChat,
           payload: {
-            roomId: selectedChat.communityId
+            roomId: selectedCommunityId
           }
         })
       } catch (err) {
         console.log("error while parsing json", err)
       }
     }
-  }, [selectedChat])
+  }, [selectedCommunityId, sendMessage])
 
   return (
     <div className="flex h-full">

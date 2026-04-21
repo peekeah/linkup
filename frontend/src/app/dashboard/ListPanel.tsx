@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useContext, useEffect, useState } from "react";
+import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
 import { Search } from "@/components/ui/search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -7,6 +7,7 @@ import { cx } from "class-variance-authority";
 import { Separator } from "@/components/ui/separator";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
+import { SupportedChatMessages } from "@/@types/chat";
 import InputAlert from "./InputAlert";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
@@ -25,12 +26,29 @@ const ListPanel = () => {
   const sendMessage = useSendMessage();
   const [community, setCommunity] = useState("");
 
+  const handleActiveTab = useCallback((chat: ChatHistory) => {
+    updateSelectedChat(chat)
+    sendMessage({
+      type: SupportedChatMessages.GetChat,
+      payload: {
+        roomId: chat.communityId
+      }
+    })
+  }, [sendMessage, updateSelectedChat])
+
   useEffect(() => {
     if (chatHistory && chatHistory?.length) {
-      updateSelectedChat(chatHistory[0])
       setFilteredChats(chatHistory)
+      const selectedChatExists = selectedChat
+        ? chatHistory.some((chat) => chat.communityId === selectedChat.communityId)
+        : false;
+
+      // Auto-select only on initial load or when current selection is no longer in the list.
+      if (!selectedChatExists) {
+        handleActiveTab(chatHistory[0])
+      }
     }
-  }, [chatHistory])
+  }, [chatHistory, handleActiveTab, selectedChat])
 
   useEffect(() => {
     if (!searchFilter) {
@@ -42,11 +60,7 @@ const ListPanel = () => {
           item.communityName.toLowerCase().includes(searchFilter.toLowerCase())
         )
     )
-  }, [searchFilter])
-
-  const handleActiveTab = (chat: ChatHistory) => {
-    updateSelectedChat(chat)
-  }
+  }, [chatHistory, searchFilter])
 
   const handleAddCommunity = () => {
     sendMessage({

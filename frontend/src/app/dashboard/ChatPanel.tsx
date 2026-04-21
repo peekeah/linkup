@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useId, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,11 @@ const ChatPanel = () => {
   const userId = authState?.userId;
 
   const { selectedChat, messages } = state;
-  const currentMessages = messages?.get(selectedChat?.communityId!) ?? [];
+
+  const currentMessages = useMemo(
+    () => messages?.get(selectedChat?.communityId ?? "") ?? [],
+    [messages, selectedChat?.communityId]
+  );
 
   const sendMessage = useSendMessage();
 
@@ -61,7 +65,7 @@ const ChatPanel = () => {
       setChatMessages(newMessages)
       setText(() => "")
     }
-  }, [state])
+  }, [currentMessages, selectedChat])
 
   const onClick = () => {
     try {
@@ -153,6 +157,11 @@ const ChatPanel = () => {
 
   return (
     <div className="h-full flex flex-col">
+      {!selectedChat?.communityId ? (
+        <div className="m-auto text-sm text-muted-foreground">
+          Select a community to start chatting.
+        </div>
+      ) : null}
       {/* Chat header */}
       <div className="p-4 flex w-full gap-3 items-center">
         <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
@@ -242,10 +251,11 @@ const ChatPanel = () => {
               value={text}
               onChange={onInputChange}
               onKeyDown={onKeyDown}
+              disabled={!selectedChat?.communityId}
               className="w-full h-14 rounded-lg!"
               placeholder={selectedChat?.communityName && `Message ${selectedChat?.communityName}`}
             />
-            <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick}>
+            <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick} disabled={!selectedChat?.communityId}>
               <IconSend className="text-white" />
             </Button>
           </div>

@@ -1,11 +1,13 @@
 "use client"
-import { createContext, ReactNode, useState } from "react";
+import { createContext, MutableRefObject, ReactNode, useCallback, useRef, useState } from "react";
 
 interface AuthContextType {
   state: AuthState;
-  updateAuth: (payload: AuthState) => void,
-  updateConnection: (ws: WebSocket | null) => void,
-  clearAuthStore: () => void,
+  wsRef: MutableRefObject<WebSocket | null>;
+  reconnectEnabledRef: MutableRefObject<boolean>;
+  updateAuth: (payload: AuthState) => void;
+  updateConnection: (ws: WebSocket | null) => void;
+  clearAuthStore: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>({
@@ -15,9 +17,10 @@ export const AuthContext = createContext<AuthContextType>({
     email: "",
     mobile: "",
     bio: "",
-    token: "",
-    ws: null
+    token: ""
   },
+  wsRef: { current: null },
+  reconnectEnabledRef: { current: true },
   updateAuth: () => { },
   updateConnection: () => { },
   clearAuthStore: () => { }
@@ -32,53 +35,63 @@ export interface AuthState {
   userName: string;
   email: string;
   mobile: string;
-  bio: string,
+  bio: string;
   token: string;
-  ws?: null | WebSocket;
 }
 
+const INITIAL_AUTH_STATE: AuthState = {
+  userId: "",
+  userName: "",
+  token: "",
+  email: "",
+  mobile: "",
+  bio: ""
+};
+
 const Auth = ({ children }: AuthProps) => {
+  const [state, setState] = useState<AuthState>(INITIAL_AUTH_STATE);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectEnabledRef = useRef(true);
 
-  const initialValues = {
-    userId: "",
-    userName: "",
-    token: "",
-    email: "",
-    mobile: "",
-    bio: "",
-    ws: null
-  }
+  const updateAuth = useCallback((payload: AuthState) => {
+    setState(payload);
+  }, []);
 
-  const [state, setState] = useState<AuthState>(initialValues)
+  const updateConnection = useCallback((ws: WebSocket | null) => {
+    wsRef.current = ws;
+  }, []);
 
-  const updateAuth = (payload: AuthState) => {
-    setState((prev) => ({
-      ws: prev?.ws || state?.ws,
-      ...payload
-    }))
-  }
-
-  const updateConnection = (ws: WebSocket | null) => {
-    setState(prev => ({
-      ...prev,
-      ["ws"]: ws
-    }))
-  }
-
-  const clearAuthStore = () => {
-    if (state?.ws) {
-      state?.ws?.close();
+  const clearAuthStore = useCallback(() => {
+    reconnectEnabledRef.current = false;
+    const ws = wsRef.current;
+    if (ws) {
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onerror = null;
+      ws.onclose = null;
+      if (
+        ws.readyState === WebSocket.OPEN ||
+        ws.readyState === WebSocket.CONNECTING
+      ) {
+        ws.close(1000, "User logged out");
+      }
     }
-    setState(() => initialValues)
-  }
+    wsRef.current = null;
+    setState(INITIAL_AUTH_STATE);
+  }, []);
 
   return (
     <AuthContext.Provider
       value={{
-        state, updateAuth, updateConnection, clearAuthStore
+        state,
+        wsRef,
+        reconnectEnabledRef,
+        updateAuth,
+        updateConnection,
+        clearAuthStore
       }}
     > {children} </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export default Auth;
