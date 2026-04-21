@@ -6,10 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
-import { IconSearch } from "@tabler/icons-react";
+import { IconSearch, IconCheck } from "@tabler/icons-react";
 import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { CommunityContext } from "@/store/communities";
+import { ChatContext } from "@/store/chat";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 
@@ -30,6 +31,12 @@ const CommunitiesPage = () => {
 
     const sendMessage = useSendMessage();
     const { state, updateSearchText } = useContext(CommunityContext);
+    const { state: chatState } = useContext(ChatContext);
+
+    // Check if user has already joined a community
+    const isJoined = useCallback((communityId: string) => {
+        return chatState.chatHistory.some(chat => chat.communityId === communityId);
+    }, [chatState.chatHistory]);
 
     useEffect(() => {
         sendMessage({
@@ -158,12 +165,22 @@ const CommunitiesPage = () => {
                                     </div>
 
                                     {/* Join Button */}
-                                    <Button
-                                        className="shrink-0 bg-primary hover:bg-primary/90 text-white"
-                                        onClick={() => handleJoinCommunity(community?.id ?? "")}
-                                    >
-                                        Join
-                                    </Button>
+                                    {isJoined(community?.id ?? "") ? (
+                                        <Button
+                                            className="shrink-0 bg-muted text-muted-foreground cursor-not-allowed"
+                                            disabled
+                                        >
+                                            <IconCheck className="w-4 h-4 mr-2" />
+                                            Joined
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            className="shrink-0 bg-primary hover:bg-primary/90 text-white"
+                                            onClick={() => handleJoinCommunity(community?.id ?? "")}
+                                        >
+                                            Join
+                                        </Button>
+                                    )}
                                 </div>
                             </div>
                         ))

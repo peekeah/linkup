@@ -1,22 +1,7 @@
 import { AuthContext, AuthState } from "@/store/auth"
 import { ChatContext } from "@/store/chat";
 import { useCallback, useContext } from "react"
-import { jwtDecode } from "jwt-decode";
-
-const isTokenExpired = (token: string): boolean => {
-  try {
-    const decodedPayload = jwtDecode<{
-      exp?: number;
-    }>(token);
-
-    if (!decodedPayload.exp) {
-      return true;
-    }
-    return decodedPayload.exp * 1000 <= Date.now();
-  } catch {
-    return true;
-  }
-};
+import { isTokenExpired } from "@/utils/auth";
 
 const useAuth = () => {
   const { state, updateAuth, clearAuthStore, reconnectEnabledRef } = useContext(AuthContext);

@@ -8,21 +8,7 @@ import useHandleMessage from "@/hooks/useHandleMessage";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { AuthContext } from "@/store/auth";
-import { jwtDecode } from "jwt-decode";
-
-const isTokenExpired = (token: string): boolean => {
-  try {
-    const decodedPayload = jwtDecode<{
-      exp?: number;
-    }>(token);
-    if (!decodedPayload.exp) {
-      return true;
-    }
-    return decodedPayload.exp * 1000 <= Date.now();
-  } catch {
-    return true;
-  }
-};
+import { isTokenExpired } from "@/utils/auth";
 
 export default function RootLayout({
   children,

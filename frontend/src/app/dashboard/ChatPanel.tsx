@@ -69,7 +69,7 @@ const ChatPanel = () => {
 
   const onClick = () => {
     try {
-      if (selectedChat?.communityId) {
+      if (selectedChat?.communityId && text.trim()) {
         sendMessage({
           type: SupportedChatMessages.AddChat,
           payload: {
@@ -77,8 +77,8 @@ const ChatPanel = () => {
             content: text,
           }
         })
+        setText(""); 
       }
-
     } catch (err) {
       console.log("error while adding chat", err)
     }
