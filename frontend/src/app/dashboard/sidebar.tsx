@@ -1,6 +1,6 @@
-import { IconBell, IconLogout, IconMessage, IconSettings, IconUser, IconUsersGroup } from "@tabler/icons-react"
+import { IconBell, IconLogout, IconMessage, IconProps, IconSettings, IconUser, IconUsersGroup } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button";
-import { useContext, useState } from "react";
+import { ForwardRefExoticComponent, RefAttributes, useContext, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import clsx from "clsx";
 import Link from "next/link";
@@ -35,7 +35,7 @@ const sidebarTabs: Tab[] = [
   {
     id: "logout",
     title: "Logout",
-    link: "logout",
+    link: "/",
     icon: <IconLogout />,
   },
   {
@@ -50,7 +50,7 @@ type Tab = {
   id: string;
   title: string;
   link: string;
-  icon: JSX.Element;
+  icon: ReactNode
 }
 
 const Sidebar = () => {
