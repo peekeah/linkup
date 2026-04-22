@@ -10,7 +10,7 @@ const errorHandler = (err: RequestError) => {
 
   if (err instanceof z.ZodError) {
     statusCode = 403;
-    errMessage = err.errors
+    errMessage = err.message
   } else if (err && typeof err === 'object' && 'message' in err) {
     errMessage = err.message
   }
