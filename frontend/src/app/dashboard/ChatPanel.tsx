@@ -7,12 +7,13 @@ import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
-import { AuthContext } from "@/store/auth";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
-import { IconArrowBigDown, IconArrowBigUp, IconDots, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { IconArrowBigDown, IconArrowBigUp, IconDots, IconMessage, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
 import { toast } from "sonner";
+import clsx from "clsx";
+import { useSession } from "next-auth/react";
 
 type ChatMessages = Map<Date, Message[]>;
 
@@ -42,13 +43,16 @@ const ChatPanel = () => {
 
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
   const [text, setText] = useState<string>("");
-
-  const [newMessage, setNewMessage] = useState("");
+  const [onEditMessageModal, setEditMessageModal] = useState({
+    state: false,
+    messageContent: "",
+    messageId: ""
+  });
 
   const { state } = useContext(ChatContext);
-  const { state: authState } = useContext(AuthContext);
 
-  const userId = authState?.userId;
+  const session = useSession();
+  const userId = session.data?.user.userId ?? "";
 
   const { selectedChat, messages } = state;
 
@@ -95,29 +99,29 @@ const ChatPanel = () => {
   }
 
   const onModalClose = () => {
-    setNewMessage("")
+    setEditMessageModal({ state: false, messageContent: "", messageId: "" })
   }
 
   const onMessageChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setNewMessage(e.target.value)
+    setEditMessageModal(prev => ({ ...prev, messageContent: e.target.value }))
   }
 
-  const onEditMessage = (chatId: string) => {
+  const onEditMessage = () => {
     try {
-      if (selectedChat?.communityId && newMessage) {
+      if (selectedChat?.communityId && onEditMessageModal.messageContent && onEditMessageModal.messageId) {
         sendMessage({
           type: SupportedChatMessages.UpdateChat,
           payload: {
             roomId: selectedChat?.communityId,
-            chatId,
-            content: newMessage
+            chatId: onEditMessageModal.messageId,
+            content: onEditMessageModal.messageContent
           }
         })
         toast("Message", {
           description: "Successfully updated message"
         })
       }
-      setNewMessage("")
+      setEditMessageModal({ state: false, messageContent: "", messageId: "" })
     } catch (err) {
       console.log("error while editing message", err)
     }
@@ -158,8 +162,16 @@ const ChatPanel = () => {
   return (
     <div className="h-full flex flex-col">
       {!selectedChat?.communityId ? (
-        <div className="m-auto text-sm text-muted-foreground">
-          Select a community to start chatting.
+        <div className="m-auto flex flex-col items-center justify-center h-full text-center space-y-4">
+          <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
+            <IconMessage className="w-10 h-10 text-muted-foreground" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-foreground">No Community Selected</h3>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Choose a community from the sidebar to start chatting with like-minded people.
+            </p>
+          </div>
         </div>
       ) : null}
       {/* Chat header */}
@@ -198,11 +210,20 @@ const ChatPanel = () => {
                 <div className="gap-3 flex flex-col">
                   {
                     messages.map(message => (
-                      <div key={message.id} className={`max-w-175 group space-y-1 overflow-hidden ${message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"}`}>
+                      <div key={message.id} className={
+                        clsx(
+                          `max-w-175 group space-y-1 overflow-hidden`,
+                          message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"
+                        )
+                        }>
                         <div className="p-3 relative">{!message?.isDeleted ? message.content : "This message is deleted"}</div>
                         {
-                          !message?.isDeleted && message?.senderId === userId ?
-                            <div className="hidden group-hover:flex absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1">
+                          !message?.isDeleted ?
+                            <div className={clsx(
+                              `hidden group-hover:flex z-10 absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1`,
+                              message.senderId === userId ? "right-0" : "left-0"
+                            )}
+                            >
                               <div className="flex items-center">
                                 {
                                   !isUpvoted(message.upvotes, userId) ?
@@ -217,24 +238,29 @@ const ChatPanel = () => {
                                 }
                                 <div>{message.upvotes?.length}</div>
                               </div>
-                              <IconTrash
-                                className="text-primary size-5 cursor-pointer"
-                                onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
-                              />
-                              <InputAlert
-                                title="Edit message"
-                                placeholder="Message"
-                                value={newMessage}
-                                triggerButton={
-                                  <IconPencil
-                                    onClick={() => setNewMessage(message.content)}
+                              {message.senderId === userId && (
+                                <>
+                                  <IconTrash
                                     className="text-primary size-5 cursor-pointer"
+                                    onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
                                   />
-                                }
-                                onChange={onMessageChange}
-                                onSubmit={() => onEditMessage(message.id)}
-                                onClose={onModalClose}
-                              />
+                                  <InputAlert
+                                    open={onEditMessageModal.state}
+                                    title="Edit message"
+                                    placeholder="Message"
+                                    value={onEditMessageModal.messageContent}
+                                    triggerButton={
+                                      <IconPencil
+                                        onClick={() => setEditMessageModal({ state: true, messageContent: message.content, messageId: message.id })}
+                                        className="text-primary size-5 cursor-pointer"
+                                      />
+                                    }
+                                    onChange={onMessageChange}
+                                    onSubmit={() => onEditMessage()}
+                                    onClose={onModalClose}
+                                  />
+                                </>
+                              )}
                             </div> : null
                         }
                       </div>

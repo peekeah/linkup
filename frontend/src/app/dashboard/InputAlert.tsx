@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { ChangeEvent, KeyboardEventHandler, ReactNode } from "react";
 
 interface Props {
+  open: boolean;
   title: string;
   placeholder: string;
   value: string;
@@ -25,6 +26,7 @@ interface Props {
 const InputAlert = (props: Props) => {
 
   const {
+    open,
     title,
     placeholder,
     value,
@@ -34,16 +36,14 @@ const InputAlert = (props: Props) => {
     onClose
   } = props;
 
-  // #FIXME: Submit on enter button.
   const onKeyDown: KeyboardEventHandler = (e) => {
-    return;
     if (e.code === "Enter") {
       onSubmit()
     }
   }
 
   return (
-    <AlertDialog>
+    <AlertDialog open={open}>
       <AlertDialogTrigger asChild>
         {triggerButton}
       </AlertDialogTrigger>

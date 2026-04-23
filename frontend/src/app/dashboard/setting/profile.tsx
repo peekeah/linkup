@@ -1,9 +1,9 @@
 import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { AuthContext } from "@/store/auth";
-import React, {
+import {
   ChangeEventHandler,
-  FormEventHandler,
+  SubmitEventHandler,
   useContext,
   useState
 } from "react";
@@ -33,7 +33,7 @@ const Profile = () => {
     }))
   }
 
-  const onSubmit: FormEventHandler = async (e) => {
+  const onSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
       const res = await api.profile({

@@ -1,10 +1,10 @@
 "use client"
-import { createContext, MutableRefObject, ReactNode, useCallback, useRef, useState } from "react";
+import { createContext, ReactNode, RefObject, useCallback, useRef, useState } from "react";
 
 interface AuthContextType {
   state: AuthState;
-  wsRef: MutableRefObject<WebSocket | null>;
-  reconnectEnabledRef: MutableRefObject<boolean>;
+  wsRef: RefObject<WebSocket | null>;
+  reconnectEnabledRef: RefObject<boolean>;
   updateAuth: (payload: AuthState) => void;
   updateConnection: (ws: WebSocket | null) => void;
   clearAuthStore: () => void;
