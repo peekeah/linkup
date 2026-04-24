@@ -160,7 +160,7 @@ type GetCommunityIncomingPayload = {
 
 export const CreateCommunity = z.object({
   name: z.string(),
-  // owner: Member
+  category: z.string(),
 });
 
 export const UpdateCommunity = z.object({

@@ -45,11 +45,17 @@ const useHandleMessage = () => {
           break;
 
         case SupportedIncomingCommunityMessage.GetCommunities:
-          updateCommunities(message.data);
+          updateCommunities({
+            communities: message.data.communities,
+            communityCount: message.data.communityCount,
+            memberCount: message.data.memberCount,
+            onlineMembers: message.data.onlineMembers,
+            categories: message.data.categories || []
+          });
           break;
 
         case SupportedIncomingCommunityMessage.Search:
-          updateCommunities({ communities: message?.data?.communities });
+          updateCommunities({ communities: message?.data?.communities, searchText: "" });
           break;
 
         case SupportedIncomingCommunityMessage.JoinCommunity:

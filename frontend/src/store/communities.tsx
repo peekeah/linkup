@@ -15,6 +15,7 @@ type State = {
     onlineMembers: number;
     communityCount: number;
     selectedCategory: string;
+    categories: string[];
 }
 
 
@@ -31,7 +32,8 @@ const initialState = {
     memberCount: 0,
     onlineMembers: 0,
     communityCount: 0,
-    selectedCategory: "all"
+    selectedCategory: "all",
+    categories: []
 }
 
 export const CommunityContext = createContext<CommunityContext>({
@@ -49,10 +51,14 @@ const Community = ({ children }: { children: ReactNode }) => {
     const updateCommunities = useCallback((updates: Partial<State>) => {
         setState(prev => {
             if (updates.communities) {
-                // If searchText is not empty, this is a search operation - replace results
-                if (prev.searchText) {
+                // Check if this is a search/filter operation by looking for searchText in updates
+                const isSearchOperation = updates.searchText !== undefined;
+                
+                if (isSearchOperation) {
+                    // For search/filter operations, replace the communities list
                     return { ...prev, ...updates, communities: updates.communities };
                 }
+                
                 // Otherwise, handle joining communities by merging to prevent duplicates
                 const existingIds = new Set(prev.communities.map(c => c.id));
                 const newCommunities = updates.communities.filter(c => !existingIds.has(c.id));

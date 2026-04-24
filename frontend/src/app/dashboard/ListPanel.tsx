@@ -15,6 +15,19 @@ import { toast } from "sonner";
 import { IconPlus, IconUser } from "@tabler/icons-react";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
+const categories = [
+  "Technology",
+  "Design",
+  "Business",
+  "Career",
+  "Education",
+  "Health & Fitness",
+  "Entertainment",
+  "Travel & Lifestyle",
+  "Creative Arts",
+  "Social & Community"
+];
+
 
 const ListPanel = () => {
 
@@ -25,6 +38,8 @@ const ListPanel = () => {
 
   const sendMessage = useSendMessage();
   const [community, setCommunity] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleActiveTab = useCallback((chat: ChatHistory) => {
     updateSelectedChat(chat)
@@ -63,10 +78,18 @@ const ListPanel = () => {
   }, [chatHistory, searchFilter])
 
   const handleAddCommunity = () => {
+    if (!selectedCategory) {
+      toast("Error", {
+        description: "Please select a category for the community"
+      })
+      return
+    }
+
     sendMessage({
       type: SupportedOutgoingCommunityMessages.CreateCommunity,
       payload: {
         name: community,
+        category: selectedCategory,
       }
     })
 
@@ -74,6 +97,8 @@ const ListPanel = () => {
       description: "Community created Successfully"
     })
     setCommunity("")
+    setSelectedCategory("")
+    setIsModalOpen(false)
   }
 
   const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -82,6 +107,7 @@ const ListPanel = () => {
 
   const onModalClose = () => {
     setCommunity("")
+    setSelectedCategory("")
   }
 
   const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -102,17 +128,25 @@ const ListPanel = () => {
       <div className="flex items-center justify-between p-3">
         <div className="text-xs text-neutral tracking-widest">COMMUNITIES</div>
         <InputAlert
+          open={isModalOpen}
           title="Add community"
           placeholder="Community name"
           value={community}
           triggerButton={
-            <Button size={"icon"} className="rounded-md size-6">
+            <Button size={"icon"} className="rounded-md size-6" onClick={() => setIsModalOpen(true)}>
               <IconPlus />
             </Button>
           }
           onChange={onInputChange}
           onSubmit={handleAddCommunity}
-          onClose={onModalClose}
+          onClose={() => {
+            onModalClose();
+            setIsModalOpen(false);
+          }}
+          showCategorySelect={true}
+          selectedCategory={selectedCategory}
+          onCategoryChange={setSelectedCategory}
+          categories={categories}
         />
       </div>
       <div>

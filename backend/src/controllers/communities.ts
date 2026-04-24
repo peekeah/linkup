@@ -9,6 +9,7 @@ import { UserId } from "./user";
 export interface ICommunity {
   id: string;
   name: string;
+  category?: string;
   owner: IMember;
   admin: IMember[];
   member: IMember[];
@@ -33,12 +34,13 @@ interface ITimeout {
 class Community {
   constructor() {}
 
-  async create(name: string, owner: IMember) {
+  async create(name: string, category: string, ownerId: string) {
     return await prisma.community.create({
       data: {
         name,
+        category,
         owner: {
-          connect: { id: owner.userId },
+          connect: { id: ownerId },
         },
       },
     });
@@ -62,7 +64,12 @@ class Community {
     const communityCount = communities.length;
     const memberCount = (await prisma.user.findMany()).length;
     const onlineMembers = activeClients.size;
-    const categories: string[] = []; // Todo: Add categories for community and return count
+    
+    // Extract unique categories from communities
+    const categories = [...new Set(communities
+      .map(community => community.category)
+      .filter((category): category is string => category !== null && category !== undefined)
+    )];
 
     return {
       communities,
@@ -113,10 +120,19 @@ class Community {
     });
   }
 
-  // Todo: Add category filter feature
   async searchCommunity(search: string, category?: string) {
+    const whereClause: any = {};
+    
+    if (search) {
+      whereClause.name = { contains: search, mode: "insensitive" };
+    }
+    
+    if (category && category !== "All") {
+      whereClause.category = category;
+    }
+    
     const communities = await prisma.community.findMany({
-      where: { name: { contains: search, mode: "insensitive" } },
+      where: whereClause,
     });
     return { communities };
   }

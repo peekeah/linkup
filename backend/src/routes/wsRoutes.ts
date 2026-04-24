@@ -90,10 +90,11 @@ const wsRequestHandler = async (
 
       // Community routes
       case SupportedCommunityMessages.CreateCommunity:
-        await communities.create(payload.name, {
-          userId: tokenData.userId,
-          name: tokenData.userName,
-        });
+        await communities.create(
+          payload.name, 
+          payload.category,
+          tokenData.userId
+        );
         break;
 
       // Todo(Auth) - Owner only

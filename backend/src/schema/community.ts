@@ -84,19 +84,12 @@ export type OutgoingCommunityMessages = {
 
 const CreateCommunity = z.object({
   name: z.string(),
-  owner: Member
+  category: z.string()
 })
 
 const UpdateCommunity = z.object({
   id: z.string(),
   name: z.string(),
-  // owner: Member,
-  // admin: z.array(Member),
-  // member: z.array(Member),
-  // timeouts: z.object({
-  //   userId: z.string(),
-  //   timeout: z.number()
-  // })
 })
 
 const DeleteCommunity = z.object({

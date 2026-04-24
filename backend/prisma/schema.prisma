@@ -69,6 +69,7 @@ model Timeout {
 model Community {
   id      String @id @default(uuid())
   name    String @unique
+  category String
 
   ownerId String
   owner   User @relation("communityOwnership", fields: [ownerId], references: [id])

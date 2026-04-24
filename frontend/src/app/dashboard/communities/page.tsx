@@ -14,7 +14,19 @@ import { ChatContext } from "@/store/chat";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 
-const categories = ["All", "Technology", "Design", "AI / ML", "Data", "Security", "Career"];
+const categories = [
+  "All",
+  "Technology",
+  "Design",
+  "Business",
+  "Career",
+  "Education",
+  "Health & Fitness",
+  "Entertainment",
+  "Travel & Lifestyle",
+  "Creative Arts",
+  "Social & Community"
+];
 
 type CommunityCard = {
     id: string;

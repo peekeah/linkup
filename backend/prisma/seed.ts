@@ -134,16 +134,26 @@ async function main() {
    * ==================================================
    */
   const communityData = [
-    { name: "Tech Enthusiasts", owner: "alice.johnson@example.com" },
-    { name: "Gaming World", owner: "frank.ocean@example.com" },
-    { name: "Book Lovers", owner: "grace.hopper@example.com" },
-    { name: "Fitness Buffs", owner: "jack.sparrow@example.com" },
-    { name: "Nature Explorers", owner: "ivy.woods@example.com" },
-    { name: "Art Lovers", owner: "hank.pym@example.com" },
-    { name: "Movie Fans", owner: "daisy.miller@example.com" },
-    { name: "Coding Gurus", owner: "grace.hopper@example.com" },
-    { name: "Travel Junkies", owner: "frank.ocean@example.com" },
-    { name: "Foodies United", owner: "eve.summers@example.com" },
+    { name: "Tech Enthusiasts", owner: "alice.johnson@example.com", category: "Technology" },
+    { name: "Web Dev Hub", owner: "bob.smith@example.com", category: "Technology" },
+    { name: "Design Masters", owner: "grace.hopper@example.com", category: "Design" },
+    { name: "UI/UX Collective", owner: "daisy.miller@example.com", category: "Design" },
+    { name: "Startup Founders", owner: "frank.ocean@example.com", category: "Business" },
+    { name: "Marketing Pros", owner: "eve.summers@example.com", category: "Business" },
+    { name: "Career Growth", owner: "jack.sparrow@example.com", category: "Career" },
+    { name: "Remote Workers", owner: "ivy.woods@example.com", category: "Career" },
+    { name: "Learning Hub", owner: "charlie.brown@example.com", category: "Education" },
+    { name: "Study Group", owner: "alice.johnson@example.com", category: "Education" },
+    { name: "Fitness Buffs", owner: "bob.smith@example.com", category: "Health & Fitness" },
+    { name: "Wellness Warriors", owner: "grace.hopper@example.com", category: "Health & Fitness" },
+    { name: "Gaming World", owner: "frank.ocean@example.com", category: "Entertainment" },
+    { name: "Movie Fans", owner: "daisy.miller@example.com", category: "Entertainment" },
+    { name: "Travel Junkies", owner: "eve.summers@example.com", category: "Travel & Lifestyle" },
+    { name: "Foodies United", owner: "jack.sparrow@example.com", category: "Travel & Lifestyle" },
+    { name: "Creative Artists", owner: "ivy.woods@example.com", category: "Creative Arts" },
+    { name: "Writers Club", owner: "charlie.brown@example.com", category: "Creative Arts" },
+    { name: "Local Community", owner: "alice.johnson@example.com", category: "Social & Community" },
+    { name: "Pet Lovers", owner: "bob.smith@example.com", category: "Social & Community" },
   ];
 
   for (const c of communityData) {
@@ -153,6 +163,7 @@ async function main() {
       create: {
         name: c.name,
         ownerId: userMap[c.owner],
+        category: c.category,
       },
     });
   }
@@ -248,20 +259,21 @@ async function main() {
    * TIMEOUTS
    * ==================================================
    */
-  await prisma.timeout.createMany({
-    data: [
-      {
-        userId: userMap["jack.sparrow@example.com"],
-        communityId: communityMap["Gaming World"],
-        expiresAt: new Date(Date.now() + 60 * 60000),
-      },
-      {
-        userId: userMap["eve.summers@example.com"],
-        communityId: communityMap["Book Lovers"],
-        expiresAt: new Date(Date.now() + 30 * 60000),
-      },
-    ],
-  });
+  // Note: Timeouts commented out to avoid unique constraint conflicts
+  // await prisma.timeout.createMany({
+  //   data: [
+  //     {
+  //       userId: userMap["jack.sparrow@example.com"],
+  //       communityId: communityMap["Gaming World"],
+  //       expiresAt: new Date(Date.now() + 60 * 60000),
+  //     },
+  //     {
+  //       userId: userMap["eve.summers@example.com"],
+  //       communityId: communityMap["Book Lovers"],
+  //       expiresAt: new Date(Date.now() + 30 * 60000),
+  //     },
+  //   ],
+  // });
 
   console.log("✅ Full seed completed");
 }
