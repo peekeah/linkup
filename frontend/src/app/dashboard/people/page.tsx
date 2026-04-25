@@ -59,16 +59,20 @@ const PeoplePage = () => {
     }
 
     const handleMessageUser = (user: User) => {
-        // Create or navigate to private chat
+        // Check if private chat already exists
         const existingChat = privateChats.find(chat => chat.recipientId === user.id);
         
         if (existingChat) {
             // Navigate to existing chat
             updateSelectedChat(existingChat);
+            toast("Private Chat", {
+                description: `Continuing conversation with ${user.name}`
+            });
         } else {
-            // Create new private chat
-            const newPrivateChat: PrivateChatHistory = {
-                id: `private-${user.id}`,
+            // Create a temporary chat object for navigation, but don't add to privateChats yet
+            // The real chat will be created when the first message is sent
+            const tempPrivateChat: PrivateChatHistory = {
+                id: `temp-${user.id}`,
                 content: "",
                 recipientId: user.id,
                 recipientName: user.name,
@@ -79,13 +83,10 @@ const PeoplePage = () => {
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
-
-            // Add to private chats and select it
-            updatePrivateChats([...privateChats, newPrivateChat]);
-            updateSelectedChat(newPrivateChat);
             
+            updateSelectedChat(tempPrivateChat);
             toast("Private Chat", {
-                description: `Started conversation with ${user.name}`
+                description: `Ready to chat with ${user.name}`
             });
         }
 

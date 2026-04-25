@@ -54,7 +54,7 @@ const ChatPanel = () => {
   const session = useSession();
   const userId = session.data?.user.userId ?? "";
 
-  const { selectedChat, messages } = state;
+  const { selectedChat, messages, privateMessages } = state;
 
   const currentMessages = useMemo(() => {
     if (!selectedChat) return [];
@@ -62,9 +62,9 @@ const ChatPanel = () => {
     if (selectedChat.type === 'community') {
       return messages?.get(selectedChat.communityId ?? "") ?? [];
     } else {
-      return messages?.get(selectedChat.recipientId ?? "") ?? [];
+      return privateMessages?.get(selectedChat.recipientId ?? "") ?? [];
     }
-  }, [messages, selectedChat]);
+  }, [messages, privateMessages, selectedChat]);
 
   const sendMessage = useSendMessage();
 

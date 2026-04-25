@@ -132,12 +132,18 @@ class Chat {
   }
 
   async getPrivateChats(
-    recipientId: string,
+    userId: string,
+    partnerId: string,
     limit?: number | undefined,
     offset?: number | undefined,
   ) {
     return await prisma.privateMessage.findMany({
-      where: { recipientId },
+      where: {
+        OR: [
+          { senderId: userId, recipientId: partnerId },
+          { senderId: partnerId, recipientId: userId }
+        ]
+      },
       skip: offset,
       take: limit,
       orderBy: { createdAt: 'desc' },

@@ -60,10 +60,9 @@ const Sidebar = () => {
       signOut();
       return;
     }
-    if (tab.id === "chats" || tab.id === "setting") {
-      setActiveTab(tab)
-      router.push(`/dashboard/${tab.link}`)
-    }
+    // Update active tab for all tabs except logout
+    setActiveTab(tab)
+    router.push(`/dashboard/${tab.link}`)
   }
 
   return (

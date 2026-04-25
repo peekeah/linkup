@@ -9,7 +9,7 @@ import { SupportedIncomingCommunityMessage } from "@/@types/community";
 import { toast } from "sonner";
 
 const useHandleMessage = () => {
-  const { updateChatHistory, updateChatMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats } =
+  const { updateChatHistory, updateChatMessages, updatePrivateMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats } =
     useContext(ChatContext);
 
   const { updateCommunities } = useContext(CommunityContext);
@@ -41,6 +41,11 @@ const useHandleMessage = () => {
           messages = message.data?.messages;
           roomId = message?.data?.roomId;
           updateChatMessages(roomId, messages);
+          break;
+        case SupportedIncomingChatMessages.GetPrivateChat:
+          messages = message.data?.messages;
+          roomId = message?.data?.roomId;
+          updatePrivateMessages(roomId, messages);
           break;
         case SupportedIncomingCommunityMessage.BroadcastMessages:
           roomId = message.data?.roomId;

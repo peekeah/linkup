@@ -10,7 +10,6 @@ interface LastMessage {
   date: Date;
 }
 
-// #NOTE: Add for private message
 export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
@@ -115,6 +114,13 @@ class User {
   async searchUser(search: string) {
     return await prisma.user.findMany({
       where: { name: { contains: search, mode: "insensitive" } },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        bio: true,
+        image: true,
+      },
     });
   }
 

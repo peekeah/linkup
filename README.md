@@ -101,6 +101,26 @@ git clone https://github.com/peekeah/linkup.git
 1. Open your browser and navigate to `http://localhost:3000` to access the frontend.
 2. The backend API will be running at `http://localhost:5000` by default, or at the port specified in your environment configuration.
 
+## Known Issues & Limitations
+
+### Recently Resolved Issues ✅
+The following issues have been identified and fixed:
+
+- **Private Chat Query Bug**: Fixed `getPrivateChats()` to return both sent and received messages for complete conversation history
+- **Message Storage Separation**: Implemented proper separation between community and private messages using distinct storage maps
+- **Real-time DM Delivery**: Implemented real-time private message broadcasting to online recipients
+- **Search Data Exposure**: Added select clause to `searchUser()` to prevent sensitive data exposure
+- **UI State Management**: Fixed infinite loop risks in useEffect dependencies and sidebar tab active states
+- **Fake Chat Objects**: Removed client-side synthetic chat creation to prevent conflicts with server-side records
+
+### Current Status
+All major functionality is working correctly:
+- ✅ Real-time community chat with upvotes
+- ✅ Private messaging with real-time delivery
+- ✅ User search and community discovery
+- ✅ Secure authentication and authorization
+- ✅ Proper data separation and state management
+
 ## Contributing
 
 If you'd like to contribute to Linkup, feel free to fork the repository and submit pull requests. We welcome contributions that improve the app's functionality, security, and user experience.

@@ -1,4 +1,4 @@
-import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
+import { ChangeEventHandler, useCallback, useContext, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "@/components/ui/search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -9,6 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedChatMessages } from "@/@types/chat";
+import { SupportedOutgoingUserMessages } from "@/@types/user";
 import InputAlert from "./InputAlert";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
@@ -46,6 +47,8 @@ const ListPanel = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const handleSelectChatRef = useRef<(chat: ChatOrPrivateHistory) => void>(() => {});
+  
   const handleSelectChat = useCallback((chat: ChatOrPrivateHistory) => {
     updateSelectedChat(chat)
     if (chat.type === 'community') {
@@ -64,6 +67,8 @@ const ListPanel = () => {
       })
     }
   }, [sendMessage, updateSelectedChat])
+  
+  handleSelectChatRef.current = handleSelectChat;
 
   useEffect(() => {
     // Handle URL parameters for navigation from people page
@@ -104,7 +109,7 @@ const ListPanel = () => {
         }
       }
     }
-  }, [chatHistory, handleSelectChat, selectedChat, activeTab, searchParams, privateChats, hasHandledNavigation])
+  }, [chatHistory, selectedChat, activeTab, searchParams, privateChats, hasHandledNavigation])
 
   useEffect(() => {
     if (activeTab === "people" && privateChats && privateChats?.length) {
@@ -120,7 +125,7 @@ const ListPanel = () => {
         }
       }
     }
-  }, [privateChats, handleSelectChat, selectedChat, activeTab])
+  }, [privateChats, selectedChat, activeTab])
 
   useEffect(() => {
     if (activeTab === "communities") {
@@ -163,6 +168,9 @@ const ListPanel = () => {
         name: community,
         category: selectedCategory,
       }
+    })
+    sendMessage({
+      type: SupportedOutgoingUserMessages.ChatHistory
     })
 
     toast("Community", {

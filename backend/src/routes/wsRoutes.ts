@@ -6,12 +6,12 @@ import communities from "../controllers/communities";
 import { authenticate, authorize, CommunityRole } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
-import { prisma } from "../utils/db";
 import {
   SupportedOutgoingUserMessages,
   SupportedUserMessages,
 } from "../schema/user";
 import user from "../controllers/user";
+import { activeClients } from "../store/clients";
 
 const wsRequestHandler = async (
   ws: CustomWebsocket,
@@ -114,13 +114,14 @@ const wsRequestHandler = async (
       case SupportedChatMessages.GetPrivateChat:
         if (payload && 'recipientId' in payload) {
           const privateMessages = await chat.getPrivateChats(
+            tokenData.userId,
             payload.recipientId,
             payload.limit,
             payload.offset
           );
           ws.send(
             JSON.stringify({
-              type: "GET_CHAT",
+              type: "GET_PRIVATE_CHAT",
               data: {
                 roomId: payload.recipientId,
                 messages: privateMessages,
@@ -134,16 +135,10 @@ const wsRequestHandler = async (
         if (payload && 'recipientId' in payload && 'content' in payload) {
           const newMessage = await chat.sendPrivateMessage(payload.recipientId, payload.content, tokenData.userId);
           
-          // Get the recipient's user details for the chat history
-          const recipient = await prisma.user.findUnique({
-            where: { id: payload.recipientId },
-            select: { id: true, name: true, email: true, bio: true, image: true }
-          });
-          
           // Send the message back to the sender
           ws.send(
             JSON.stringify({
-              type: "GET_CHAT",
+              type: "GET_PRIVATE_CHAT",
               data: {
                 roomId: payload.recipientId,
                 messages: [newMessage],
@@ -160,8 +155,29 @@ const wsRequestHandler = async (
             }),
           );
           
-          // TODO: Broadcast to recipient when they're online
-          // For now, we'll just update the sender's view
+          // Broadcast to recipient when they're online
+          const recipientConnection = activeClients.get(payload.recipientId);
+          if (recipientConnection) {
+            // Send the new message to the recipient
+            recipientConnection.send(
+              JSON.stringify({
+                type: "GET_PRIVATE_CHAT",
+                data: {
+                  roomId: tokenData.userId, // For recipient, the sender is the roomId
+                  messages: [newMessage],
+                },
+              }),
+            );
+            
+            // Update recipient's private chat history
+            const recipientChatHistory = await user.getPrivateChatHistory(payload.recipientId);
+            recipientConnection.send(
+              JSON.stringify({
+                type: "GET_PRIVATE_CHAT_HISTORY",
+                data: recipientChatHistory,
+              }),
+            );
+          }
         }
         break;
 
@@ -171,6 +187,13 @@ const wsRequestHandler = async (
           payload.name, 
           payload.category,
           tokenData.userId
+        );
+        // Send updated ChatHistory to include the newly created community
+        ws.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.ChatHistory,
+            data: await user.getChatHistory(tokenData.userId),
+          }),
         );
         break;
 
@@ -237,7 +260,14 @@ const wsRequestHandler = async (
         );
         ws.send(JSON.stringify({
           type: "JOIN_COMMUNITY",
-        }))
+        }));
+        // Refresh ChatHistory to show the newly joined community
+        ws.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.ChatHistory,
+            data: await user.getChatHistory(tokenData.userId),
+          }),
+        );
         break;
 
       case SupportedCommunityMessages.LeaveCommunity:
