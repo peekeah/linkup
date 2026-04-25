@@ -6,6 +6,8 @@ export enum SupportedChatMessages {
   UpdateChat = "UPDATE_CHAT",
   DeleteChat = "DELETE_CHAT",
   UpvoteMessage = "UPVOTE_MESSAGE",
+  GetPrivateChat = "GET_PRIVATE_CHAT",
+  SendPrivateMessage = "SEND_PRIVATE_MESSAGE",
 }
 
 export type IncomingChatMessages = {
@@ -23,6 +25,12 @@ export type IncomingChatMessages = {
 } | {
   type: SupportedChatMessages.UpvoteMessage,
   payload: UpvoteMessageType
+} | {
+  type: SupportedChatMessages.GetPrivateChat,
+  payload: GetPrivateChatType
+} | {
+  type: SupportedChatMessages.SendPrivateMessage,
+  payload: SendPrivateMessageType
 }
 
 export enum OutgoingChatMessages {
@@ -65,8 +73,28 @@ export const UpvoteMessage = z.object({
   chatId: z.string()
 })
 
+export const GetPrivateChat = z.object({
+  recipientId: z.string(),
+  offset: z.number().optional(),
+  limit: z.number().optional(),
+}).refine(
+  (data) => (data.offset === undefined && data.limit === undefined) ||
+    (data.offset !== undefined && data.limit !== undefined),
+  {
+    message: "Both offset and limit must be provided together",
+    path: ["offset"],
+  }
+)
+
+export const SendPrivateMessage = z.object({
+  recipientId: z.string(),
+  content: z.string(),
+})
+
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;
 export type UpdateChatType = z.infer<typeof UpdateChat>;
 export type DeleteChatType = z.infer<typeof DeleteChat>;
 export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;
+export type GetPrivateChatType = z.infer<typeof GetPrivateChat>;
+export type SendPrivateMessageType = z.infer<typeof SendPrivateMessage>;

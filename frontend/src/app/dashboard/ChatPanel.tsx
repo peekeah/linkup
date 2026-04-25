@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChatContext, Message } from "@/store/chat";
+import { ChatContext, Message, ChatOrPrivateHistory } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
@@ -56,10 +56,15 @@ const ChatPanel = () => {
 
   const { selectedChat, messages } = state;
 
-  const currentMessages = useMemo(
-    () => messages?.get(selectedChat?.communityId ?? "") ?? [],
-    [messages, selectedChat?.communityId]
-  );
+  const currentMessages = useMemo(() => {
+    if (!selectedChat) return [];
+    
+    if (selectedChat.type === 'community') {
+      return messages?.get(selectedChat.communityId ?? "") ?? [];
+    } else {
+      return messages?.get(selectedChat.recipientId ?? "") ?? [];
+    }
+  }, [messages, selectedChat]);
 
   const sendMessage = useSendMessage();
 
@@ -73,14 +78,24 @@ const ChatPanel = () => {
 
   const onClick = () => {
     try {
-      if (selectedChat?.communityId && text.trim()) {
-        sendMessage({
-          type: SupportedChatMessages.AddChat,
-          payload: {
-            roomId: selectedChat?.communityId,
-            content: text,
-          }
-        })
+      if (selectedChat && text.trim()) {
+        if (selectedChat.type === 'community') {
+          sendMessage({
+            type: SupportedChatMessages.AddChat,
+            payload: {
+              roomId: selectedChat.communityId,
+              content: text,
+            }
+          })
+        } else {
+          sendMessage({
+            type: SupportedChatMessages.SendPrivateMessage,
+            payload: {
+              recipientId: selectedChat.recipientId,
+              content: text,
+            }
+          })
+        }
         setText(""); 
       }
     } catch (err) {
@@ -108,11 +123,12 @@ const ChatPanel = () => {
 
   const onEditMessage = () => {
     try {
-      if (selectedChat?.communityId && onEditMessageModal.messageContent && onEditMessageModal.messageId) {
+      if (selectedChat && onEditMessageModal.messageContent && onEditMessageModal.messageId) {
+        const roomId = selectedChat.type === 'community' ? selectedChat.communityId : selectedChat.recipientId;
         sendMessage({
           type: SupportedChatMessages.UpdateChat,
           payload: {
-            roomId: selectedChat?.communityId,
+            roomId: roomId,
             chatId: onEditMessageModal.messageId,
             content: onEditMessageModal.messageContent
           }
@@ -127,12 +143,12 @@ const ChatPanel = () => {
     }
   }
 
-  const handleDeleteMessage = (communityId: string, chatId: string) => {
+  const handleDeleteMessage = (roomId: string, chatId: string) => {
     try {
       sendMessage({
         type: SupportedChatMessages.DeleteChat,
         payload: {
-          roomId: communityId,
+          roomId: roomId,
           chatId
         }
       })
@@ -145,11 +161,12 @@ const ChatPanel = () => {
 
   const handleUpvoteMessage = (chatId: string) => {
     try {
-      if (selectedChat?.communityId) {
+      if (selectedChat) {
+        const roomId = selectedChat.type === 'community' ? selectedChat.communityId : selectedChat.recipientId;
         sendMessage({
           type: SupportedChatMessages.UpvoteMessage,
           payload: {
-            roomId: selectedChat.communityId,
+            roomId: roomId,
             chatId
           }
         })
@@ -161,15 +178,15 @@ const ChatPanel = () => {
 
   return (
     <div className="h-full flex flex-col">
-      {!selectedChat?.communityId ? (
+      {!selectedChat ? (
         <div className="m-auto flex flex-col items-center justify-center h-full text-center space-y-4">
           <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center">
             <IconMessage className="w-10 h-10 text-muted-foreground" />
           </div>
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-foreground">No Community Selected</h3>
+            <h3 className="text-lg font-semibold text-foreground">No Chat Selected</h3>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Choose a community from the sidebar to start chatting with like-minded people.
+              Choose a community or person from the sidebar to start chatting.
             </p>
           </div>
         </div>
@@ -183,7 +200,9 @@ const ChatPanel = () => {
           <AvatarFallback><IconUser /></AvatarFallback>
         </Avatar>
         <div className="w-full">
-          <div className="text-heading">{selectedChat?.communityName}</div>
+          <div className="text-heading">
+            {selectedChat?.type === 'community' ? selectedChat.communityName : selectedChat?.recipientName}
+          </div>
         </div>
         <div className="flex gap-2.5">
           <Button size={"icon"} variant={"outline"}><IconSearch /></Button>
@@ -226,23 +245,28 @@ const ChatPanel = () => {
                             >
                               <div className="flex items-center">
                                 {
-                                  !isUpvoted(message.upvotes, userId) ?
-                                    <IconArrowBigUp
-                                      className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                      onClick={() => handleUpvoteMessage(message.id)}
-                                    /> :
-                                    <IconArrowBigDown
-                                      className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                      onClick={() => handleUpvoteMessage(message.id)}
-                                    />
+                                  selectedChat?.type === 'community' && (
+                                    !isUpvoted(message.upvotes, userId) ?
+                                      <IconArrowBigUp
+                                        className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                        onClick={() => handleUpvoteMessage(message.id)}
+                                      /> :
+                                      <IconArrowBigDown
+                                        className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                        onClick={() => handleUpvoteMessage(message.id)}
+                                      />
+                                  )
                                 }
-                                <div>{message.upvotes?.length}</div>
+                                {selectedChat?.type === 'community' && <div>{message.upvotes?.length}</div>}
                               </div>
                               {message.senderId === userId && (
                                 <>
                                   <IconTrash
                                     className="text-primary size-5 cursor-pointer"
-                                    onClick={() => handleDeleteMessage(selectedChat?.communityId || "", message.id)}
+                                    onClick={() => {
+                                      const roomId = selectedChat?.type === 'community' ? selectedChat.communityId : selectedChat?.recipientId;
+                                      handleDeleteMessage(roomId || "", message.id)
+                                    }}
                                   />
                                   <InputAlert
                                     open={onEditMessageModal.state}
@@ -277,11 +301,11 @@ const ChatPanel = () => {
               value={text}
               onChange={onInputChange}
               onKeyDown={onKeyDown}
-              disabled={!selectedChat?.communityId}
+              disabled={!selectedChat}
               className="w-full h-14 rounded-lg!"
-              placeholder={selectedChat?.communityName && `Message ${selectedChat?.communityName}`}
+              placeholder={selectedChat ? `Message ${selectedChat.type === 'community' ? selectedChat.communityName : selectedChat.recipientName}` : undefined}
             />
-            <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick} disabled={!selectedChat?.communityId}>
+            <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick} disabled={!selectedChat}>
               <IconSend className="text-white" />
             </Button>
           </div>

@@ -31,12 +31,14 @@ export type LoginType = z.infer<typeof Login>
 
 export enum SupportedIncomingUserMessages {
   ChatHistory = "CHAT_HISTORY",
-  Search = "SEARCH"
+  Search = "SEARCH",
+  GetPrivateChatHistory = "GET_PRIVATE_CHAT_HISTORY"
 }
 
 export enum SupportedOutgoingUserMessages {
   ChatHistory = "CHAT_HISTORY",
-  Search = "SEARCH"
+  Search = "SEARCH",
+  GetPrivateChatHistory = "GET_PRIVATE_CHAT_HISTORY"
 }
 
 export type OutgoingUserMessage = {
@@ -46,11 +48,43 @@ export type OutgoingUserMessage = {
   payload: {
     search: string;
   }
+} | {
+  type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+  payload: null,
 }
 
 export type IncomingUserMessage = {
   type: SupportedIncomingUserMessages.ChatHistory;
   data: ChatHistory[];
+} | {
+  type: SupportedIncomingUserMessages.Search;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    mobile?: string;
+    bio?: string;
+    image?: string;
+  }[];
+} | {
+  type: SupportedIncomingUserMessages.GetPrivateChatHistory;
+  data: {
+    id: string;
+    recipientId: string;
+    recipientName: string;
+    recipient: {
+      id: string;
+      name: string;
+      email: string;
+      bio?: string;
+      image?: string;
+    };
+    message: string;
+    date: string;
+    type: 'private';
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }
 
 export default UserSchema;

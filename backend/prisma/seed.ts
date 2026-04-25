@@ -200,7 +200,7 @@ async function main() {
   });
 
   await prisma.community.update({
-    where: { id: communityMap["Coding Gurus"] },
+    where: { id: communityMap["Web Dev Hub"] },
     data: {
       admins: {
         connect: [{ id: userMap["hank.pym@example.com"] }],
@@ -238,16 +238,16 @@ async function main() {
         createdAt: new Date("2024-12-01T10:00:00"),
       },
       {
-        content: "What’s everyone working on these days?",
+        content: "What's everyone working on these days?",
         senderId: userMap["alice.johnson@example.com"],
-        communityId: communityMap["Coding Gurus"],
+        communityId: communityMap["Web Dev Hub"],
         isDeleted: false,
         createdAt: new Date("2024-12-02T10:45:00"),
       },
       {
-        content: "Great question, Alice. I’m building a web app.",
+        content: "Great question, Alice. I'm building a web app.",
         senderId: userMap["grace.hopper@example.com"],
-        communityId: communityMap["Coding Gurus"],
+        communityId: communityMap["Web Dev Hub"],
         isDeleted: false,
         createdAt: new Date("2024-12-02T11:00:00"),
       },

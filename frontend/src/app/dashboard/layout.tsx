@@ -50,6 +50,10 @@ export default function RootLayout({
         sendMessage({
           type: SupportedOutgoingUserMessages.ChatHistory
         });
+        sendMessage({
+          type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+          payload: null
+        });
       };
 
       socket.onmessage = (event) => {

@@ -118,7 +118,55 @@ class User {
     });
   }
 
-  // #TODO: Fix personal messages
+  async getPrivateChatHistory(id: UserId) {
+    const user = await prisma.user.findFirst({ where: { id } });
+
+    if (!user) {
+      throw new Error("user not found");
+    }
+
+    // Get all private messages where the user is either sender or recipient
+    const privateMessages = await prisma.privateMessage.findMany({
+      where: {
+        OR: [
+          { senderId: id },
+          { recipientId: id }
+        ]
+      },
+      include: {
+        sender: { select: { id: true, name: true, email: true, bio: true, image: true } },
+        recipient: { select: { id: true, name: true, email: true, bio: true, image: true } }
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Group messages by conversation partner and get the latest message from each conversation
+    const conversationMap = new Map();
+    
+    privateMessages.forEach(message => {
+      const partnerId = message.senderId === id ? message.recipientId : message.senderId;
+      const partner = message.senderId === id ? message.recipient : message.sender;
+      
+      if (!conversationMap.has(partnerId) || conversationMap.get(partnerId).createdAt < message.createdAt) {
+        conversationMap.set(partnerId, {
+          id: `private-${partnerId}`,
+          recipientId: partnerId,
+          recipientName: partner.name,
+          recipient: partner,
+          message: message.content,
+          date: message.createdAt.toISOString(),
+          type: 'private' as const,
+          createdAt: message.createdAt.toISOString(),
+          updatedAt: message.updatedAt.toISOString()
+        });
+      }
+    });
+
+    return Array.from(conversationMap.values()).sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }
+
   async getChatHistory(id: UserId) {
     const user = await prisma.user.findFirst({ where: { id } });
 

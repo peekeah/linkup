@@ -4,17 +4,23 @@ import { createContext, ReactNode, useState } from "react";
 
 interface ChatContextType {
   state: State;
-  updateChatHistory: (chatHistory: ChatHistory[]) => void;
-  updateSelectedChat: (chat: ChatHistory) => void;
-  updateChatMessages: (communityId: string, newMessages: Message[]) => void;
-  updateSingleChatMessage: (communityId: string, messageId: string, newMessage: Message) => void;
+  updateChatHistory: (chatHistory: ChatOrPrivateHistory[]) => void;
+  updateSelectedChat: (chat: ChatOrPrivateHistory) => void;
+  updateChatMessages: (roomId: string, newMessages: Message[]) => void;
+  updatePrivateMessages: (roomId: string, newMessages: Message[]) => void;
+  updatePrivateChats: (privateChats: PrivateChatHistory[]) => void;
+  updateSingleChatMessage: (roomId: string, messageId: string, newMessage: Message) => void;
+  updateSearchResults: (users: User[]) => void;
   clearChatStore: () => void;
 }
 
 interface State {
-  chatHistory: ChatHistory[];
-  selectedChat: ChatHistory | null;
+  chatHistory: ChatOrPrivateHistory[];
+  selectedChat: ChatOrPrivateHistory | null;
+  privateChats: PrivateChatHistory[];
   messages: Map<string, Message[]>;
+  privateMessages: Map<string, Message[]>;
+  searchResults: User[];
 }
 
 export interface Message {
@@ -34,42 +40,70 @@ interface LastMessage {
   updatedAt: string;
 }
 
-// NOTE: Add for private message
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  bio?: string;
+  image?: string;
+}
+
 export interface ChatHistory extends LastMessage {
   communityId: string;
   communityName: string;
   date: string;
   community: Community;
   message: string;
+  type: 'community';
 }
+
+export interface PrivateChatHistory extends LastMessage {
+  recipientId: string;
+  recipientName: string;
+  date: string;
+  recipient: User;
+  message: string;
+  type: 'private';
+}
+
+export type ChatOrPrivateHistory = ChatHistory | PrivateChatHistory;
 
 export const ChatContext = createContext<ChatContextType>({
   state: {
     chatHistory: [],
     selectedChat: null,
+    privateChats: [],
     messages: new Map(),
+    privateMessages: new Map(),
+    searchResults: [],
   },
   updateChatHistory: () => { },
   updateSelectedChat: () => { },
   updateSingleChatMessage: () => { },
   updateChatMessages: () => { },
+  updatePrivateMessages: () => { },
+  updatePrivateChats: () => { },
+  updateSearchResults: () => { },
   clearChatStore: () => { },
 });
 
 const initialValues = {
   chatHistory: [],
   selectedChat: null,
+  privateChats: [],
   messages: new Map(),
+  privateMessages: new Map(),
+  searchResults: [],
 }
 
 const Chat = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<State>(initialValues);
 
-  const updateChatHistory = (chatHistory: ChatHistory[]) => {
+  const updateChatHistory = (chatHistory: ChatOrPrivateHistory[]) => {
     setState(prev => ({ ...prev, ["chatHistory"]: chatHistory }))
   }
 
-  const updateSelectedChat = (chat: ChatHistory) => {
+  const updateSelectedChat = (chat: ChatOrPrivateHistory) => {
     setState(prev => ({ ...prev, ["selectedChat"]: chat }))
   }
 
@@ -100,16 +134,36 @@ const Chat = ({ children }: { children: ReactNode }) => {
     })
   };
 
-  const updateChatMessages = (communityId: string, newMessages: Message[]) => {
+  const updateChatMessages = (roomId: string, newMessages: Message[]) => {
     setState(prev => {
       const newMessagesMap = new Map(prev.messages);
-      newMessagesMap.set(communityId, newMessages);
+      newMessagesMap.set(roomId, newMessages);
 
       return ({
         ...prev,
         messages: newMessagesMap
       })
     })
+  }
+
+  const updatePrivateMessages = (roomId: string, newMessages: Message[]) => {
+    setState(prev => {
+      const newMessagesMap = new Map(prev.privateMessages);
+      newMessagesMap.set(roomId, newMessages);
+
+      return ({
+        ...prev,
+        privateMessages: newMessagesMap
+      })
+    })
+  }
+
+  const updatePrivateChats = (privateChats: PrivateChatHistory[]) => {
+    setState(prev => ({ ...prev, privateChats }))
+  }
+
+  const updateSearchResults = (users: User[]) => {
+    setState(prev => ({ ...prev, searchResults: users }))
   }
 
   const clearChatStore = () => {
@@ -122,7 +176,10 @@ const Chat = ({ children }: { children: ReactNode }) => {
       updateChatHistory,
       updateSelectedChat,
       updateChatMessages,
+      updatePrivateMessages,
+      updatePrivateChats,
       updateSingleChatMessage,
+      updateSearchResults,
       clearChatStore,
     }}>{children}</ChatContext.Provider>
   )

@@ -27,15 +27,26 @@ const Login = z.object({
 export type LoginType = z.infer<typeof Login>
 
 export enum SupportedUserMessages {
-  ChatHistory = "CHAT_HISTORY"
+  ChatHistory = "CHAT_HISTORY",
+  Search = "SEARCH",
+  GetPrivateChatHistory = "GET_PRIVATE_CHAT_HISTORY"
 }
 
 export enum SupportedOutgoingUserMessages {
-  ChatHistory = "CHAT_HISTORY"
+  ChatHistory = "CHAT_HISTORY",
+  Search = "SEARCH"
 }
 
 export type IncomingUserMessage = {
   type: SupportedUserMessages.ChatHistory,
+  payload: null,
+} | {
+  type: SupportedUserMessages.Search,
+  payload: {
+    search: string;
+  }
+} | {
+  type: SupportedUserMessages.GetPrivateChatHistory,
   payload: null,
 }
 

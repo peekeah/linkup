@@ -6,6 +6,7 @@ import communities from "../controllers/communities";
 import { authenticate, authorize, CommunityRole } from "../middlewares/auth";
 import { TokenData } from "../utils/jwt";
 import { CustomWebsocket } from "../server";
+import { prisma } from "../utils/db";
 import {
   SupportedOutgoingUserMessages,
   SupportedUserMessages,
@@ -32,6 +33,28 @@ const wsRequestHandler = async (
           JSON.stringify({
             type: SupportedOutgoingUserMessages.ChatHistory,
             data: await user.getChatHistory(tokenData.userId),
+          }),
+        );
+        break;
+
+      case SupportedUserMessages.Search:
+        if (payload && 'search' in payload) {
+          const searchResults = await user.searchUser(payload.search);
+          ws.send(
+            JSON.stringify({
+              type: SupportedOutgoingUserMessages.Search,
+              data: searchResults,
+            }),
+          );
+        }
+        break;
+
+      case SupportedUserMessages.GetPrivateChatHistory:
+        const privateChatHistory = await user.getPrivateChatHistory(tokenData.userId);
+        ws.send(
+          JSON.stringify({
+            type: "GET_PRIVATE_CHAT_HISTORY",
+            data: privateChatHistory,
           }),
         );
         break;
@@ -86,6 +109,60 @@ const wsRequestHandler = async (
 
       case SupportedChatMessages.UpvoteMessage:
         await chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
+        break;
+
+      case SupportedChatMessages.GetPrivateChat:
+        if (payload && 'recipientId' in payload) {
+          const privateMessages = await chat.getPrivateChats(
+            payload.recipientId,
+            payload.limit,
+            payload.offset
+          );
+          ws.send(
+            JSON.stringify({
+              type: "GET_CHAT",
+              data: {
+                roomId: payload.recipientId,
+                messages: privateMessages,
+              },
+            }),
+          );
+        }
+        break;
+
+      case SupportedChatMessages.SendPrivateMessage:
+        if (payload && 'recipientId' in payload && 'content' in payload) {
+          const newMessage = await chat.sendPrivateMessage(payload.recipientId, payload.content, tokenData.userId);
+          
+          // Get the recipient's user details for the chat history
+          const recipient = await prisma.user.findUnique({
+            where: { id: payload.recipientId },
+            select: { id: true, name: true, email: true, bio: true, image: true }
+          });
+          
+          // Send the message back to the sender
+          ws.send(
+            JSON.stringify({
+              type: "GET_CHAT",
+              data: {
+                roomId: payload.recipientId,
+                messages: [newMessage],
+              },
+            }),
+          );
+          
+          // Send updated private chat history
+          const updatedChatHistory = await user.getPrivateChatHistory(tokenData.userId);
+          ws.send(
+            JSON.stringify({
+              type: "GET_PRIVATE_CHAT_HISTORY",
+              data: updatedChatHistory,
+            }),
+          );
+          
+          // TODO: Broadcast to recipient when they're online
+          // For now, we'll just update the sender's view
+        }
         break;
 
       // Community routes

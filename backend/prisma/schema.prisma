@@ -29,6 +29,8 @@ model User {
   ownedCommunities    Community[] @relation("communityOwnership")
   messageUpvotes      ChatMessage[] @relation("messageUpvotes")
   sentMessages        ChatMessage[] @relation("sentMessages")
+  sentPrivateMessages PrivateMessage[] @relation("sentPrivateMessages")
+  receivedPrivateMessages PrivateMessage[] @relation("receivedPrivateMessages")
 
   timeouts Timeout[]
 
@@ -100,4 +102,21 @@ model ChatMessage {
 
   @@index([communityId])
   @@index([senderId])
+}
+
+model PrivateMessage {
+  id          String @id @default(uuid())
+  content     String
+  senderId    String 
+  recipientId String
+  isDeleted   Boolean @default(false)
+
+  sender    User @relation("sentPrivateMessages", fields: [senderId], references: [id])
+  recipient User @relation("receivedPrivateMessages", fields: [recipientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([senderId])
+  @@index([recipientId])
 }

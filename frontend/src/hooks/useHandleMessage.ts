@@ -9,7 +9,7 @@ import { SupportedIncomingCommunityMessage } from "@/@types/community";
 import { toast } from "sonner";
 
 const useHandleMessage = () => {
-  const { updateChatHistory, updateChatMessages, updateSingleChatMessage } =
+  const { updateChatHistory, updateChatMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats } =
     useContext(ChatContext);
 
   const { updateCommunities } = useContext(CommunityContext);
@@ -26,6 +26,16 @@ const useHandleMessage = () => {
         case SupportedIncomingUserMessages.ChatHistory:
           const chatHistory = message.data as ChatHistory[];
           updateChatHistory(chatHistory);
+          break;
+
+        case SupportedIncomingUserMessages.Search:
+          const searchResults = message.data as any[];
+          updateSearchResults(searchResults);
+          break;
+
+        case SupportedIncomingUserMessages.GetPrivateChatHistory:
+          const privateChatHistory = message.data as any[];
+          updatePrivateChats(privateChatHistory);
           break;
         case SupportedIncomingChatMessages.GetChat:
           messages = message.data?.messages;

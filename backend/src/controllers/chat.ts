@@ -130,6 +130,29 @@ class Chat {
 
     return await communities.broadcastMessage(roomId);
   }
+
+  async getPrivateChats(
+    recipientId: string,
+    limit?: number | undefined,
+    offset?: number | undefined,
+  ) {
+    return await prisma.privateMessage.findMany({
+      where: { recipientId },
+      skip: offset,
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async sendPrivateMessage(recipientId: string, content: string, senderId: string) {
+    return await prisma.privateMessage.create({
+      data: {
+        senderId,
+        recipientId,
+        content,
+      },
+    });
+  }
 }
 
 export default new Chat();

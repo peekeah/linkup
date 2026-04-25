@@ -15,16 +15,10 @@ const sidebarTabs: Tab[] = [
     icon: <IconMessage />,
   },
   {
-    id: "personal",
-    title: "Personal",
-    link: "private",
+    id: "people",
+    title: "People",
+    link: "people",
     icon: <IconUser />,
-  },
-  {
-    id: "notification",
-    title: "Notification",
-    link: "notification",
-    icon: <IconBell />,
   },
   {
     id: "communities",

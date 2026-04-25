@@ -56,6 +56,24 @@ const useSendMessage = () => {
               payload: message.payload
             }))
 
+          case SupportedOutgoingUserMessages.GetPrivateChatHistory:
+            return ws.send(JSON.stringify({
+              type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+              payload: message.payload
+            }))
+
+          case SupportedChatMessages.SendPrivateMessage:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.SendPrivateMessage,
+              payload: message.payload
+            }))
+
+          case SupportedChatMessages.GetPrivateChat:
+            return ws.send(JSON.stringify({
+              type: SupportedChatMessages.GetPrivateChat,
+              payload: message.payload
+            }))
+
           case SupportedOutgoingCommunityMessages.JoinCommunity:
             return ws.send(JSON.stringify({
               type: SupportedOutgoingCommunityMessages.JoinCommunity,
