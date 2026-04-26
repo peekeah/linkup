@@ -110,7 +110,7 @@ const PeoplePage = () => {
                     <div className="relative">
                         <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                         <Input
-                            placeholder="Search by name, email, or bio..."
+                            placeholder="Search by name..."
                             className="pl-10 bg-card border-border text-foreground placeholder-muted-foreground focus:border-primary"
                             value={searchInput}
                             onChange={onSearchChange}

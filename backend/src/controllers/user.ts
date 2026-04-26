@@ -155,7 +155,7 @@ class User {
       
       if (!conversationMap.has(partnerId) || conversationMap.get(partnerId).createdAt < message.createdAt) {
         conversationMap.set(partnerId, {
-          id: `private-${partnerId}`,
+          id: partnerId,
           recipientId: partnerId,
           recipientName: partner.name,
           recipient: partner,

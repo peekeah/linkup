@@ -1,8 +1,15 @@
-import { ChangeEventHandler, useCallback, useContext, useEffect, useState, useRef } from "react";
+import {
+  ChangeEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  useRef,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "@/components/ui/search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
+import { AvatarImage } from "@radix-ui/react-avatar";
 import { ChatContext, ChatHistory, PrivateChatHistory, ChatOrPrivateHistory } from "@/store/chat";
 import { cx } from "class-variance-authority";
 import { Separator } from "@/components/ui/separator";
@@ -14,171 +21,147 @@ import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { IconPlus, IconUser } from "@tabler/icons-react";
-import { AvatarImage } from "@radix-ui/react-avatar";
 
 const categories = [
-  "Technology",
-  "Design",
-  "Business",
-  "Career",
-  "Education",
-  "Health & Fitness",
-  "Entertainment",
-  "Travel & Lifestyle",
-  "Creative Arts",
-  "Social & Community"
+  "Technology", "Design", "Business", "Career", "Education",
+  "Health & Fitness", "Entertainment", "Travel & Lifestyle",
+  "Creative Arts", "Social & Community",
 ];
 
+const isPrivateChat = (chat: ChatOrPrivateHistory): chat is PrivateChatHistory =>
+  chat && "recipientId" in chat;
+
+const isCommunityChat = (chat: ChatOrPrivateHistory): chat is ChatHistory =>
+  chat && "communityId" in chat;
 
 const ListPanel = () => {
-
   const { state, updateSelectedChat } = useContext(ChatContext);
   const { chatHistory, selectedChat, privateChats } = state;
-  const [searchFilter, setSearchFilter] = useState("");
-  const [filteredChats, setFilteredChats] = useState<ChatHistory[]>([]);
-  const [filteredPrivateChats, setFilteredPrivateChats] = useState<PrivateChatHistory[]>([]);
-  const [activeTab, setActiveTab] = useState<"communities" | "people">("communities");
-  const searchParams = useSearchParams();
-  const [hasHandledNavigation, setHasHandledNavigation] = useState(false);
 
-  const sendMessage = useSendMessage();
+  const [searchFilter, setSearchFilter] = useState("");
+  const [activeTab, setActiveTab] = useState<"communities" | "people">("communities");
   const [community, setCommunity] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSelectChatRef = useRef<(chat: ChatOrPrivateHistory) => void>(() => {});
-  
-  const handleSelectChat = useCallback((chat: ChatOrPrivateHistory) => {
-    updateSelectedChat(chat)
-    if ('communityId' in chat) {
-      sendMessage({
-        type: SupportedChatMessages.GetChat,
-        payload: {
-          roomId: (chat as ChatHistory).communityId
-        }
-      })
-    } else {
-      sendMessage({
-        type: SupportedChatMessages.GetPrivateChat,
-        payload: {
-          recipientId: (chat as PrivateChatHistory).recipientId
-        }
-      })
-    }
-  }, [sendMessage, updateSelectedChat])
-  
-  handleSelectChatRef.current = handleSelectChat;
+  const searchParams = useSearchParams();
+  const hasHandledNavigation = useRef(false);
 
-  const tab = searchParams.get('tab') as 'communities' | 'people';
-  const chatId = searchParams.get('chat');
+  const sendMessage = useSendMessage();
 
+  const tab = searchParams.get("tab") as "communities" | "people" | null;
+  const chatId = searchParams.get("chat");
+
+  // Stable select handler — no ref gymnastics needed
+  const handleSelectChat = useCallback(
+    (chat: ChatOrPrivateHistory) => {
+      updateSelectedChat(chat);
+      if (isCommunityChat(chat)) {
+        sendMessage({
+          type: SupportedChatMessages.GetChat,
+          payload: { roomId: chat.communityId },
+        });
+      } else {
+        sendMessage({
+          type: SupportedChatMessages.GetPrivateChat,
+          payload: { recipientId: chat.recipientId },
+        });
+      }
+    },
+    [sendMessage, updateSelectedChat]
+  );
+
+  // Handle URL-driven navigation once on mount
   useEffect(() => {
-    // Handle URL parameters for navigation from people page
-    if (!hasHandledNavigation) {
-      
-      if (tab === 'people' && chatId) {
-        setActiveTab('people');
-        setHasHandledNavigation(true);
-        
-        // Find and select the specific private chat
-        const targetChat = privateChats.find(chat => chat.recipientId === chatId);
-        if (targetChat) {
-          handleSelectChat(targetChat);
-        }
-        return;
-      }
-      
-      setHasHandledNavigation(true);
-    }
+    if (hasHandledNavigation.current) return;
+    hasHandledNavigation.current = true;
 
-    if (activeTab === "communities" && chatHistory?.length) {
-      const communityChats = chatHistory.filter(chat => 'communityId' in chat) as ChatHistory[];
-      setFilteredChats(communityChats);
-      
-      // Always select the first community if none is selected
-      if (!selectedChat || !('communityId' in selectedChat)) {
-        if (communityChats.length > 0) {
-          handleSelectChat(communityChats[0]);
-        }
-      }
+    if (tab === "people" && chatId) {
+      setActiveTab("people");
     }
-  }, [chatHistory, selectedChat, activeTab, searchParams, privateChats, hasHandledNavigation, handleSelectChat])
+  }, [searchParams]);
 
+  // Handle chatId-based selection once privateChats is available
   useEffect(() => {
-    if (activeTab === "people" && privateChats?.length) {
-      setFilteredPrivateChats(privateChats);
-      
-      // Always select the first private chat if none is selected
-      if (!selectedChat || !('recipientId' in selectedChat)) {
-        if (privateChats.length > 0) {
-          handleSelectChat(privateChats[0]);
-        }
-      }
-    }
-  }, [privateChats, selectedChat, activeTab, handleSelectChat])
+    if (!chatId || !tab || tab !== "people") return;
+    if (!privateChats.length) return;
 
-  useEffect(() => {
-    if (activeTab === "communities") {
-      const communityChats = chatHistory.filter(chat => 'communityId' in chat) as ChatHistory[];
-      
-      if (!searchFilter) {
-        setFilteredChats(communityChats);
-        return;
-      }
-      
-      const filtered = communityChats.filter(chat =>
-        chat.communityName.toLowerCase().includes(searchFilter.toLowerCase())
-      );
-      setFilteredChats(filtered);
-    } else {
-      if (!searchFilter) {
-        setFilteredPrivateChats(privateChats);
-        return;
-      }
-      
-      const filtered = privateChats.filter(chat =>
-        chat.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
-      );
-      setFilteredPrivateChats(filtered);
+    const target = privateChats.find((c) => c.recipientId === chatId);
+    if (target) {
+      handleSelectChat(target);
     }
-  }, [chatHistory, privateChats, searchFilter, activeTab])
+  }, [privateChats, chatId, tab]); // runs whenever privateChats loads/updates
+
+  // Auto-select first community when tab is active and none is selected
+  useEffect(() => {
+    if (activeTab !== "communities") return;
+    if (chatId && tab === "people") return; // don't override params-driven selection
+    const communityChats = chatHistory.filter(isCommunityChat);
+    if (communityChats.length > 0 && (!selectedChat || isPrivateChat(selectedChat))) {
+      handleSelectChat(communityChats[0]);
+    }
+  }, [activeTab, chatHistory]);
+
+  // Auto-select first private chat when tab is active and none is selected
+  useEffect(() => {
+    if (activeTab !== "people") return;
+    if (chatId && tab === "people") return; // params flow takes priority
+    if (privateChats.length > 0 && (!selectedChat || isCommunityChat(selectedChat))) {
+      handleSelectChat(privateChats[0]);
+    }
+  }, [activeTab, privateChats]);
+
+  // Derived filtered lists — keep as pure computation, no state
+  const communityChats = chatHistory.filter(isCommunityChat);
+  const filteredChats = searchFilter
+    ? communityChats.filter((c) =>
+      c.communityName.toLowerCase().includes(searchFilter.toLowerCase())
+    )
+    : communityChats;
+
+  const filteredPrivateChats = (() => {
+    const base = searchFilter
+      ? privateChats.filter((c) =>
+        c.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
+      )
+      : [...privateChats];
+
+    // Prepend selectedChat if it's a private chat not yet in the list
+    if (
+      selectedChat &&
+      isPrivateChat(selectedChat) &&
+      !base.some((c) => c.recipientId === selectedChat.recipientId)
+    ) {
+      base.unshift(selectedChat);
+    }
+
+    return base;
+  })();
 
   const handleAddCommunity = () => {
     if (!selectedCategory) {
-      toast("Error", {
-        description: "Please select a category for the community"
-      })
-      return
+      toast("Error", { description: "Please select a category for the community" });
+      return;
     }
-
     sendMessage({
       type: SupportedOutgoingCommunityMessages.CreateCommunity,
-      payload: {
-        name: community,
-        category: selectedCategory,
-      }
-    })
-
-    toast("Community", {
-      description: "Community created Successfully"
-    })
-    setCommunity("")
-    setSelectedCategory("")
-    setIsModalOpen(false)
-  }
-
-  const onInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setCommunity(e.target.value)
-  }
-
-  const onModalClose = () => {
-    setCommunity("")
-    setSelectedCategory("")
-  }
+      payload: { name: community, category: selectedCategory },
+    });
+    toast("Community", { description: "Community created successfully" });
+    setCommunity("");
+    setSelectedCategory("");
+    setIsModalOpen(false);
+  };
 
   const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
-    setSearchFilter(e.target.value)
-  }
+    setSearchFilter(e.target.value);
+  };
+
+  const onModalClose = () => {
+    setCommunity("");
+    setSelectedCategory("");
+    setIsModalOpen(false);
+  };
 
   return (
     <div className="h-full lg:min-w-sm">
@@ -191,7 +174,7 @@ const ListPanel = () => {
         />
       </div>
       <Separator orientation="horizontal" />
-      
+
       {/* Tab Navigation */}
       <div className="flex items-center justify-between p-3">
         <div className="flex gap-2">
@@ -212,6 +195,7 @@ const ListPanel = () => {
             People
           </Button>
         </div>
+
         {activeTab === "communities" && (
           <InputAlert
             open={isModalOpen}
@@ -219,16 +203,17 @@ const ListPanel = () => {
             placeholder="Community name"
             value={community}
             triggerButton={
-              <Button size={"icon"} className="rounded-md size-6" onClick={() => setIsModalOpen(true)}>
+              <Button
+                size="icon"
+                className="rounded-md size-6"
+                onClick={() => setIsModalOpen(true)}
+              >
                 <IconPlus />
               </Button>
             }
-            onChange={onInputChange}
+            onChange={(e) => setCommunity(e.target.value)}
             onSubmit={handleAddCommunity}
-            onClose={() => {
-              onModalClose();
-              setIsModalOpen(false);
-            }}
+            onClose={onModalClose}
             showCategorySelect={true}
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
@@ -236,23 +221,25 @@ const ListPanel = () => {
           />
         )}
       </div>
-      
+
+      {/* Chat List */}
       <div>
         {activeTab === "communities" ? (
-          !filteredChats?.length ? (
+          filteredChats.length === 0 ? (
             <div className="p-4 opacity-75">No communities found</div>
           ) : (
-            filteredChats?.map((item, index) => (
-              <div key={item.communityId} className={
-                cx(
+            filteredChats.map((item, index) => (
+              <div
+                key={item.communityId}
+                className={cx(
                   "cursor-pointer hover:bg-primary/30",
-                  selectedChat?.type !== 'private' && selectedChat?.communityId === item.communityId ? "bg-primary/70 hover:bg-primary/30" : ""
-                )
-              }
+                  isCommunityChat(selectedChat!) && selectedChat.communityId === item.communityId
+                    ? "bg-primary/70 hover:bg-primary/30"
+                    : ""
+                )}
                 onClick={() => handleSelectChat(item)}
               >
                 {index === 0 && <Separator orientation="horizontal" />}
-
                 <div className="flex gap-3 p-3 items-center">
                   <Avatar className="shadow-md">
                     <AvatarImage><IconUser /></AvatarImage>
@@ -270,42 +257,41 @@ const ListPanel = () => {
               </div>
             ))
           )
+        ) : filteredPrivateChats.length === 0 ? (
+          <div className="p-4 opacity-75">No private chats found</div>
         ) : (
-          !filteredPrivateChats?.length ? (
-            <div className="p-4 opacity-75">No private chats found</div>
-          ) : (
-            filteredPrivateChats?.map((item, index) => (
-              <div key={item.recipientId} className={
-                cx(
-                  "cursor-pointer hover:bg-primary/30",
-                  selectedChat?.type === 'private' && selectedChat?.recipientId === item.recipientId ? "bg-primary/70 hover:bg-primary/30" : ""
-                )
-              }
-                onClick={() => handleSelectChat(item)}
-              >
-                {index === 0 && <Separator orientation="horizontal" />}
-
-                <div className="flex gap-3 p-3 items-center">
-                  <Avatar className="shadow-md">
-                    <AvatarImage><IconUser /></AvatarImage>
-                    <AvatarFallback><IconUser /></AvatarFallback>
-                  </Avatar>
-                  <div className="w-full">
-                    <div className="flex justify-between">
-                      <div className="text-heading">{item.recipientName}</div>
-                      <div className="text-sm opacity-60">{getDate(item?.date)}</div>
-                    </div>
-                    <div className="text-sm opacity-40">{item.message}</div>
+          filteredPrivateChats.map((item, index) => (
+            <div
+              key={item.recipientId}
+              className={cx(
+                "cursor-pointer hover:bg-primary/30",
+                isPrivateChat(selectedChat!) && selectedChat.recipientId === item.recipientId
+                  ? "bg-primary/70 hover:bg-primary/30"
+                  : ""
+              )}
+              onClick={() => handleSelectChat(item)}
+            >
+              {index === 0 && <Separator orientation="horizontal" />}
+              <div className="flex gap-3 p-3 items-center">
+                <Avatar className="shadow-md">
+                  <AvatarImage><IconUser /></AvatarImage>
+                  <AvatarFallback><IconUser /></AvatarFallback>
+                </Avatar>
+                <div className="w-full">
+                  <div className="flex justify-between">
+                    <div className="text-heading">{item.recipientName}</div>
+                    <div className="text-sm opacity-60">{getDate(item?.date)}</div>
                   </div>
+                  <div className="text-sm opacity-40">{item.message}</div>
                 </div>
-                <Separator />
               </div>
-            ))
-          )
+              <Separator />
+            </div>
+          ))
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default ListPanel;
