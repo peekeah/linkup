@@ -224,10 +224,10 @@ const wsRequestHandler = async (
         }));
         break;
 
-      case SupportedCommunityMessages.Search:
+      case SupportedCommunityMessages.SearchCommunity:
         ws.send(
           JSON.stringify({
-            type: "SEARCH",
+            type: "SEARCH_COMMUNITY",
             data: await communities.searchCommunity(payload.search, payload.category),
           }),
         );

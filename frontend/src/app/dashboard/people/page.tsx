@@ -1,7 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AvatarFallback as RadixAvatarFallback } from "@radix-ui/react-avatar";
@@ -10,7 +9,6 @@ import { IconSearch, IconMessage } from "@tabler/icons-react";
 import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { ChatContext, User, PrivateChatHistory } from "@/store/chat";
-import { SupportedChatMessages } from "@/@types/chat";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -155,17 +153,8 @@ const PeoplePage = () => {
                                         className="shrink-0 bg-primary hover:bg-primary/90 text-white"
                                         onClick={() => handleMessageUser(user)}
                                     >
-                                        {hasPrivateChat(user.id) ? (
-                                            <>
-                                                <IconMessage className="w-4 h-4 mr-2" />
-                                                Chat
-                                            </>
-                                        ) : (
-                                            <>
-                                                <IconMessage className="w-4 h-4 mr-2" />
-                                                Message
-                                            </>
-                                        )}
+                                        <IconMessage className="w-4 h-4 mr-2" />
+                                        Message
                                     </Button>
                                 </div>
                             </div>

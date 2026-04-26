@@ -42,12 +42,12 @@ const CommunitiesPage = () => {
     const debouncedSearchText = useDebounce(searchInput, 500);
 
     const sendMessage = useSendMessage();
-    const { state, updateSearchText } = useContext(CommunityContext);
+    const { state } = useContext(CommunityContext);
     const { state: chatState } = useContext(ChatContext);
 
     // Check if user has already joined a community
     const isJoined = useCallback((communityId: string) => {
-        return chatState.chatHistory.some(chat => chat.communityId === communityId);
+        return chatState.chatHistory.some(chat => "communityId" in chat && chat.communityId === communityId);
     }, [chatState.chatHistory]);
 
     useEffect(() => {
@@ -57,15 +57,14 @@ const CommunitiesPage = () => {
     }, [sendMessage])
 
     useEffect(() => {
-        updateSearchText(debouncedSearchText);
+        setSearchInput(debouncedSearchText);
         sendMessage({
-            type: SupportedOutgoingCommunityMessages.Search,
+            type: SupportedOutgoingCommunityMessages.SearchCommunity,
             payload: {
                 search: debouncedSearchText,
                 category: selectedCategory === "All" ? "" : selectedCategory
             }
         })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearchText, selectedCategory, sendMessage])
 
     const onSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {

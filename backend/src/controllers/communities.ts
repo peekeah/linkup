@@ -130,7 +130,7 @@ class Community {
     if (category && category !== "All") {
       whereClause.category = category;
     }
-    
+
     const communities = await prisma.community.findMany({
       where: whereClause,
     });

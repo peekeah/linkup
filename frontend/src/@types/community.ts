@@ -12,7 +12,7 @@ export enum SupportedOutgoingCommunityMessages {
   RemoveAdmin = "REMOVE_ADMIN",
   JoinCommunity = "JOIN_COMMUNITY",
   LeaveCommunity = "LEAVE_COMMUNITY",
-  Search = "SEARCH",
+  SearchCommunity = "SEARCH_COMMUNITY",
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT",
 }
@@ -21,7 +21,7 @@ export enum SupportedIncomingCommunityMessage {
   BroadcastMessages = "BROADCAST_MESSAGE",
   BroadcastUpvote = "UPVOTE_MESSAGE",
   GetCommunities = "GET_COMMUNITIES",
-  Search = "SEARCH",
+  SearchCommunity = "SEARCH_COMMUNITY",
   JoinCommunity = "JOIN_COMMUNITY",
 }
 
@@ -108,7 +108,7 @@ export type OutgoingCommunityMessage =
       payload: ClearTimeoutType;
     }
   | {
-      type: SupportedOutgoingCommunityMessages.Search;
+      type: SupportedOutgoingCommunityMessages.SearchCommunity;
       payload?: SearchPayload;
     };
 
@@ -133,7 +133,7 @@ export type IncomingCommunityMessage =
       data: GetCommunityIncomingPayload;
     }
   | {
-      type: SupportedIncomingCommunityMessage.Search;
+      type: SupportedIncomingCommunityMessage.SearchCommunity;
       data: {
         communities: {
           id: string;
@@ -166,13 +166,6 @@ export const CreateCommunity = z.object({
 export const UpdateCommunity = z.object({
   id: z.string(),
   name: z.string(),
-  // owner: Member,
-  // admin: z.array(Member),
-  // member: z.array(Member),
-  // timeouts: z.object({
-  //   userId: z.string(),
-  //   timeout: z.number()
-  // })
 });
 
 export const DeleteCommunity = z.object({

@@ -65,7 +65,7 @@ export default function RootLayout({
       };
 
       socket.onerror = (err) => {
-        // WebSocket error handling
+        console.log("error", err);
       };
 
       socket.onclose = () => {

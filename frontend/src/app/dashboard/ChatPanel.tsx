@@ -182,7 +182,7 @@ const ChatPanel = () => {
       toast("Successfully deleted message")
 
     } catch (err) {
-      // Error handling without console logging
+      console.log("error while editing message", err)
     }
   }
 
@@ -199,7 +199,7 @@ const ChatPanel = () => {
         })
       }
     } catch (err) {
-      // Error handling without console logging
+      console.log("error while editing message", err)
     }
   }
 

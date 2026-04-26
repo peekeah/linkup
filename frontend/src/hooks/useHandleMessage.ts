@@ -78,7 +78,7 @@ const useHandleMessage = () => {
           });
           break;
 
-        case SupportedIncomingCommunityMessage.Search:
+        case SupportedIncomingCommunityMessage.SearchCommunity:
           updateCommunities({ communities: message?.data?.communities, searchText: "" });
           break;
 

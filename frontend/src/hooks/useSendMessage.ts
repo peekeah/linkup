@@ -124,11 +124,14 @@ const useSendMessage = () => {
               type: SupportedOutgoingCommunityMessages.GetCommunities,
             }));
             break;
+          case SupportedOutgoingCommunityMessages.SearchCommunity:
+            ws.send(JSON.stringify({
+              type: SupportedOutgoingCommunityMessages.SearchCommunity,
+              payload: message.payload
+            }))
           default:
-            // Unknown message type
         }
     } catch (err) {
-      // Error handling without console logging
     }
   }, [wsRef])
 }

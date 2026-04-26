@@ -9,7 +9,6 @@ import { Separator } from "@/components/ui/separator";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { SupportedChatMessages } from "@/@types/chat";
-import { SupportedOutgoingUserMessages } from "@/@types/user";
 import InputAlert from "./InputAlert";
 import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
@@ -70,11 +69,12 @@ const ListPanel = () => {
   
   handleSelectChatRef.current = handleSelectChat;
 
+  const tab = searchParams.get('tab') as 'communities' | 'people';
+  const chatId = searchParams.get('chat');
+
   useEffect(() => {
     // Handle URL parameters for navigation from people page
     if (!hasHandledNavigation) {
-      const tab = searchParams.get('tab') as 'communities' | 'people';
-      const chatId = searchParams.get('chat');
       
       if (tab === 'people' && chatId) {
         setActiveTab('people');

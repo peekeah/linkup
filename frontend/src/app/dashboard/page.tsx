@@ -1,5 +1,5 @@
 "use client";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, Suspense } from "react";
 
 import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
@@ -28,7 +28,10 @@ const Dashboard = () => {
   const sendMessage = useSendMessage();
   const { state } = useContext(ChatContext);
   const { selectedChat } = state;
-  const selectedCommunityId = selectedChat?.communityId;
+  const selectedCommunityId =
+    selectedChat && "communityId" in selectedChat ?
+      selectedChat?.communityId :
+      ""
 
   const [profileDrawer, setProfileDrawer] = useState<ProfileDrawer>({
     open: false,
@@ -68,14 +71,16 @@ const Dashboard = () => {
           }
         })
       } catch (err) {
-        // Error handling without console logging
+        console.log("error while parsing json", err)
       }
     }
   }, [selectedCommunityId, sendMessage])
 
   return (
     <div className="flex h-full">
-      <ListPanel />
+      <Suspense fallback={<div className="p-4">Loading...</div>}>
+        <ListPanel />
+      </Suspense>
       <Separator orientation="vertical" />
       <div className="flex-1">
         <ChatPanel />

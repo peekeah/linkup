@@ -12,7 +12,7 @@ export enum SupportedCommunityMessages {
   RemoveAdmin = "REMOVE_ADMIN",
   JoinCommunity = "JOIN_COMMUNITY",
   LeaveCommunity = "LEAVE_COMMUNITY",
-  Search = "SEARCH",
+  SearchCommunity = "SEARCH_COMMUNITY",
   GiveTimeout = "GIVE_TIMEOUT",
   ClearTimeout = "CLEAR_TIMEOUT",
 
@@ -57,7 +57,7 @@ export type IncomingCommunityMessages = {
   type: SupportedCommunityMessages.LeaveCommunity,
   payload: LeaveCommunityType
 } | {
-  type: SupportedCommunityMessages.Search,
+  type: SupportedCommunityMessages.SearchCommunity,
   payload: SearchCommunityType
 } | {
   type: SupportedCommunityMessages.GiveTimeout,
