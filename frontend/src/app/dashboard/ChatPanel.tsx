@@ -188,8 +188,8 @@ const ChatPanel = () => {
 
   const handleUpvoteMessage = (chatId: string) => {
     try {
-      if (selectedChat) {
-        const roomId = selectedChat.type === 'community' ? selectedChat.communityId : selectedChat.recipientId;
+      if (selectedChat && selectedChat.type === 'community') {
+        const roomId = selectedChat.communityId;
         sendMessage({
           type: SupportedChatMessages.UpvoteMessage,
           payload: {
@@ -199,7 +199,7 @@ const ChatPanel = () => {
         })
       }
     } catch (err) {
-      console.log("error while editing message", err)
+      console.log("error while upvoting message", err)
     }
   }
 

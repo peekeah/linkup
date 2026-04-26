@@ -79,11 +79,14 @@ const useHandleMessage = () => {
           break;
 
         case SupportedIncomingCommunityMessage.SearchCommunity:
-          updateCommunities({ communities: message?.data?.communities, searchText: "" });
+          updateCommunities({ 
+            communities: message?.data?.communities, 
+          });
           break;
 
         case SupportedIncomingCommunityMessage.JoinCommunity:
           toast("Successfully joined community");
+          // ChatHistory arrives in the next message as type CHAT_HISTORY — handled above
           break;
 
         default:
