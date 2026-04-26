@@ -12,92 +12,123 @@ const useSendMessage = () => {
   return useCallback((message: OutgoingMessage) => {
     try {
       const ws = wsRef.current;
-      if (ws && ws?.readyState === WebSocket.OPEN) {
-        switch (message.type) {
+      
+      if (!ws) {
+        return;
+      }
+
+      if (ws.readyState === WebSocket.CONNECTING) {
+        return;
+      }
+
+      if (ws.readyState === WebSocket.CLOSING) {
+        return;
+      }
+
+      if (ws.readyState === WebSocket.CLOSED) {
+        return;
+      }
+
+      if (ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+
+      switch (message.type) {
           // Chat messages
           case SupportedChatMessages.AddChat:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.AddChat,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedChatMessages.GetChat:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.GetChat,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedChatMessages.UpdateChat:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.UpdateChat,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedChatMessages.DeleteChat:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.DeleteChat,
               payload: message.payload
-            }))
+            }));
+            break;
           case SupportedChatMessages.UpvoteMessage:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.UpvoteMessage,
               payload: message.payload
-            }))
+            }));
+            break;
 
           // User messages
           case SupportedOutgoingUserMessages.ChatHistory:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingUserMessages.ChatHistory,
-            }))
+            }));
+            break;
 
           case SupportedOutgoingUserMessages.Search:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingUserMessages.Search,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedOutgoingUserMessages.GetPrivateChatHistory:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedChatMessages.SendPrivateMessage:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.SendPrivateMessage,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedChatMessages.GetPrivateChat:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedChatMessages.GetPrivateChat,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedOutgoingCommunityMessages.JoinCommunity:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingCommunityMessages.JoinCommunity,
               payload: message.payload
-            }))
+            }));
+            break;
 
           case SupportedOutgoingCommunityMessages.CreateCommunity:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingCommunityMessages.CreateCommunity,
               payload: message.payload
-            }))
+            }));
+            break;
 
           // Community messages
           case SupportedOutgoingCommunityMessages.GetCommunities:
-            return ws.send(JSON.stringify({
+            ws.send(JSON.stringify({
               type: SupportedOutgoingCommunityMessages.GetCommunities,
-            }))
+            }));
+            break;
           default:
-            console.error("error while sending message")
-            return null
+            // Unknown message type
         }
-      }
     } catch (err) {
-      console.log("connection is broken", err)
+      // Error handling without console logging
     }
   }, [wsRef])
 }

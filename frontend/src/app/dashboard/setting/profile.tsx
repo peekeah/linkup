@@ -47,7 +47,6 @@ const Profile = () => {
       }
 
     } catch (err) {
-      console.log("error while updating profile", err)
       toast.error("Error while updating profile")
     }
   }

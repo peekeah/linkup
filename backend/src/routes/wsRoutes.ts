@@ -133,7 +133,7 @@ const wsRequestHandler = async (
 
       case SupportedChatMessages.SendPrivateMessage:
         if (payload && 'recipientId' in payload && 'content' in payload) {
-          const newMessage = await chat.sendPrivateMessage(payload.recipientId, payload.content, tokenData.userId);
+          const newMessages = await chat.sendPrivateMessage(payload.recipientId, payload.content, tokenData.userId);
           
           // Send the message back to the sender
           ws.send(
@@ -141,7 +141,7 @@ const wsRequestHandler = async (
               type: "GET_PRIVATE_CHAT",
               data: {
                 roomId: payload.recipientId,
-                messages: [newMessage],
+                messages: newMessages,
               },
             }),
           );
@@ -164,7 +164,7 @@ const wsRequestHandler = async (
                 type: "GET_PRIVATE_CHAT",
                 data: {
                   roomId: tokenData.userId, // For recipient, the sender is the roomId
-                  messages: [newMessage],
+                  messages: newMessages,
                 },
               }),
             );
@@ -300,7 +300,6 @@ const wsRequestHandler = async (
         throw new Error("Invalid request");
     }
   } catch (err) {
-    console.log("err", err);
     ws.send(
       JSON.stringify({
         type: "ERROR",

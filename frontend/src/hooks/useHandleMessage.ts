@@ -2,14 +2,14 @@ import { useContext } from "react";
 
 import { SupportedIncomingUserMessages } from "@/@types/user";
 import { IncomingMessage } from "@/@types";
-import { ChatContext, ChatHistory } from "@/store/chat";
+import { ChatContext, ChatHistory, PrivateChatHistory } from "@/store/chat";
 import { CommunityContext } from "@/store/communities";
 import { SupportedIncomingChatMessages } from "@/@types/chat";
 import { SupportedIncomingCommunityMessage } from "@/@types/community";
 import { toast } from "sonner";
 
 const useHandleMessage = () => {
-  const { updateChatHistory, updateChatMessages, updatePrivateMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats } =
+  const { updateChatHistory, updateChatMessages, updatePrivateMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats, state } =
     useContext(ChatContext);
 
   const { updateCommunities } = useContext(CommunityContext);
@@ -34,7 +34,7 @@ const useHandleMessage = () => {
           break;
 
         case SupportedIncomingUserMessages.GetPrivateChatHistory:
-          const privateChatHistory = message.data as any[];
+          const privateChatHistory = message.data as PrivateChatHistory[];
           updatePrivateChats(privateChatHistory);
           break;
         case SupportedIncomingChatMessages.GetChat:
@@ -46,6 +46,15 @@ const useHandleMessage = () => {
           messages = message.data?.messages;
           roomId = message?.data?.roomId;
           updatePrivateMessages(roomId, messages);
+          break;
+        case SupportedIncomingChatMessages.BroadcastPrivateMessage:
+          roomId = message.data?.roomId;
+          const newPrivateMessage = message?.data?.message;
+          if (roomId && newPrivateMessage) {
+            const existingMessages = state.privateMessages.get(roomId) || [];
+            const updatedMessages = [...existingMessages, newPrivateMessage];
+            updatePrivateMessages(roomId, updatedMessages);
+          }
           break;
         case SupportedIncomingCommunityMessage.BroadcastMessages:
           roomId = message.data?.roomId;
@@ -78,7 +87,7 @@ const useHandleMessage = () => {
           break;
 
         default:
-          console.log("unsupported message:", message);
+          break;
       }
     } catch (err) {
       console.log("err while parsing response", err);

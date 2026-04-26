@@ -146,18 +146,20 @@ class Chat {
       },
       skip: offset,
       take: limit,
-      orderBy: { createdAt: 'desc' },
+      // orderBy: { createdAt: 'asc' },
     });
   }
 
   async sendPrivateMessage(recipientId: string, content: string, senderId: string) {
-    return await prisma.privateMessage.create({
+    await prisma.privateMessage.create({
       data: {
         senderId,
         recipientId,
         content,
       },
     });
+
+    return this.getPrivateChats(senderId, recipientId)
   }
 }
 

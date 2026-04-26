@@ -63,13 +63,12 @@ const SearchInput = () => {
       setSearchText("")
 
     } catch (err) {
-      console.log("err while joining community", err)
+      // Error handling without console logging
     }
   }
 
   return (
     <div className="relative">
-      {/* <ButtonIcon svg={MessageCircle} onClick={() => console.log("ell")} /> */}
       <Command className="rounded-lg border shadow-md md:min-w-[450px]">
         <CommandInput
           // value={searchText}

@@ -58,11 +58,9 @@ const handler = NextAuth({
             user.userId = data.data.userId;
             return true;
           } else {
-            console.error("Backend OAuth callback failed:", response.status, response.statusText);
             return false;
           }
         } catch (error) {
-          console.error("OAuth callback error:", error);
           return false;
         }
       }

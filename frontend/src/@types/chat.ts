@@ -40,6 +40,7 @@ export type OutgoingChatMessage = {
 export enum SupportedIncomingChatMessages {
   GetChat = "GET_CHAT",
   GetPrivateChat = "GET_PRIVATE_CHAT",
+  BroadcastPrivateMessage = "BROADCAST_PRIVATE_MESSAGE",
 }
 
 export type IncomingChatMessage = {
@@ -53,6 +54,12 @@ export type IncomingChatMessage = {
   data: {
     roomId: string;
     messages: Message[];
+  }
+} | {
+  type: SupportedIncomingChatMessages.BroadcastPrivateMessage,
+  data: {
+    roomId: string;
+    message: Message;
   }
 }
 

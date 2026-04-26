@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import useHandleMessage from "@/hooks/useHandleMessage";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedOutgoingUserMessages } from "@/@types/user";
+import { SupportedOutgoingCommunityMessages } from "@/@types/community";
 import { AuthContext } from "@/store/auth";
 import { useSession } from "next-auth/react";
 
@@ -54,6 +55,9 @@ export default function RootLayout({
           type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
           payload: null
         });
+        sendMessage({
+          type: SupportedOutgoingCommunityMessages.GetCommunities
+        });
       };
 
       socket.onmessage = (event) => {
@@ -61,7 +65,7 @@ export default function RootLayout({
       };
 
       socket.onerror = (err) => {
-        console.log("error", err);
+        // WebSocket error handling
       };
 
       socket.onclose = () => {

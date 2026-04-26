@@ -59,10 +59,10 @@ const ChatPanel = () => {
   const currentMessages = useMemo(() => {
     if (!selectedChat) return [];
     
-    if (selectedChat.type === 'community') {
-      return messages?.get(selectedChat.communityId ?? "") ?? [];
-    } else {
+    if (selectedChat.type === 'private') {
       return privateMessages?.get(selectedChat.recipientId ?? "") ?? [];
+    } else {
+      return messages?.get(selectedChat.communityId ?? "") ?? [];
     }
   }, [messages, privateMessages, selectedChat]);
 
@@ -78,28 +78,55 @@ const ChatPanel = () => {
 
   const onClick = () => {
     try {
-      if (selectedChat && text.trim()) {
-        if (selectedChat.type === 'community') {
-          sendMessage({
-            type: SupportedChatMessages.AddChat,
-            payload: {
-              roomId: selectedChat.communityId,
-              content: text,
-            }
-          })
-        } else {
-          sendMessage({
-            type: SupportedChatMessages.SendPrivateMessage,
-            payload: {
-              recipientId: selectedChat.recipientId,
-              content: text,
-            }
-          })
-        }
-        setText(""); 
+      if (!selectedChat) {
+        toast("Error", {
+          description: "No chat selected"
+        });
+        return;
       }
+
+      if (!text.trim()) {
+        toast("Error", {
+          description: "Message cannot be empty"
+        });
+        return;
+      }
+
+      // Validate required IDs
+      if ('communityId' in selectedChat) {
+        if (!selectedChat.communityId) {
+          toast("Error", {
+            description: "Community ID is missing"
+          });
+          return;
+        }
+        sendMessage({
+          type: SupportedChatMessages.AddChat,
+          payload: {
+            roomId: selectedChat.communityId,
+            content: text.trim(),
+          }
+        });
+      } else {
+        if (!selectedChat.recipientId) {
+          toast("Error", {
+            description: "Recipient ID is missing"
+          });
+          return;
+        }
+        sendMessage({
+          type: SupportedChatMessages.SendPrivateMessage,
+          payload: {
+            recipientId: selectedChat.recipientId,
+            content: text.trim(),
+          }
+        });
+      }
+      setText(""); 
     } catch (err) {
-      console.log("error while adding chat", err)
+      toast("Error", {
+        description: "Failed to send message. Please try again."
+      });
     }
   }
 
@@ -139,7 +166,7 @@ const ChatPanel = () => {
       }
       setEditMessageModal({ state: false, messageContent: "", messageId: "" })
     } catch (err) {
-      console.log("error while editing message", err)
+      // Error handling without console logging
     }
   }
 
@@ -155,7 +182,7 @@ const ChatPanel = () => {
       toast("Successfully deleted message")
 
     } catch (err) {
-      console.log("error while editing message", err)
+      // Error handling without console logging
     }
   }
 
@@ -172,9 +199,10 @@ const ChatPanel = () => {
         })
       }
     } catch (err) {
-      console.log("error while editing message", err)
+      // Error handling without console logging
     }
   }
+
 
   return (
     <div className="h-full flex flex-col">
@@ -231,7 +259,7 @@ const ChatPanel = () => {
                     messages.map(message => (
                       <div key={message.id} className={
                         clsx(
-                          `max-w-175 group space-y-1 overflow-hidden`,
+                          `w-fit group space-y-1 overflow-hidden`,
                           message.senderId !== userId ? "text-left bg-secondary rounded-t-xl rounded-br-xl" : "bg-primary text-white rounded-xl rounded-bl-xl self-end"
                         )
                         }>
@@ -303,7 +331,7 @@ const ChatPanel = () => {
               onKeyDown={onKeyDown}
               disabled={!selectedChat}
               className="w-full h-14 rounded-lg!"
-              placeholder={selectedChat ? `Message ${selectedChat.type === 'community' ? selectedChat.communityName : selectedChat.recipientName}` : undefined}
+              placeholder={selectedChat ? `Message ${selectedChat.type !== 'private' ? selectedChat.communityName : selectedChat.recipientName}` : undefined}
             />
             <Button size={"icon"} className="absolute right-3.5 inset-y-1/2 transform -translate-y-1/2 rounded-xl" onClick={onClick} disabled={!selectedChat}>
               <IconSend className="text-white" />

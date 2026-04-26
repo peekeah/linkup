@@ -68,7 +68,7 @@ const Dashboard = () => {
           }
         })
       } catch (err) {
-        console.log("error while parsing json", err)
+        // Error handling without console logging
       }
     }
   }, [selectedCommunityId, sendMessage])

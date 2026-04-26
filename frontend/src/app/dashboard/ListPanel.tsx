@@ -51,7 +51,7 @@ const ListPanel = () => {
   
   const handleSelectChat = useCallback((chat: ChatOrPrivateHistory) => {
     updateSelectedChat(chat)
-    if (chat.type === 'community') {
+    if ('communityId' in chat) {
       sendMessage({
         type: SupportedChatMessages.GetChat,
         payload: {
@@ -91,66 +91,55 @@ const ListPanel = () => {
       setHasHandledNavigation(true);
     }
 
-    if (activeTab === "communities" && chatHistory && chatHistory?.length) {
-      // Handle both new data with type property and legacy data without it
-      const communityChats = chatHistory.filter(chat => 
-        chat.type === 'community' || (!chat.type && 'communityId' in chat)
-      ) as ChatHistory[]
-      setFilteredChats(communityChats)
+    if (activeTab === "communities" && chatHistory?.length) {
+      const communityChats = chatHistory.filter(chat => 'communityId' in chat) as ChatHistory[];
+      setFilteredChats(communityChats);
       
-      const selectedChatExists = selectedChat && (selectedChat.type === 'community' || (!selectedChat.type && 'communityId' in selectedChat))
-        ? communityChats.some((chat) => chat.communityId === (selectedChat as ChatHistory).communityId)
-        : false;
-
-      // Auto-select only on initial load or when current selection is no longer in the list.
-      if (!selectedChatExists) {
+      // Always select the first community if none is selected
+      if (!selectedChat || !('communityId' in selectedChat)) {
         if (communityChats.length > 0) {
-          handleSelectChat(communityChats[0])
+          handleSelectChat(communityChats[0]);
         }
       }
     }
-  }, [chatHistory, selectedChat, activeTab, searchParams, privateChats, hasHandledNavigation])
+  }, [chatHistory, selectedChat, activeTab, searchParams, privateChats, hasHandledNavigation, handleSelectChat])
 
   useEffect(() => {
-    if (activeTab === "people" && privateChats && privateChats?.length) {
-      setFilteredPrivateChats(privateChats)
-      const selectedChatExists = selectedChat && selectedChat.type === 'private'
-        ? privateChats.some((chat) => chat.type === 'private' && (chat as PrivateChatHistory).recipientId === selectedChat.recipientId)
-        : false;
-
-      // Auto-select only on initial load or when current selection is no longer in the list.
-      if (!selectedChatExists) {
+    if (activeTab === "people" && privateChats?.length) {
+      setFilteredPrivateChats(privateChats);
+      
+      // Always select the first private chat if none is selected
+      if (!selectedChat || !('recipientId' in selectedChat)) {
         if (privateChats.length > 0) {
-          handleSelectChat(privateChats[0])
+          handleSelectChat(privateChats[0]);
         }
       }
     }
-  }, [privateChats, selectedChat, activeTab])
+  }, [privateChats, selectedChat, activeTab, handleSelectChat])
 
   useEffect(() => {
     if (activeTab === "communities") {
+      const communityChats = chatHistory.filter(chat => 'communityId' in chat) as ChatHistory[];
+      
       if (!searchFilter) {
-        return setFilteredChats(chatHistory.filter(chat => 
-          chat.type === 'community' || (!chat.type && 'communityId' in chat)
-        ) as ChatHistory[])
+        setFilteredChats(communityChats);
+        return;
       }
-      setFilteredChats(
-        chatHistory
-          .filter(chat => chat.type === 'community' || (!chat.type && 'communityId' in chat))
-          .filter(item =>
-            (item as ChatHistory).communityName.toLowerCase().includes(searchFilter.toLowerCase())
-          ) as ChatHistory[]
-      )
+      
+      const filtered = communityChats.filter(chat =>
+        chat.communityName.toLowerCase().includes(searchFilter.toLowerCase())
+      );
+      setFilteredChats(filtered);
     } else {
       if (!searchFilter) {
-        return setFilteredPrivateChats(privateChats)
+        setFilteredPrivateChats(privateChats);
+        return;
       }
-      setFilteredPrivateChats(
-        privateChats
-          .filter(item =>
-            item.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
-          )
-      )
+      
+      const filtered = privateChats.filter(chat =>
+        chat.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
+      );
+      setFilteredPrivateChats(filtered);
     }
   }, [chatHistory, privateChats, searchFilter, activeTab])
 
@@ -168,9 +157,6 @@ const ListPanel = () => {
         name: community,
         category: selectedCategory,
       }
-    })
-    sendMessage({
-      type: SupportedOutgoingUserMessages.ChatHistory
     })
 
     toast("Community", {
@@ -260,7 +246,7 @@ const ListPanel = () => {
               <div key={item.communityId} className={
                 cx(
                   "cursor-pointer hover:bg-primary/30",
-                  selectedChat?.type === 'community' && selectedChat?.communityId === item.communityId ? "bg-primary/70 hover:bg-primary/30" : ""
+                  selectedChat?.type !== 'private' && selectedChat?.communityId === item.communityId ? "bg-primary/70 hover:bg-primary/30" : ""
                 )
               }
                 onClick={() => handleSelectChat(item)}
