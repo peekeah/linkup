@@ -1,9 +1,7 @@
 import { Router } from "express";
-import UserSchema, { LoginType } from "../schema/user";
 import user from "../controllers/user";
 import errorHandler from "../middlewares/error";
 import { prisma } from "../utils/db";
-import { generateHash } from "../utils/bcrypt";
 import { requireRole, validateRole } from "../middlewares/httpMiddleware";
 import { z } from "zod";
 import jwt from "jsonwebtoken";
@@ -14,6 +12,10 @@ const router = Router();
 // HTTP Routes
 router.get("/", (_req, res) => {
   res.send("<h1>Hello world </h1>");
+});
+
+router.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Google OAuth Callback

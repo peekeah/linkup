@@ -9,6 +9,8 @@
     "start": "npm run build && npm run serve",
     "serve": "node -r dotenv/config dist/server.js",
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
     "prisma:generate": "prisma generate",
     "db:seed": "prisma db seed",
     "db:push": "prisma db push",
