@@ -24,4 +24,4 @@ COPY --from=builder --chown=backenduser:nodejs /app/package.json ./
 
 USER backenduser
 EXPOSE 8080
-CMD ["bun", "dist/index.js"]
+CMD ["bun", "dist/server.js"]
