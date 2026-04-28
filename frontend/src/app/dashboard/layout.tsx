@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  const { state: authState, wsRef, reconnectEnabledRef, updateConnection } =
+  const { wsRef, reconnectEnabledRef, updateConnection } =
     useContext(AuthContext);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const retryRef = useRef(0);

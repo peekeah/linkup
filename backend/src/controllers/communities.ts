@@ -6,29 +6,9 @@ import { activeClients } from "../store/clients";
 import { prisma } from "../utils/db";
 import { UserId } from "./user";
 
-export interface ICommunity {
-  id: string;
-  name: string;
-  category?: string;
-  owner: IMember;
-  admin: IMember[];
-  member: IMember[];
-  timeouts: ITimeout[];
-}
-
 export interface UpdateCommunity {
   id: string;
   name: string;
-}
-
-export interface IMember {
-  userId: UserId;
-  name: string;
-}
-
-interface ITimeout {
-  userId: UserId;
-  timeout: number;
 }
 
 class Community {
@@ -106,7 +86,7 @@ class Community {
     });
   }
 
-  async addAdmin(id: string, userId: UserId, userName: string) {
+  async addAdmin(id: string, userId: UserId) {
     return await prisma.community.update({
       data: { admins: { connect: { id: userId } } },
       where: { id },

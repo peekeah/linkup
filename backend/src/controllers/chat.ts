@@ -1,16 +1,7 @@
 import { CommunityRole } from "../middlewares/auth";
 import { prisma } from "../utils/db";
-import communities, { IMember } from "./communities";
+import communities from "./communities";
 import { UserId } from "./user";
-
-export interface IChat {
-  id: string;
-  content: string;
-  sender: IMember;
-  upvotes: UserId[];
-  isDeleted: boolean;
-  createdAt: Date;
-}
 
 class Chat {
   constructor() {}

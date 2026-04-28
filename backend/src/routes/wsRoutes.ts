@@ -241,7 +241,6 @@ const wsRequestHandler = async (
         await communities.addAdmin(
           payload.roomId,
           payload.userId,
-          payload.userName,
         );
         break;
 

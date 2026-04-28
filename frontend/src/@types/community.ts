@@ -31,15 +31,6 @@ export interface Member {
   name: string;
 }
 
-export interface IChat {
-  id: string;
-  content: string;
-  sender: Member;
-  upvotes: UserId[];
-  date: Date;
-  isDeleted: boolean;
-}
-
 export interface Community {
   id: string;
   name: string;

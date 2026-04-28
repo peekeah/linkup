@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { IChat } from "../controllers/chat";
 import { ChatMessage } from "../generated/prisma/client";
 
 export enum SupportedCommunityMessages {

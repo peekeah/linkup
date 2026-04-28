@@ -4,7 +4,7 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AvatarFallback as RadixAvatarFallback } from "@radix-ui/react-avatar";
-import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
+import { ChangeEventHandler, useContext, useEffect, useState } from "react";
 import { IconSearch, IconMessage } from "@tabler/icons-react";
 import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -20,14 +20,8 @@ const PeoplePage = () => {
 
     const sendMessage = useSendMessage();
     const router = useRouter();
-    const { state, updateSelectedChat, updatePrivateChats } = useContext(ChatContext);
+    const { state, updateSelectedChat } = useContext(ChatContext);
     const { privateChats, searchResults } = state;
-
-
-    // Check if user already has a private chat
-    const hasPrivateChat = useCallback((userId: string) => {
-        return privateChats.some(chat => chat.recipientId === userId);
-    }, [privateChats]);
 
     useEffect(() => {
         // Load initial users

@@ -14,7 +14,7 @@ router.get("/", (_req, res) => {
   res.send("<h1>Hello world </h1>");
 });
 
-router.get('/health', (req, res) => {
+router.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
@@ -78,7 +78,7 @@ router.post("/auth/google/callback", async (req, res) => {
   }
 });
 
-router.get("/users", requireRole("ADMIN"), async (req, res) => {
+router.get("/users", requireRole("ADMIN"), async (_req, res) => {
   try {
     const users = await user.getUsers();
     res.send({
