@@ -1,6 +1,8 @@
 import { useContext } from "react";
 
-import { SupportedIncomingUserMessages } from "@/@types/user";
+import {
+  SupportedIncomingUserMessages,
+} from "@/@types/user";
 import { IncomingMessage } from "@/@types";
 import { ChatContext, ChatHistory, PrivateChatHistory } from "@/store/chat";
 import { CommunityContext } from "@/store/communities";
@@ -9,8 +11,15 @@ import { SupportedIncomingCommunityMessage } from "@/@types/community";
 import { toast } from "sonner";
 
 const useHandleMessage = () => {
-  const { updateChatHistory, updateChatMessages, updatePrivateMessages, updateSingleChatMessage, updateSearchResults, updatePrivateChats, state } =
-    useContext(ChatContext);
+  const {
+    updateChatHistory,
+    updateChatMessages,
+    updatePrivateMessages,
+    updateSingleChatMessage,
+    updateSearchResults,
+    updatePrivateChats,
+    state,
+  } = useContext(ChatContext);
 
   const { updateCommunities } = useContext(CommunityContext);
 
@@ -74,20 +83,24 @@ const useHandleMessage = () => {
             communityCount: message.data.communityCount,
             memberCount: message.data.memberCount,
             onlineMembers: message.data.onlineMembers,
-            categories: message.data.categories || []
+            categories: message.data.categories || [],
           });
           break;
 
         case SupportedIncomingCommunityMessage.SearchCommunity:
-          updateCommunities({ 
-            communities: message?.data?.communities, 
+          updateCommunities({
+            communities: message?.data?.communities,
           });
           break;
 
         case SupportedIncomingCommunityMessage.JoinCommunity:
           toast("Successfully joined community");
-          // ChatHistory arrives in the next message as type CHAT_HISTORY — handled above
           break;
+
+        case SupportedIncomingCommunityMessage.LeaveCommunity:
+          if (message.data.success) {
+            toast("Successfully left community");
+          }
 
         default:
           break;

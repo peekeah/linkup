@@ -23,6 +23,7 @@ export enum SupportedIncomingCommunityMessage {
   GetCommunities = "GET_COMMUNITIES",
   SearchCommunity = "SEARCH_COMMUNITY",
   JoinCommunity = "JOIN_COMMUNITY",
+  LeaveCommunity = "LEAVE_cOMMUNITY",
 }
 
 export interface Member {
@@ -144,6 +145,11 @@ export type IncomingCommunityMessage =
     }
   | {
       type: SupportedIncomingCommunityMessage.JoinCommunity;
+    } | {
+      type: SupportedIncomingCommunityMessage.LeaveCommunity,
+      data: {
+        success: boolean
+      }
     };
 
 type GetCommunityIncomingPayload = {

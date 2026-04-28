@@ -272,6 +272,21 @@ const wsRequestHandler = async (
 
       case SupportedCommunityMessages.LeaveCommunity:
         await communities.leaveCommunity(payload.roomId, tokenData.userId);
+        ws.send(
+          JSON.stringify({
+            type: SupportedCommunityMessages.LeaveCommunity,
+            data: {
+              success: true
+            }
+          })
+        )
+        // Refresh ChatHistory to show the updated community list after leaving
+        ws.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.ChatHistory,
+            data: await user.getChatHistory(tokenData.userId),
+          }),
+        );
         break;
 
       // Todo(Auth) - Admin & Owner

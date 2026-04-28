@@ -100,6 +100,23 @@ const Chat = ({ children }: { children: ReactNode }) => {
   const [state, setState] = useState<State>(initialValues);
 
   const updateChatHistory = (chatHistory: ChatOrPrivateHistory[]) => {
+    if (state.selectedChat) {
+      const isStillValidCommunity = chatHistory.some(chat => {
+        if (state.selectedChat?.type !== 'private') {
+          return "communityId" in chat && chat?.communityId === state.selectedChat?.communityId;
+        }
+      });
+
+      // Clear selected chat if it's no longer in the chat history
+      if (!isStillValidCommunity && chatHistory.length) {
+        updateSelectedChat(chatHistory[0]);
+      }
+    } else {
+      if (chatHistory.length) {
+        updateSelectedChat(chatHistory[0])
+      }
+    }
+
     setState(prev => ({ ...prev, ["chatHistory"]: chatHistory }))
   }
 

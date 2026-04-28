@@ -3,14 +3,14 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 import { ChangeEvent, ChangeEventHandler, KeyboardEvent, useContext, useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ChatContext, Message, ChatOrPrivateHistory } from "@/store/chat";
+import { ChatContext, Message } from "@/store/chat";
 import { Input } from "@/components/ui/input";
 import { SupportedChatMessages } from "@/@types/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
-import { IconArrowBigDown, IconArrowBigUp, IconDots, IconMessage, IconPencil, IconSearch, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { IconArrowBigDown, IconArrowBigUp, IconLogout, IconMessage, IconPencil, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
 import { toast } from "sonner";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
@@ -203,6 +203,37 @@ const ChatPanel = () => {
     }
   }
 
+  const handleLeaveCommunity = () => {
+    try {
+      if (!selectedChat || !("communityId" in selectedChat)) {
+        toast("Error", {
+          description: "No chat selected"
+        });
+        return;
+      }
+
+      const roomId = selectedChat?.communityId;
+      if (!roomId) {
+        toast("Error", {
+          description: "Community ID is missing"
+        });
+        return;
+      }
+
+      sendMessage({
+        type: SupportedChatMessages.LeaveCommunity,
+        payload: {
+          roomId: roomId
+        }
+      });
+
+    } catch (err) {
+      toast("Error", {
+        description: "Failed to leave community. Please try again."
+      });
+    }
+  }
+
 
   return (
     <div className="h-full flex flex-col">
@@ -229,16 +260,19 @@ const ChatPanel = () => {
         </Avatar>
         <div className="w-full">
           <div className="text-heading">
-            {selectedChat?.type === 'community' ? selectedChat.communityName : selectedChat?.recipientName}
+            {selectedChat?.type === 'private' ? selectedChat?.recipientName : selectedChat?.communityName}
           </div>
         </div>
         <div className="flex gap-2.5">
-          <Button size={"icon"} variant={"outline"}><IconSearch /></Button>
-          <Button
-            size={"icon"}
-            variant={"outline"}
-            className="flex items-center justify-center"
-          ><IconDots /></Button>
+          {
+            selectedChat?.type !== "private" &&
+            <Button
+              size={"icon"}
+              variant={"outline"}
+              className="flex items-center justify-center"
+              onClick={handleLeaveCommunity}
+            ><IconLogout /></Button>
+          }
         </div>
       </div>
 

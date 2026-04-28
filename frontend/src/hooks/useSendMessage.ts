@@ -129,6 +129,11 @@ const useSendMessage = () => {
               type: SupportedOutgoingCommunityMessages.SearchCommunity,
               payload: message.payload
             }))
+          case SupportedOutgoingCommunityMessages.LeaveCommunity:
+            ws.send(JSON.stringify({
+              type: SupportedOutgoingCommunityMessages.LeaveCommunity,
+              payload:message.payload
+            }))
           default:
         }
     } catch (err) {
