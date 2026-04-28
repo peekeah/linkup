@@ -1,6 +1,6 @@
 "use client";
-import { Community } from "@/@types/community";
 import { createContext, ReactNode, useState } from "react";
+import Community from "./communities";
 
 interface ChatContextType {
   state: State;

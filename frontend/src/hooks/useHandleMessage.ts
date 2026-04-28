@@ -89,7 +89,8 @@ const useHandleMessage = () => {
 
         case SupportedIncomingCommunityMessage.SearchCommunity:
           updateCommunities({
-            communities: message?.data?.communities,
+            ...message.data,
+            selectedCategory: message.data.category,
           });
           break;
 

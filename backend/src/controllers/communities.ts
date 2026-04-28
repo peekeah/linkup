@@ -100,11 +100,11 @@ class Community {
     });
   }
 
-  async searchCommunity(search: string, category?: string) {
+  async searchCommunity(searchText: string, category?: string) {
     const whereClause: any = {};
-    
-    if (search) {
-      whereClause.name = { contains: search, mode: "insensitive" };
+
+    if (searchText) {
+      whereClause.name = { contains: searchText, mode: "insensitive" };
     }
     
     if (category && category !== "All") {
@@ -114,7 +114,7 @@ class Community {
     const communities = await prisma.community.findMany({
       where: whereClause,
     });
-    return { communities };
+    return { communities: communities ?? [], searchText, category };
   }
 
   // Todo: Add authorization

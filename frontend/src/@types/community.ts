@@ -31,20 +31,6 @@ export interface Member {
   name: string;
 }
 
-export interface Community {
-  id: string;
-  name: string;
-  owner: Member;
-  admin: Member[];
-  member: Member[];
-  timeouts: Timeout[];
-}
-
-interface Timeout {
-  userId: UserId;
-  timeout: number;
-}
-
 export const Member = z.object({
   userId: z.string(),
   name: z.string(),
@@ -126,29 +112,33 @@ export type IncomingCommunityMessage =
     }
   | {
       type: SupportedIncomingCommunityMessage.SearchCommunity;
-      data: {
-        communities: {
-          id: string;
-          name: string;
-          ownerId: string;
-        }[];
-      };
+      data: SearchCommunityIncomingPayload;
     }
   | {
       type: SupportedIncomingCommunityMessage.JoinCommunity;
-    } | {
-      type: SupportedIncomingCommunityMessage.LeaveCommunity,
+    }
+  | {
+      type: SupportedIncomingCommunityMessage.LeaveCommunity;
       data: {
-        success: boolean
-      }
+        success: boolean;
+      };
     };
 
+type Community = {
+      id: string;
+      name: string;
+      ownerId: string;
+    };
+
+
+export type SearchCommunityIncomingPayload = {
+  searchText: string;
+  category: string;
+  communities: Community[];
+};
+
 type GetCommunityIncomingPayload = {
-  communities: {
-    id: string;
-    name: string;
-    ownerId: string;
-  }[];
+  communities: Community[];
   communityCount: number;
   memberCount: number;
   onlineMembers: number;
@@ -179,7 +169,6 @@ export const JoinCommunity = z.object({
 
 export const LeaveCommunity = z.object({
   roomId: z.string(),
-  // userId: z.string(),
 });
 
 export const AddAdmin = z.object({
