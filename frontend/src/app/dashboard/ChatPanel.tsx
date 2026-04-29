@@ -10,12 +10,16 @@ import useSendMessage from "@/hooks/useSendMessage";
 import InputAlert from "./InputAlert";
 import { Separator } from "@/components/ui/separator";
 import { getDate } from "@/lib/utils";
-import { IconArrowBigDown, IconArrowBigUp, IconLogout, IconMessage, IconPencil, IconSend, IconTrash, IconUser } from "@tabler/icons-react";
+import { IconArrowBigDown, IconArrowBigUp, IconLogout, IconMessage, IconPencil, IconSend, IconTrash, IconUser, IconArrowLeft } from "@tabler/icons-react";
 import { toast } from "sonner";
 import clsx from "clsx";
 import { useSession } from "next-auth/react";
 
 type ChatMessages = Map<Date, Message[]>;
+
+interface ChatPanelProps {
+  onBackToList?: () => void;
+}
 
 const formatMessages = (message: Message[]) => {
   return message.reduce((acc, entry) => {
@@ -38,7 +42,7 @@ const isUpvoted = (upvotes: { id: string }[], userId: string) => {
   return false
 }
 
-const ChatPanel = () => {
+const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
 
   const [chatMessages, setChatMessages] = useState<ChatMessages>(new Map());
   const [text, setText] = useState<string>("");
@@ -297,6 +301,16 @@ const ChatPanel = () => {
 
           {/* Header */}
           <div className="m-4 flex gap-3 items-center shrink-0">
+            {/* Mobile Back Button */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onBackToList}
+              className="md:hidden"
+            >
+              <IconArrowLeft className="h-5 w-5" />
+            </Button>
+            
             <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
               <AvatarImage>
                 <IconUser />

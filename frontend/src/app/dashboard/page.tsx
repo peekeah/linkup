@@ -26,7 +26,7 @@ type ProfileDrawer = {
 const Dashboard = () => {
 
   const sendMessage = useSendMessage();
-  const { state } = useContext(ChatContext);
+  const { state, updateSelectedChat } = useContext(ChatContext);
   const { selectedChat } = state;
   const selectedCommunityId =
     selectedChat && "communityId" in selectedChat ?
@@ -37,6 +37,9 @@ const Dashboard = () => {
     open: false,
     data: null
   })
+
+  // Mobile toggle state for ChatPanel - false shows ListPanel, true shows ChatPanel
+  const [toggleChatPanel, setToggleChatPanel] = useState(false);
 
   const toggleDrawer = () => {
     // #TODO: Future implementation
@@ -76,18 +79,41 @@ const Dashboard = () => {
     }
   }, [selectedCommunityId, sendMessage])
 
+  const handleSelectChat = (chat: any) => {
+    updateSelectedChat(chat);
+    setToggleChatPanel(true);
+  };
+
   return (
     <div className="w-full h-full overflow-hidden flex">
-      <Separator orientation="vertical" />
-      <Suspense fallback={<div className="p-4">Loading...</div>}>
-        <ListPanel />
-      </Suspense>
-      <Separator orientation="vertical" />
-      <ChatPanel />
+      {/* Desktop Layout */}
+      <div className="hidden md:flex w-full">
+        <Separator orientation="vertical" />
+        <Suspense fallback={<div className="p-4">Loading...</div>}>
+          <ListPanel />
+        </Suspense>
+        <Separator orientation="vertical" />
+        <ChatPanel />
+      </div>
+      
+      {/* Mobile Layout */}
+      <div className="md:hidden w-full">
+        {!toggleChatPanel ? (
+          <Suspense fallback={<div className="p-4">Loading...</div>}>
+            <ListPanel
+              onSelectChat={handleSelectChat}
+              disableHighliteSelected={true}
+            />
+          </Suspense>
+        ) : (
+          <ChatPanel onBackToList={() => setToggleChatPanel(false)} />
+        )}
+      </div>
+      
       <>
         {
           profileDrawer.open ?
-            <div className="w-3/12">
+            <div className="w-3/12 hidden md:block">
               <ProfileDetails
                 toggleDrawer={toggleDrawer}
                 memberDetails={profileDrawer.data}

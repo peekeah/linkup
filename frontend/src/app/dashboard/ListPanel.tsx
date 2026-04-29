@@ -34,7 +34,12 @@ const isPrivateChat = (chat: ChatOrPrivateHistory): chat is PrivateChatHistory =
 const isCommunityChat = (chat: ChatOrPrivateHistory): chat is ChatHistory =>
   chat && "communityId" in chat;
 
-const ListPanel = () => {
+interface ListPanelProps {
+  onSelectChat?: (chat: ChatOrPrivateHistory) => void;
+  disableHighliteSelected?: boolean;
+}
+
+const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) => {
   const { state, updateSelectedChat } = useContext(ChatContext);
   const { chatHistory, selectedChat, privateChats } = state;
 
@@ -69,8 +74,10 @@ const ListPanel = () => {
           payload: { recipientId: chat.recipientId },
         });
       }
+      // Call onSelectChat for mobile control if provided
+      onSelectChat?.(chat);
     },
-    [sendMessage, updateSelectedChat]
+    [sendMessage, updateSelectedChat, onSelectChat]
   );
 
   // Handle URL-driven navigation once on mount
@@ -98,20 +105,25 @@ const ListPanel = () => {
   useEffect(() => {
     if (activeTab !== "communities") return;
     if (chatId && tab === "people") return; // don't override params-driven selection
+    // Don't auto-select on mobile when disableHighliteSelected is true
+    if (disableHighliteSelected) return;
+    
     const communityChats = chatHistory.filter(isCommunityChat);
     if (communityChats.length > 0 && (!selectedChat || isPrivateChat(selectedChat))) {
       handleSelectChat(communityChats[0]);
     }
-  }, [activeTab, chatHistory]);
+  }, [activeTab, chatHistory, disableHighliteSelected]);
 
   // Auto-select first private chat when tab is active and none is selected
   useEffect(() => {
     if (activeTab !== "people") return;
     if (chatId && tab === "people") return; // params flow takes priority
+    // Don't auto-select on mobile when disableHighliteSelected is true
+    if (disableHighliteSelected) return;
     if (privateChats.length > 0 && (!selectedChat || isCommunityChat(selectedChat))) {
       handleSelectChat(privateChats[0]);
     }
-  }, [activeTab, privateChats]);
+  }, [activeTab, privateChats, disableHighliteSelected]);
 
   // Scroll detection for scrollbar visibility
   useEffect(() => {
@@ -204,7 +216,7 @@ const ListPanel = () => {
   };
 
   return (
-    <div className="flex flex-col lg:min-w-sm">
+    <div className="flex flex-col lg:min-w-sm overflow-hidden">
       <div className="p-2 py-3">
         <Search
           className="rounded-full h-12 flex-1"
@@ -273,24 +285,24 @@ const ListPanel = () => {
                 key={item.communityId}
                 className={cx(
                   "cursor-pointer hover:bg-primary/30",
-                  isCommunityChat(selectedChat!) && selectedChat.communityId === item.communityId
+                  !disableHighliteSelected && isCommunityChat(selectedChat!) && selectedChat.communityId === item.communityId
                     ? "bg-primary/70 hover:bg-primary/30"
                     : ""
                 )}
                 onClick={() => handleSelectChat(item)}
               >
                 {index === 0 && <Separator orientation="horizontal" />}
-                <div className="flex gap-3 p-3 items-center">
-                  <Avatar className="shadow-md">
+                <div className="flex gap-3 p-3 items-center min-w-0 overflow-hidden">
+                  <Avatar className="shadow-md shrink-0">
                     <AvatarImage><IconUser /></AvatarImage>
                     <AvatarFallback><IconUser /></AvatarFallback>
                   </Avatar>
-                  <div className="w-full">
+                  <div className="min-w-0 flex-1">
                     <div className="flex justify-between">
                       <div className="text-heading">{item.communityName}</div>
                       <div className="text-sm opacity-60">{getDate(item?.date)}</div>
                     </div>
-                    <div className="text-sm opacity-40">{item.message}</div>
+                    <div className="text-sm opacity-40 truncate">{item.message}</div>
                   </div>
                 </div>
                 <Separator />
@@ -305,24 +317,24 @@ const ListPanel = () => {
               key={item.recipientId}
               className={cx(
                 "cursor-pointer hover:bg-primary/30",
-                isPrivateChat(selectedChat!) && selectedChat.recipientId === item.recipientId
+                !disableHighliteSelected && isPrivateChat(selectedChat!) && selectedChat.recipientId === item.recipientId
                   ? "bg-primary/70 hover:bg-primary/30"
                   : ""
               )}
               onClick={() => handleSelectChat(item)}
             >
               {index === 0 && <Separator orientation="horizontal" />}
-              <div className="flex gap-3 p-3 items-center">
-                <Avatar className="shadow-md">
+              <div className="flex gap-3 p-3 items-center overflow-hidden">
+                <Avatar className="shadow-md shrink-0">
                   <AvatarImage><IconUser /></AvatarImage>
                   <AvatarFallback><IconUser /></AvatarFallback>
                 </Avatar>
-                <div className="w-full">
+                <div className="min-w-0 flex-1">
                   <div className="flex justify-between">
                     <div className="text-heading">{item.recipientName}</div>
                     <div className="text-sm opacity-60">{getDate(item?.date)}</div>
                   </div>
-                  <div className="text-sm opacity-40">{item.message}</div>
+                  <div className="text-sm opacity-40 truncate">{item.message}</div>
                 </div>
               </div>
               <Separator />

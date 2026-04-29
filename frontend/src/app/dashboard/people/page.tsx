@@ -92,9 +92,9 @@ const PeoplePage = () => {
         <div className="w-full h-full bg-background">
             {/* Header Section */}
             <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border">
-                <div className="px-8 py-6">
-                    <div className="mb-6">
-                        <h1 className="text-3xl font-bold text-foreground mb-1">Discover People</h1>
+                <div className="px-4 md:px-8 py-4 md:py-6">
+                    <div className="mb-4 md:mb-6">
+                        <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-1">Discover People</h1>
                         <p className="text-muted-foreground text-sm">
                             Find and connect with people in the community • {searchResults.length} users found
                         </p>
@@ -114,7 +114,7 @@ const PeoplePage = () => {
             </div>
 
             {/* Users List */}
-            <div className="px-8 py-8">
+            <div className="px-4 md:px-8 py-4 md:py-8">
                 <div className="space-y-3">
                     {loading ? (
                         <div className="text-center py-12">
@@ -124,11 +124,11 @@ const PeoplePage = () => {
                         searchResults.map((user: User) => (
                             <div
                                 key={user.id}
-                                className="group bg-card border border-border rounded-xl p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"
+                                className="group bg-card border border-border rounded-xl p-4 md:p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"
                             >
-                                <div className="flex items-center gap-4">
+                                <div className="flex items-center gap-3 md:gap-4">
                                     {/* Avatar */}
-                                    <Avatar className="w-14 h-14 shrink-0 bg-primary grid place-content-center text-primary-foreground font-bold text-lg">
+                                    <Avatar className="w-12 h-12 md:w-14 md:h-14 shrink-0 bg-primary grid place-content-center text-primary-foreground font-bold text-lg">
                                         <AvatarImage src={user.image} />
                                         <RadixAvatarFallback className="bg-primary">
                                             {getAvatarInitial(user?.name)}
@@ -138,17 +138,17 @@ const PeoplePage = () => {
                                     {/* User Info */}
                                     <div className="flex-1 min-w-0">
                                         <h3 className="text-foreground font-semibold text-sm truncate">{user?.name}</h3>
-                                        <p className="text-muted-foreground text-xs mb-2 line-clamp-1">{user.email}</p>
+                                        <p className="text-muted-foreground text-xs mb-2 line-clamp-1 hidden md:block">{user.email}</p>
                                         <p className="text-muted-foreground text-xs line-clamp-2">{user.bio || "No bio available"}</p>
                                     </div>
 
                                     {/* Message Button */}
                                     <Button
-                                        className="shrink-0 bg-primary hover:bg-primary/90 text-white"
+                                        className="shrink-0 bg-primary hover:bg-primary/90 text-white text-xs md:text-sm px-3 md:px-4"
                                         onClick={() => handleMessageUser(user)}
                                     >
-                                        <IconMessage className="w-4 h-4 mr-2" />
-                                        Message
+                                        <IconMessage className="w-4 h-4 mr-1 md:mr-2" />
+                                        <span className="hidden md:inline">Message</span>
                                     </Button>
                                 </div>
                             </div>

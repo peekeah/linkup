@@ -47,7 +47,11 @@ type Tab = {
   icon: ReactNode
 }
 
-const Sidebar = () => {
+interface SidebarProps {
+  onClose?: () => void;
+}
+
+const Sidebar = ({ onClose }: SidebarProps) => {
   const [activeTab, setActiveTab] = useState<Tab>(sidebarTabs[0])
 
   const {clearChatStore} = useContext(ChatContext);
@@ -63,6 +67,8 @@ const Sidebar = () => {
     // Update active tab for all tabs except logout
     setActiveTab(tab)
     router.push(`/dashboard/${tab.link}`)
+    // Close mobile menu if onClose prop is provided
+    onClose?.();
   }
 
   return (
@@ -75,16 +81,20 @@ const Sidebar = () => {
           <Link
             key={tab.id}
             href={`/dashboard/${tab.link}`}
-            className={tab.id === "setting" ? "absolute bottom-5" : ""}
+            className={tab.id === "setting" ? "absolute bottom-5 w-full" : "w-full"}
           >
             <Button
               onClick={() => handleSelectTab(tab)}
               className={clsx(
-                "bg-secondary/10 text-primary transition-all cursor-pointer shadow-sm rounded-md size-12 hover:bg-primary hover:text-secondary hover:border-primary",
-                tab.id === activeTab.id && "bg-primary text-secondary"
+                "bg-secondary/10 text-primary transition-all cursor-pointer shadow-sm rounded-md hover:bg-primary hover:text-secondary hover:border-primary w-full justify-start",
+                tab.id === activeTab.id && "bg-primary text-secondary",
+                "md:size-12 md:justify-center md:p-0"
               )}
             >
-              {tab.icon}
+              <div className="flex items-center gap-3">
+                {tab.icon}
+                <span className="md:hidden">{tab.title}</span>
+              </div>
             </Button>
           </Link>
         ))
