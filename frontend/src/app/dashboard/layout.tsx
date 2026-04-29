@@ -108,14 +108,11 @@ export default function RootLayout({
   ])
 
   return (
-    <main>
-      <div className="h-screen w-screen flex flex-col font-serif">
-        <Separator orientation="horizontal" />
-        <div className="flex flex-1">
-          <Sidebar />
-          <Separator orientation="vertical" />
-          <div className="h-full w-full overflow-auto">{children}</div>
-        </div>
+    <main className="h-screen w-screen flex flex-col font-serif">
+      <div className="flex h-full w-full overflow-hidden">
+        <Sidebar />
+        <Separator orientation="vertical" />
+        <div className="h-full w-full min-h-0 overflow-hidden">{children}</div>
       </div>
     </main>
   );

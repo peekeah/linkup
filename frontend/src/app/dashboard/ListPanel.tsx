@@ -46,6 +46,8 @@ const ListPanel = () => {
 
   const searchParams = useSearchParams();
   const hasHandledNavigation = useRef(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const sendMessage = useSendMessage();
 
@@ -111,6 +113,44 @@ const ListPanel = () => {
     }
   }, [activeTab, privateChats]);
 
+  // Scroll detection for scrollbar visibility
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    let isScrolling = false;
+
+    const handleScroll = () => {
+      if (!isScrolling) {
+        // Add scrolling class when scroll starts
+        scrollContainer.classList.add('scrolling');
+        scrollContainer.classList.add('recently-scrolled');
+        isScrolling = true;
+      }
+      
+      // Clear existing timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+      
+      // Set timeout to remove classes after scroll ends
+      scrollTimeoutRef.current = setTimeout(() => {
+        scrollContainer.classList.remove('scrolling');
+        scrollContainer.classList.remove('recently-scrolled');
+        isScrolling = false;
+      }, 1500); // Keep visible for 1.5 seconds after scroll stops
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Derived filtered lists — keep as pure computation, no state
   const communityChats = chatHistory.filter(isCommunityChat);
   const filteredChats = searchFilter
@@ -164,7 +204,7 @@ const ListPanel = () => {
   };
 
   return (
-    <div className="h-full lg:min-w-sm">
+    <div className="flex flex-col lg:min-w-sm">
       <div className="p-2 py-3">
         <Search
           className="rounded-full h-12 flex-1"
@@ -223,7 +263,7 @@ const ListPanel = () => {
       </div>
 
       {/* Chat List */}
-      <div>
+      <div ref={scrollContainerRef} className="flex-1 chat-scroll overflow-y-auto">
         {activeTab === "communities" ? (
           filteredChats.length === 0 ? (
             <div className="p-4 opacity-75">No communities found</div>

@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={"flex flex-col h-screen w-full"}
+        className={"flex flex-col scroll h-screen w-full"}
       >
         <ThemeProvider
           attribute="class"

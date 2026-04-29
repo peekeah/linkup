@@ -1,12 +1,12 @@
 "use client";
-import { useContext, useEffect, useState, Suspense } from "react";
+import { Suspense, useContext, useEffect, useState } from "react";
 
-import { Separator } from "@/components/ui/separator";
 import ChatPanel from "./ChatPanel";
 import ProfileDetails from "./ProfileDetails";
 import { ChatContext } from "@/store/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedChatMessages } from "@/@types/chat";
+import { Separator } from "@/components/ui/separator";
 import ListPanel from "./ListPanel";
 
 export interface MemberDetails {
@@ -77,26 +77,25 @@ const Dashboard = () => {
   }, [selectedCommunityId, sendMessage])
 
   return (
-    <div className="flex h-full">
+    <div className="w-full h-full overflow-hidden flex">
+      <Separator orientation="vertical" />
       <Suspense fallback={<div className="p-4">Loading...</div>}>
         <ListPanel />
       </Suspense>
       <Separator orientation="vertical" />
-      <div className="flex-1">
-        <ChatPanel />
-      </div >
-      {
-        profileDrawer.open ?
-          <>
-            <Separator orientation="vertical" />
+      <ChatPanel />
+      <>
+        {
+          profileDrawer.open ?
             <div className="w-3/12">
               <ProfileDetails
                 toggleDrawer={toggleDrawer}
                 memberDetails={profileDrawer.data}
               />
             </div>
-          </> : null
-      }
+            : null
+        }
+      </>
     </div>
   )
 }

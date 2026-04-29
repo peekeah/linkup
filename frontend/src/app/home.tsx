@@ -25,11 +25,11 @@ const Home = () => {
               <div className="space-x-3">
                 <Button
                   className="relative px-6 py-3 text-foreground font-semibold rounded-lg 
-  border border-primary/60
-  shadow-[0_0_8px_color:var(--primary),0_0_16px_color:var(--primary)]
-  hover:shadow-[0_0_16px_color:var(--primary),0_0_32px_color:var(--primary)]
-  hover:border-primary
-  transition-all duration-300"
+                    border border-primary/60
+                    shadow-[0_0_8px_color:var(--primary),0_0_16px_color:var(--primary)]
+                    hover:shadow-[0_0_16px_color:var(--primary),0_0_32px_color:var(--primary)]
+                    hover:border-primary
+                    transition-all duration-300"
                   onClick={handleGetStarted}
                 >
                   <div className="flex gap-2 items-center text-white">
