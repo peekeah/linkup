@@ -102,6 +102,7 @@ const useHandleMessage = () => {
           if (message.data.success) {
             toast("Successfully left community");
           }
+          break;
 
         default:
           break;

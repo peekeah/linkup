@@ -54,6 +54,14 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
 
   // Message cache per chat ID
   const [messageCache, setMessageCache] = useState<Map<string, Message[]>>(new Map());
+  
+  // Input text cache per chat ID for mobile/desktop compatibility
+  const [inputCache, setInputCache] = useState<Map<string, string>>(new Map());
+  const previousChatIdRef = useRef<string | null>(null);
+  
+  // Refs to prevent effect re-running on every keystroke
+  const textRef = useRef(text);
+  const inputCacheRef = useRef(inputCache);
 
   const { state } = useContext(ChatContext);
 
@@ -133,26 +141,62 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
     isInitialLoad.current = false;
   }, [currentMessages]);
 
+  // Keep refs in sync with state
+  useEffect(() => { textRef.current = text; }, [text]);
+  useEffect(() => { inputCacheRef.current = inputCache; }, [inputCache]);
+
+  // Handle chat switching with input preservation
   useEffect(() => {
-    if (selectedChat) {
-      const newMessages = formatMessages(currentMessages);
-      setChatMessages(newMessages);
-      setText(() => "");
-      
-      // Multiple scroll attempts to ensure it works on page refresh
-      const scrollToBottom = () => {
-        if (bottomRef.current) {
-          bottomRef.current.scrollIntoView({
-            behavior: 'instant'
-          });
-        }
-      };
-      
-      // Try scrolling at different intervals
-      setTimeout(scrollToBottom, 0);
-      setTimeout(scrollToBottom, 50);
-      setTimeout(scrollToBottom, 100);
+    if (!selectedChat) return;
+    
+    const chatId = selectedChat.type === 'private' 
+      ? selectedChat.recipientId 
+      : selectedChat.communityId;
+    
+    if (!chatId) return;
+    
+    // Preserve input across navigation and mobile remounts
+    const previousChatId = previousChatIdRef.current;
+    
+    // Save current input before switching chats
+    if (previousChatId && previousChatId !== chatId) {
+      setInputCache(prev => {
+        const cache = new Map(prev);
+        cache.set(previousChatId, textRef.current); // read from ref, not state
+        return cache;
+      });
     }
+    
+    // Restore saved input or clear if switching to different chat
+    const savedInput = inputCacheRef.current.get(chatId); // read from ref
+    if (savedInput !== undefined) {
+      setText(savedInput);
+    } else if (previousChatId !== chatId) {
+      setText(""); // Only clear if actually switching to a different chat
+    }
+    
+    previousChatIdRef.current = chatId;
+  }, [selectedChat]); // ← only selectedChat
+
+  // Handle message formatting and scrolling
+  useEffect(() => {
+    if (!selectedChat) return;
+    
+    const newMessages = formatMessages(currentMessages);
+    setChatMessages(newMessages);
+    
+    // Multiple scroll attempts to ensure it works on page refresh
+    const scrollToBottom = () => {
+      if (bottomRef.current) {
+        bottomRef.current.scrollIntoView({
+          behavior: 'instant'
+        });
+      }
+    };
+    
+    setTimeout(scrollToBottom, 0);
+    setTimeout(scrollToBottom, 50);
+    setTimeout(scrollToBottom, 100);
   }, [currentMessages, selectedChat]);
 
   // Scroll detection for scrollbar visibility
@@ -230,13 +274,43 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
         });
       }
       setText("");
+      // Clear the cached input after successful send
+      if (selectedChat) {
+        const chatId = selectedChat.type === 'private' 
+          ? selectedChat.recipientId 
+          : selectedChat.communityId;
+        
+        if (chatId) {
+          setInputCache(prev => {
+            const cache = new Map(prev);
+            cache.set(chatId, "");
+            return cache;
+          });
+        }
+      }
     } catch (err) {
       toast("Error", { description: "Failed to send message. Please try again." });
     }
   }
 
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setText(() => e.target.value);
+    const newText = e.target.value;
+    setText(newText);
+    
+    // Update cache in real-time for immediate persistence
+    if (selectedChat) {
+      const chatId = selectedChat.type === 'private' 
+        ? selectedChat.recipientId 
+        : selectedChat.communityId;
+      
+      if (chatId) {
+        setInputCache(prev => {
+          const cache = new Map(prev);
+          cache.set(chatId, newText);
+          return cache;
+        });
+      }
+    }
   }
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {

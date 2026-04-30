@@ -7,7 +7,7 @@ import {
   useRef,
   useMemo,
 } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search } from "@/components/ui/search";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
@@ -58,6 +58,7 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
   const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const sendMessage = useSendMessage();
+  const router = useRouter();
 
   // Runtime validation for URL parameters
   const validateTab = (tab: string | null): "communities" | "people" | null => {
@@ -92,10 +93,12 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
           payload: { recipientId: chat.recipientId },
         });
       }
+      // Clear URL params when selecting different chats
+      router.replace("/dashboard");
       // Call onSelectChat for mobile control if provided
       onSelectChat?.(chat);
     },
-    [sendMessage, updateSelectedChat, onSelectChat]
+    [sendMessage, updateSelectedChat, onSelectChat, router]
   );
 
   // Handle URL-driven navigation once on mount
@@ -276,7 +279,11 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
           <Button
             variant={activeTab === "communities" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setActiveTab("communities")}
+            onClick={() => {
+              setActiveTab("communities");
+              router.replace("/dashboard")
+
+            }}
             className="text-xs"
             role="tab"
             aria-selected={activeTab === "communities"}
@@ -288,7 +295,10 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
           <Button
             variant={activeTab === "people" ? "default" : "ghost"}
             size="sm"
-            onClick={() => setActiveTab("people")}
+            onClick={() => {
+              setActiveTab("people")
+              router.replace("/dashboard")
+            }}
             className="text-xs"
             role="tab"
             aria-selected={activeTab === "people"}
