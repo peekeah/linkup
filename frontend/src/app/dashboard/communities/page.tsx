@@ -90,14 +90,14 @@ const CommunitiesPage = () => {
     const totalMembers = state.memberCount > 1000 ? `${(state.memberCount / 1000).toFixed(1)}k` : state.memberCount;
 
     return (
-        <div className="w-full h-full bg-background">
+        <div className="w-full h-full bg-background flex flex-col">
             {/* Header Section */}
-            <div className="sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border">
+            <div className="flex-shrink-0 sticky top-0 z-10 bg-card/95 backdrop-blur-sm border-b border-border">
                 <div className="px-8 py-6">
                     <div className="mb-6">
                         <h1 className="text-3xl font-bold text-foreground mb-1">Explore Communities</h1>
                         <p className="text-muted-foreground text-sm">
-                            Discover your next community • {state.communityCount} communities • {state.memberCount?.toLocaleString() || 0} members active
+                            Discover your next community - {state.communityCount} communities - {state.memberCount?.toLocaleString() || 0} members active
                         </p>
                     </div>
 
@@ -148,58 +148,60 @@ const CommunitiesPage = () => {
                 </div>
             </div>
 
-            {/* Communities List */}
-            <div className="px-8 py-8">
-                <div className="space-y-3">
-                    {state.communities.length > 0 ? (
-                        state.communities.map((community: CommunityCard) => (
-                            <div
-                                key={community.id}
-                                className="group bg-card border border-border rounded-xl p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"
-                            >
-                                <div className="flex items-center gap-4">
-                                    {/* Avatar */}
-                                    <Avatar className="w-14 h-14 shrink-0 bg-primary grid place-content-center text-primary-foreground font-bold text-lg">
-                                        <AvatarFallback className="bg-primary">
-                                            {getAvatarInitial(community?.name)}
-                                        </AvatarFallback>
-                                    </Avatar>
+            {/* Communities List - Scrollable Container */}
+            <div className="flex-1 chat-scroll overflow-y-auto">
+                <div className="px-8 py-8">
+                    <div className="space-y-3">
+                        {state.communities.length > 0 ? (
+                            state.communities.map((community: CommunityCard) => (
+                                <div
+                                    key={community.id}
+                                    className="group bg-card border border-border rounded-xl p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        {/* Avatar */}
+                                        <Avatar className="w-14 h-14 shrink-0 bg-primary grid place-content-center text-primary-foreground font-bold text-lg">
+                                            <AvatarFallback className="bg-primary">
+                                                {getAvatarInitial(community?.name)}
+                                            </AvatarFallback>
+                                        </Avatar>
 
-                                    {/* Community Info */}
-                                    <div className="flex-1 min-w-0">
-                                        <h3 className="text-foreground font-semibold text-sm truncate">{community?.name}</h3>
-                                        <p className="text-muted-foreground text-xs mb-3 line-clamp-1">{community?.description || "A community for like-minded people"}</p>
-                                        <div className="flex gap-4 text-xs text-muted-foreground">
-                                            <span>👥 {community?.members || 0} members</span>
-                                            <span>🟢 {community?.onlineMembers || 0} online</span>
+                                        {/* Community Info */}
+                                        <div className="flex-1 min-w-0">
+                                            <h3 className="text-foreground font-semibold text-sm truncate">{community?.name}</h3>
+                                            <p className="text-muted-foreground text-xs mb-3 line-clamp-1">{community?.description || "A community for like-minded people"}</p>
+                                            <div className="flex gap-4 text-xs text-muted-foreground">
+                                                <span>Members: {community?.members || 0}</span>
+                                                <span>Online: {community?.onlineMembers || 0}</span>
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* Join Button */}
-                                    {isJoined(community?.id ?? "") ? (
-                                        <Button
-                                            className="shrink-0 bg-muted text-muted-foreground cursor-not-allowed"
-                                            disabled
-                                        >
-                                            <IconCheck className="w-4 h-4 mr-2" />
-                                            Joined
-                                        </Button>
-                                    ) : (
-                                        <Button
-                                            className="shrink-0 bg-primary hover:bg-primary/90 text-white"
-                                            onClick={() => handleJoinCommunity(community?.id ?? "")}
-                                        >
-                                            Join
-                                        </Button>
-                                    )}
+                                        {/* Join Button */}
+                                        {isJoined(community?.id ?? "") ? (
+                                            <Button
+                                                className="shrink-0 bg-muted text-muted-foreground cursor-not-allowed"
+                                                disabled
+                                            >
+                                                <IconCheck className="w-4 h-4 mr-2" />
+                                                Joined
+                                            </Button>
+                                        ) : (
+                                            <Button
+                                                className="shrink-0 bg-primary hover:bg-primary/90 text-white"
+                                                onClick={() => handleJoinCommunity(community?.id ?? "")}
+                                            >
+                                                Join
+                                            </Button>
+                                        )}
+                                    </div>
                                 </div>
+                            ))
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-muted-foreground text-sm">No communities found matching your search.</p>
                             </div>
-                        ))
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground text-sm">No communities found matching your search.</p>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

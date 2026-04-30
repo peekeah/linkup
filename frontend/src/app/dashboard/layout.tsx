@@ -163,7 +163,7 @@ export default function RootLayout({
 
       <div className="flex h-full w-full overflow-hidden">
         {/* Desktop Sidebar */}
-        <div className="hidden md:flex">
+        <div className="hidden md:flex shrink-0">
           <Sidebar />
         </div>
         
@@ -180,8 +180,8 @@ export default function RootLayout({
           </>
         )}
         
-        <Separator orientation="vertical" className="hidden md:block" />
-        <div className="h-full w-full min-h-0 overflow-hidden">{children}</div>
+        <Separator orientation="vertical" className="hidden md:block shrink-0" />
+        <div className="flex-1 h-full min-h-0 overflow-hidden">{children}</div>
       </div>
     </main>
   );

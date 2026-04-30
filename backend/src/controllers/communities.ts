@@ -3,9 +3,10 @@ import {
   OutgoingCommunityMessages,
   SupportedCommunityMessages,
 } from "../schema/community";
+import { SupportedUserMessages } from "../schema/user";
 import { activeClients } from "../store/clients";
 import { prisma } from "../utils/db";
-import { UserId } from "./user";
+import user, { UserId } from "./user";
 
 export interface UpdateCommunity {
   id: string;
@@ -181,7 +182,7 @@ class Community {
       include: { sender: true, upvotes: true },
     });
 
-    function sendMsg(member: User) {
+    async function sendMsg(member: User) {
       const conn = activeClients.get(member.id);
       if (conn) {
         conn.send(
@@ -193,12 +194,21 @@ class Community {
             },
           }),
         );
+
+        conn.send(
+          JSON.stringify({
+            type: SupportedUserMessages.ChatHistory,
+            data: await user.getChatHistory(member.id),
+          }),
+        );
       }
     }
 
-    community.members.forEach((member) => sendMsg(member));
-    community.admins.forEach((member) => sendMsg(member));
-    sendMsg(community.owner);
+    await Promise.all([
+      ...community.members.map((member) => sendMsg(member)),
+      ...community.admins.map((member) => sendMsg(member)),
+      sendMsg(community.owner),
+    ]);
   }
 
   async broadcastUpvotes(communityId: string, messageId: string) {

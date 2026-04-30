@@ -261,8 +261,8 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
   };
 
   return (
-    <div className="flex flex-col lg:min-w-sm overflow-hidden">
-      <div className="p-2 py-3">
+    <div className="flex flex-col lg:min-w-sm h-full overflow-hidden">
+      <div className="flex-shrink-0 p-2 py-3">
         <Search
           className="rounded-full h-12 flex-1"
           placeholder="Search"
@@ -274,7 +274,7 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
       <Separator orientation="horizontal" />
 
       {/* Tab Navigation */}
-      <div className="flex items-center justify-between p-3" role="tablist">
+      <div className="flex-shrink-0 flex items-center justify-between p-3" role="tablist">
         <div className="flex gap-2">
           <Button
             variant={activeTab === "communities" ? "default" : "ghost"}
@@ -340,10 +340,10 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
         )}
       </div>
 
-      {/* Chat List */}
+      {/* Chat List - Scrollable Container */}
       <div 
         ref={scrollContainerRef} 
-        className="flex-1 chat-scroll overflow-y-auto"
+        className="flex-1 chat-scroll overflow-y-auto min-h-0"
         role="tabpanel"
         id={activeTab === "communities" ? "communities-panel" : "people-panel"}
         aria-labelledby={activeTab === "communities" ? "communities-tab" : "people-tab"}

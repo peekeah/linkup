@@ -84,7 +84,6 @@ const wsRequestHandler = async (
         await communities.broadcastMessage(payload.roomId);
         break;
 
-      // Todo(Auth) - OP & Admin & Owner
       case SupportedChatMessages.DeleteChat:
         communityRole = await authorize(payload.roomId, tokenData.userId, [
           "USER",
@@ -245,7 +244,6 @@ const wsRequestHandler = async (
         );
         break;
 
-      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.RemoveAdmin:
         communityRole = await authorize(payload.roomId, tokenData.userId, [
           "OWNER",
