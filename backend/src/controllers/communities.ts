@@ -1,3 +1,4 @@
+import { User } from "../generated/prisma/client";
 import {
   OutgoingCommunityMessages,
   SupportedCommunityMessages,
@@ -170,7 +171,7 @@ class Community {
   async broadcastMessage(communityId: string) {
     const community = await prisma.community.findFirst({
       where: { id: communityId },
-      include: { members: true },
+      include: { members: true, admins: true, owner: true },
     });
 
     if (!community) throw new Error("Community not found");
@@ -180,25 +181,30 @@ class Community {
       include: { sender: true, upvotes: true },
     });
 
-    community.members.forEach((member) => {
+    function sendMsg(member: User) {
       const conn = activeClients.get(member.id);
-      const response: OutgoingCommunityMessages = {
-        type: SupportedCommunityMessages.BrodcastMessages,
-        data: {
-          roomId: communityId,
-          messages,
-        },
-      };
       if (conn) {
-        conn.send(JSON.stringify(response));
+        conn.send(
+          JSON.stringify({
+            type: SupportedCommunityMessages.BrodcastMessages,
+            data: {
+              roomId: communityId,
+              messages,
+            },
+          }),
+        );
       }
-    });
+    }
+
+    community.members.forEach((member) => sendMsg(member));
+    community.admins.forEach((member) => sendMsg(member));
+    sendMsg(community.owner);
   }
 
   async broadcastUpvotes(communityId: string, messageId: string) {
     const community = await prisma.community.findFirst({
       where: { id: communityId },
-      include: { members: true },
+      include: { members: true, admins: true, owner: true },
     });
 
     if (!community) throw new Error("Community not found");
@@ -212,7 +218,7 @@ class Community {
       throw new Error("Message not found");
     }
 
-    community.members.forEach((member) => {
+    function sendMsg(member: User) {
       const conn = activeClients.get(member.id);
       if (conn) {
         const response: OutgoingCommunityMessages = {
@@ -220,12 +226,16 @@ class Community {
           data: {
             communityId,
             messageId,
-            message,
+            message: message!,
           },
         };
         conn.send(JSON.stringify(response));
       }
-    });
+    }
+
+    community.members.forEach((member) => sendMsg(member));
+    community.admins.forEach((member) => sendMsg(member))
+    sendMsg(community.owner)
   }
 }
 

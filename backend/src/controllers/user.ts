@@ -182,7 +182,11 @@ class User {
 
     const communities = await prisma.community.findMany({
       where: {
-        members: { some: { id } },
+        OR: [
+          { members: { some: { id } } },
+          { admins: { some: { id } } },
+          { owner: { id } }
+        ]
       },
       include: {
         chatMessages: {

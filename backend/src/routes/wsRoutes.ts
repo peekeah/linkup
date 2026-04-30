@@ -200,7 +200,6 @@ const wsRequestHandler = async (
         );
         break;
 
-      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.UpdateCommunity:
         communityRole = await authorize(payload.id, tokenData.userId, [
           "OWNER",
@@ -208,7 +207,6 @@ const wsRequestHandler = async (
         await communities.update(payload);
         break;
 
-      // Todo(Auth) - Owner only
       case SupportedCommunityMessages.DeleteCommunity:
         communityRole = await authorize(payload.id, tokenData.userId, [
           "OWNER",
@@ -291,7 +289,6 @@ const wsRequestHandler = async (
         );
         break;
 
-      // Todo(Auth) - Admin & Owner
       case SupportedCommunityMessages.GiveTimeout:
         communityRole = await authorize(payload.roomId, tokenData.userId, [
           "OWNER",
@@ -304,7 +301,6 @@ const wsRequestHandler = async (
         );
         break;
 
-      // Todo(Auth) - Admin & Owner
       case SupportedCommunityMessages.ClearTimeout:
         communityRole = await authorize(payload.roomId, tokenData.userId, [
           "OWNER",
