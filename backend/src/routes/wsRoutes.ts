@@ -53,7 +53,7 @@ const wsRequestHandler = async (
         const privateChatHistory = await user.getPrivateChatHistory(tokenData.userId);
         ws.send(
           JSON.stringify({
-            type: "GET_PRIVATE_CHAT_HISTORY",
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
             data: privateChatHistory,
           }),
         );
@@ -108,6 +108,9 @@ const wsRequestHandler = async (
         break;
 
       case SupportedChatMessages.UpvoteMessage:
+        communityRole = await authorize(payload.roomId, tokenData.userId, [
+          "USER", "ADMIN", "OWNER"
+        ]);
         await chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
         break;
 
@@ -150,7 +153,7 @@ const wsRequestHandler = async (
           const updatedChatHistory = await user.getPrivateChatHistory(tokenData.userId);
           ws.send(
             JSON.stringify({
-              type: "GET_PRIVATE_CHAT_HISTORY",
+              type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
               data: updatedChatHistory,
             }),
           );
@@ -173,7 +176,7 @@ const wsRequestHandler = async (
             const recipientChatHistory = await user.getPrivateChatHistory(payload.recipientId);
             recipientConnection.send(
               JSON.stringify({
-                type: "GET_PRIVATE_CHAT_HISTORY",
+                type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
                 data: recipientChatHistory,
               }),
             );

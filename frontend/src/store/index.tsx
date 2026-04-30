@@ -2,6 +2,7 @@
 import { ReactNode } from "react";
 import Auth from "./auth";
 import Chat from "./chat";
+import Community from "./communities";
 
 interface StoreProps {
   children: ReactNode
@@ -10,7 +11,9 @@ interface StoreProps {
 const Store = ({ children }: StoreProps) => {
   return (
     <Auth>
-      <Chat>{children}</Chat>
+      <Chat>
+        <Community>{children}</Community>
+      </Chat>
     </Auth>
   )
 }

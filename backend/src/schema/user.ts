@@ -34,7 +34,8 @@ export enum SupportedUserMessages {
 
 export enum SupportedOutgoingUserMessages {
   ChatHistory = "CHAT_HISTORY",
-  Search = "SEARCH"
+  Search = "SEARCH",
+  GetPrivateChatHistory = "GET_PRIVATE_CHAT_HISTORY"
 }
 
 export type IncomingUserMessage = {
