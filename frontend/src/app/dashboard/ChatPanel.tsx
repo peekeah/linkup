@@ -52,6 +52,9 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
     messageId: ""
   });
 
+  // Message cache per chat ID
+  const [messageCache, setMessageCache] = useState<Map<string, Message[]>>(new Map());
+
   const { state } = useContext(ChatContext);
 
   const session = useSession();
@@ -59,14 +62,47 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
 
   const { selectedChat, messages, privateMessages } = state;
 
-  const currentMessages = useMemo(() => {
-    if (!selectedChat) return [];
-    if (selectedChat.type === 'private') {
-      return privateMessages?.get(selectedChat.recipientId ?? "") ?? [];
-    } else {
-      return messages?.get(selectedChat.communityId ?? "") ?? [];
+  // Cache messages when they change
+  useEffect(() => {
+    if (!selectedChat) return;
+    
+    const chatId = selectedChat.type === 'private' 
+      ? selectedChat.recipientId 
+      : selectedChat.communityId;
+    
+    if (!chatId) return;
+    
+    const newMessages = selectedChat.type === 'private'
+      ? privateMessages?.get(chatId) ?? []
+      : messages?.get(chatId) ?? [];
+    
+    if (newMessages.length > 0) {
+      setMessageCache(prev => {
+        const cache = new Map(prev);
+        cache.set(chatId, newMessages);
+        return cache;
+      });
     }
   }, [messages, privateMessages, selectedChat]);
+
+  const currentMessages = useMemo(() => {
+    if (!selectedChat) return [];
+    
+    const chatId = selectedChat.type === 'private' 
+      ? selectedChat.recipientId 
+      : selectedChat.communityId;
+    
+    if (!chatId) return [];
+    
+    // Try to get from cache first, then from current state
+    const cachedMessages = messageCache.get(chatId);
+    const currentMessages = selectedChat.type === 'private'
+      ? privateMessages?.get(chatId) ?? []
+      : messages?.get(chatId) ?? [];
+    
+    // Return current messages if available, otherwise cached messages
+    return currentMessages.length > 0 ? currentMessages : cachedMessages ?? [];
+  }, [messages, privateMessages, selectedChat, messageCache]);
 
   const sendMessage = useSendMessage();
 
@@ -233,6 +269,7 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
       }
       setEditMessageModal({ state: false, messageContent: "", messageId: "" });
     } catch (err) {
+      toast("Error", { description: "Failed to update message" });
     }
   }
 
@@ -302,14 +339,16 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
           {/* Header */}
           <div className="m-4 flex gap-3 items-center shrink-0">
             {/* Mobile Back Button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={onBackToList}
-              className="md:hidden"
-            >
-              <IconArrowLeft className="h-5 w-5" />
-            </Button>
+            {onBackToList && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onBackToList}
+                className="md:hidden"
+              >
+                <IconArrowLeft className="h-5 w-5" />
+              </Button>
+            )}
             
             <Avatar className="shadow-md rounded-xl p-3 border border-neutral">
               <AvatarImage>
@@ -396,14 +435,12 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
                                 <div>{message.upvotes?.length}</div>
                               )}
                             </div>
-                            {message.senderId === userId && (
+                            {message.senderId === userId && selectedChat?.type === 'community' && (
                               <>
                                 <IconTrash
                                   className="text-primary size-5 cursor-pointer"
                                   onClick={() => {
-                                    const roomId = selectedChat?.type === 'community'
-                                      ? selectedChat.communityId
-                                      : selectedChat?.recipientId;
+                                    const roomId = selectedChat?.communityId;
                                     handleDeleteMessage(roomId || "", message.id);
                                   }}
                                 />

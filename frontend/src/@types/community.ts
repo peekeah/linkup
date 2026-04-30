@@ -23,7 +23,7 @@ export enum SupportedIncomingCommunityMessage {
   GetCommunities = "GET_COMMUNITIES",
   SearchCommunity = "SEARCH_COMMUNITY",
   JoinCommunity = "JOIN_COMMUNITY",
-  LeaveCommunity = "LEAVE_cOMMUNITY",
+  LeaveCommunity = "LEAVE_COMMUNITY",
 }
 
 export interface Member {

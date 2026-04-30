@@ -2,8 +2,7 @@
 import { Suspense, useContext, useEffect, useState } from "react";
 
 import ChatPanel from "./ChatPanel";
-import ProfileDetails from "./ProfileDetails";
-import { ChatContext } from "@/store/chat";
+import { ChatContext, ChatOrPrivateHistory } from "@/store/chat";
 import useSendMessage from "@/hooks/useSendMessage";
 import { SupportedChatMessages } from "@/@types/chat";
 import { Separator } from "@/components/ui/separator";
@@ -15,13 +14,6 @@ export interface MemberDetails {
   bio: string;
 }
 
-type ProfileDrawer = {
-  open: false;
-  data: null
-} | {
-  open: true,
-  data: MemberDetails
-}
 
 const Dashboard = () => {
 
@@ -33,37 +25,11 @@ const Dashboard = () => {
       selectedChat?.communityId :
       ""
 
-  const [profileDrawer, setProfileDrawer] = useState<ProfileDrawer>({
-    open: false,
-    data: null
-  })
 
   // Mobile toggle state for ChatPanel - false shows ListPanel, true shows ChatPanel
   const [toggleChatPanel, setToggleChatPanel] = useState(false);
 
-  const toggleDrawer = () => {
-    // #TODO: Future implementation
-    return;
-    setProfileDrawer(prev => {
-      if (prev.open) {
-        return ({
-          open: false,
-          data: null
-        })
-      } else {
-        return ({
-          open: true,
-          data: {
-            name: "Alex F",
-            title: "Full stack Developer",
-            bio: `An enthustiac web developer,
-            Expert in React, Express, MongoDB & TailwindCSS`
-          }
-        })
-      }
-    })
-  }
-
+  
   useEffect(() => {
     if (selectedCommunityId) {
       try {
@@ -79,9 +45,14 @@ const Dashboard = () => {
     }
   }, [selectedCommunityId, sendMessage])
 
-  const handleSelectChat = (chat: any) => {
-    updateSelectedChat(chat);
-    setToggleChatPanel(true);
+  const handleSelectChat = (chat: ChatOrPrivateHistory) => {
+    try {
+      updateSelectedChat(chat);
+      setToggleChatPanel(true);
+    } catch (error) {
+      console.error("Failed to select chat:", error);
+      // Don't set toggleChatPanel if selection failed
+    }
   };
 
   return (
@@ -110,18 +81,6 @@ const Dashboard = () => {
         )}
       </div>
       
-      <>
-        {
-          profileDrawer.open ?
-            <div className="w-3/12 hidden md:block">
-              <ProfileDetails
-                toggleDrawer={toggleDrawer}
-                memberDetails={profileDrawer.data}
-              />
-            </div>
-            : null
-        }
-      </>
     </div>
   )
 }

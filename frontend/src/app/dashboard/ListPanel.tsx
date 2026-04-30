@@ -5,6 +5,7 @@ import {
   useEffect,
   useState,
   useRef,
+  useMemo,
 } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search } from "@/components/ui/search";
@@ -48,6 +49,8 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
   const [community, setCommunity] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNavigatingToChat, setIsNavigatingToChat] = useState(false);
+  const [isCreatingCommunity, setIsCreatingCommunity] = useState(false);
 
   const searchParams = useSearchParams();
   const hasHandledNavigation = useRef(false);
@@ -56,8 +59,23 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
 
   const sendMessage = useSendMessage();
 
-  const tab = searchParams.get("tab") as "communities" | "people" | null;
-  const chatId = searchParams.get("chat");
+  // Runtime validation for URL parameters
+  const validateTab = (tab: string | null): "communities" | "people" | null => {
+    if (tab === "communities" || tab === "people") {
+      return tab;
+    }
+    return null;
+  };
+
+  const validateChatId = (chatId: string | null): string | null => {
+    if (chatId && /^[a-zA-Z0-9_-]+$/.test(chatId)) {
+      return chatId;
+    }
+    return null;
+  };
+
+  const tab = validateTab(searchParams.get("tab"));
+  const chatId = validateChatId(searchParams.get("chat"));
 
   // Stable select handler — no ref gymnastics needed
   const handleSelectChat = useCallback(
@@ -94,12 +112,16 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
   useEffect(() => {
     if (!chatId || !tab || tab !== "people") return;
     if (!privateChats.length) return;
+    if (isNavigatingToChat) return; // Prevent multiple calls
 
     const target = privateChats.find((c) => c.recipientId === chatId);
     if (target) {
+      setIsNavigatingToChat(true);
       handleSelectChat(target);
+      // Reset navigation flag after a short delay
+      setTimeout(() => setIsNavigatingToChat(false), 1000);
     }
-  }, [privateChats, chatId, tab]); // runs whenever privateChats loads/updates
+  }, [privateChats, chatId, tab, isNavigatingToChat, handleSelectChat]);
 
   // Auto-select first community when tab is active and none is selected
   useEffect(() => {
@@ -124,6 +146,11 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
       handleSelectChat(privateChats[0]);
     }
   }, [activeTab, privateChats, disableHighliteSelected]);
+
+  // Reset search filter when tab changes
+  useEffect(() => {
+    setSearchFilter("");
+  }, [activeTab]);
 
   // Scroll detection for scrollbar visibility
   useEffect(() => {
@@ -161,21 +188,28 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, []);
+  }, [scrollContainerRef]); // Add ref dependency to handle ref changes
 
-  // Derived filtered lists — keep as pure computation, no state
-  const communityChats = chatHistory.filter(isCommunityChat);
-  const filteredChats = searchFilter
-    ? communityChats.filter((c) =>
-      c.communityName.toLowerCase().includes(searchFilter.toLowerCase())
-    )
-    : communityChats;
+  // Derived filtered lists — optimized with useMemo
+  const communityChats = useMemo(() => 
+    chatHistory.filter(isCommunityChat), 
+    [chatHistory]
+  );
 
-  const filteredPrivateChats = (() => {
+  const filteredChats = useMemo(() => 
+    searchFilter
+      ? communityChats.filter((c) =>
+          c.communityName.toLowerCase().includes(searchFilter.toLowerCase())
+        )
+      : communityChats,
+    [communityChats, searchFilter]
+  );
+
+  const filteredPrivateChats = useMemo(() => {
     const base = searchFilter
       ? privateChats.filter((c) =>
-        c.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
-      )
+          c.recipientName.toLowerCase().includes(searchFilter.toLowerCase())
+        )
       : [...privateChats];
 
     // Prepend selectedChat if it's a private chat not yet in the list
@@ -188,21 +222,29 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
     }
 
     return base;
-  })();
+  }, [privateChats, searchFilter, selectedChat]);
 
-  const handleAddCommunity = () => {
+  const handleAddCommunity = async () => {
     if (!selectedCategory) {
       toast("Error", { description: "Please select a category for the community" });
       return;
     }
-    sendMessage({
-      type: SupportedOutgoingCommunityMessages.CreateCommunity,
-      payload: { name: community, category: selectedCategory },
-    });
-    toast("Community", { description: "Community created successfully" });
-    setCommunity("");
-    setSelectedCategory("");
-    setIsModalOpen(false);
+    
+    setIsCreatingCommunity(true);
+    try {
+      sendMessage({
+        type: SupportedOutgoingCommunityMessages.CreateCommunity,
+        payload: { name: community, category: selectedCategory },
+      });
+      toast("Community", { description: "Community created successfully" });
+      setCommunity("");
+      setSelectedCategory("");
+      setIsModalOpen(false);
+    } catch (error) {
+      toast("Error", { description: "Failed to create community" });
+    } finally {
+      setIsCreatingCommunity(false);
+    }
   };
 
   const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -223,18 +265,23 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
           placeholder="Search"
           value={searchFilter}
           onChange={handleSearchChange}
+          aria-label="Search chats and communities"
         />
       </div>
       <Separator orientation="horizontal" />
 
       {/* Tab Navigation */}
-      <div className="flex items-center justify-between p-3">
+      <div className="flex items-center justify-between p-3" role="tablist">
         <div className="flex gap-2">
           <Button
             variant={activeTab === "communities" ? "default" : "ghost"}
             size="sm"
             onClick={() => setActiveTab("communities")}
             className="text-xs"
+            role="tab"
+            aria-selected={activeTab === "communities"}
+            aria-controls="communities-panel"
+            tabIndex={0}
           >
             Communities
           </Button>
@@ -243,6 +290,10 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
             size="sm"
             onClick={() => setActiveTab("people")}
             className="text-xs"
+            role="tab"
+            aria-selected={activeTab === "people"}
+            aria-controls="people-panel"
+            tabIndex={0}
           >
             People
           </Button>
@@ -259,8 +310,13 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
                 size="icon"
                 className="rounded-md size-6"
                 onClick={() => setIsModalOpen(true)}
+                disabled={isCreatingCommunity}
               >
-                <IconPlus />
+                {isCreatingCommunity ? (
+                  <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
+                ) : (
+                  <IconPlus />
+                )}
               </Button>
             }
             onChange={(e) => setCommunity(e.target.value)}
@@ -275,34 +331,50 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
       </div>
 
       {/* Chat List */}
-      <div ref={scrollContainerRef} className="flex-1 chat-scroll overflow-y-auto">
+      <div 
+        ref={scrollContainerRef} 
+        className="flex-1 chat-scroll overflow-y-auto"
+        role="tabpanel"
+        id={activeTab === "communities" ? "communities-panel" : "people-panel"}
+        aria-labelledby={activeTab === "communities" ? "communities-tab" : "people-tab"}
+      >
         {activeTab === "communities" ? (
           filteredChats.length === 0 ? (
-            <div className="p-4 opacity-75">No communities found</div>
+            <div className="p-4 opacity-75" role="status" aria-live="polite">No communities found</div>
           ) : (
             filteredChats.map((item, index) => (
               <div
                 key={item.communityId}
                 className={cx(
-                  "cursor-pointer hover:bg-primary/30",
+                  "cursor-pointer",
                   !disableHighliteSelected && isCommunityChat(selectedChat!) && selectedChat.communityId === item.communityId
-                    ? "bg-primary/70 hover:bg-primary/30"
-                    : ""
+                    ? "bg-primary"
+                    : "hover:bg-primary/60"
                 )}
                 onClick={() => handleSelectChat(item)}
+                role="button"
+                tabIndex={0}
+                aria-label={`Community: ${item.communityName}, last message: ${item.message}`}
+                aria-selected={!disableHighliteSelected && isCommunityChat(selectedChat!) && selectedChat.communityId === item.communityId}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleSelectChat(item);
+                  }
+                }}
               >
                 {index === 0 && <Separator orientation="horizontal" />}
                 <div className="flex gap-3 p-3 items-center min-w-0 overflow-hidden">
-                  <Avatar className="shadow-md shrink-0">
+                  <Avatar className="shadow-md shrink-0" aria-hidden="true">
                     <AvatarImage><IconUser /></AvatarImage>
                     <AvatarFallback><IconUser /></AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
                     <div className="flex justify-between">
                       <div className="text-heading">{item.communityName}</div>
-                      <div className="text-sm opacity-60">{getDate(item?.date)}</div>
+                      <div className="text-sm opacity-60" aria-label={`Last message: ${getDate(item?.date)}`}>{getDate(item?.date)}</div>
                     </div>
-                    <div className="text-sm opacity-40 truncate">{item.message}</div>
+                    <div className="text-sm opacity-55 truncate">{item.message}</div>
                   </div>
                 </div>
                 <Separator />
@@ -310,31 +382,41 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
             ))
           )
         ) : filteredPrivateChats.length === 0 ? (
-          <div className="p-4 opacity-75">No private chats found</div>
+          <div className="p-4 opacity-75" role="status" aria-live="polite">No private chats found</div>
         ) : (
           filteredPrivateChats.map((item, index) => (
             <div
               key={item.recipientId}
               className={cx(
-                "cursor-pointer hover:bg-primary/30",
+                "cursor-pointer",
                 !disableHighliteSelected && isPrivateChat(selectedChat!) && selectedChat.recipientId === item.recipientId
-                  ? "bg-primary/70 hover:bg-primary/30"
-                  : ""
+                  ? "bg-primary"
+                  : "hover:bg-primary/60"
               )}
               onClick={() => handleSelectChat(item)}
+              role="button"
+              tabIndex={0}
+              aria-label={`Chat with ${item.recipientName}, last message: ${item.message}`}
+              aria-selected={!disableHighliteSelected && isPrivateChat(selectedChat!) && selectedChat.recipientId === item.recipientId}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectChat(item);
+                }
+              }}
             >
               {index === 0 && <Separator orientation="horizontal" />}
               <div className="flex gap-3 p-3 items-center overflow-hidden">
-                <Avatar className="shadow-md shrink-0">
+                <Avatar className="shadow-md shrink-0" aria-hidden="true">
                   <AvatarImage><IconUser /></AvatarImage>
                   <AvatarFallback><IconUser /></AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
                   <div className="flex justify-between">
                     <div className="text-heading">{item.recipientName}</div>
-                    <div className="text-sm opacity-60">{getDate(item?.date)}</div>
+                    <div className="text-sm opacity-60" aria-label={`Last message: ${getDate(item?.date)}`}>{getDate(item?.date)}</div>
                   </div>
-                  <div className="text-sm opacity-40 truncate">{item.message}</div>
+                  <div className="text-sm opacity-55 truncate">{item.message}</div>
                 </div>
               </div>
               <Separator />

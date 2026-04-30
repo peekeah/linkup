@@ -43,6 +43,13 @@ export default function RootLayout({
 
       // Don't connect WebSocket if token is not available
       if (!token) {
+        console.warn("WebSocket connection skipped: No token available");
+        return;
+      }
+
+      // Validate token format (basic validation)
+      if (token.length < 10) {
+        console.error("WebSocket connection skipped: Invalid token format");
         return;
       }
 
@@ -50,39 +57,67 @@ export default function RootLayout({
       updateConnection(socket);
 
       socket.onopen = () => {
+        console.log("WebSocket connected successfully");
         retryRef.current = 0;
-        sendMessage({
-          type: SupportedOutgoingUserMessages.ChatHistory
-        });
-        sendMessage({
-          type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
-          payload: null
-        });
-        sendMessage({
-          type: SupportedOutgoingCommunityMessages.GetCommunities
-        });
+        try {
+          sendMessage({
+            type: SupportedOutgoingUserMessages.ChatHistory
+          });
+          sendMessage({
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+            payload: null
+          });
+          sendMessage({
+            type: SupportedOutgoingCommunityMessages.GetCommunities
+          });
+        } catch (error) {
+          console.error("Failed to send initial messages:", error);
+        }
       };
 
       socket.onmessage = (event) => {
-        handleMessage(event.data);
+        try {
+          handleMessage(event.data);
+        } catch (error) {
+          console.error("Error handling WebSocket message:", error, event.data);
+        }
       };
 
       socket.onerror = (err) => {
-        console.log("error", err);
+        console.error("WebSocket error:", err);
+        // Log additional error details if available
+        if (socket.readyState === WebSocket.CLOSED) {
+          console.warn("WebSocket connection closed unexpectedly");
+        }
       };
 
-      socket.onclose = () => {
+      socket.onclose = (event) => {
+        console.log("WebSocket closed:", {
+          code: event.code,
+          reason: event.reason,
+          wasClean: event.wasClean
+        });
+        
         updateConnection(null);
         if (!reconnectEnabledRef.current) {
+          console.log("WebSocket reconnection disabled");
+          return;
+        }
+
+        // Don't reconnect if it was a clean close (user logout, etc.)
+        if (event.wasClean) {
+          console.log("WebSocket closed cleanly, not reconnecting");
           return;
         }
 
         const maxRetries = 5;
         if (retryRef.current >= maxRetries) {
+          console.error(`WebSocket reconnection failed after ${maxRetries} attempts`);
           return;
         }
 
         const delay = Math.min(2 ** retryRef.current, 16) * 1000;
+        console.log(`Attempting WebSocket reconnection ${retryRef.current + 1}/${maxRetries} in ${delay}ms`);
         retryRef.current += 1;
         reconnectTimeoutRef.current = setTimeout(() => {
           connect();

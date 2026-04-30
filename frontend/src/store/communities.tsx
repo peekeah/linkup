@@ -51,11 +51,13 @@ const Community = ({ children }: { children: ReactNode }) => {
     const updateCommunities = useCallback((updates: Partial<State>) => {
         setState((prev) => {
             if (updates.communities) {
-
-                if (updates.searchText || updates.selectedCategory) {
+                // Always replace when there's explicit search or category filter (presence check, not truthiness)
+                if (updates.searchText !== undefined || updates.selectedCategory !== undefined) {
                     return { ...prev, ...updates, communities: updates?.communities ?? [] };
                 }
-
+                
+                // For initial load and incremental updates, merge to avoid race conditions
+                // but ensure we don't duplicate existing communities
                 const existingIds = new Set(prev.communities.map(c => c.id));
                 const newCommunities = updates?.communities.filter(c => !existingIds.has(c.id));
                 const mergedCommunities = [...prev.communities, ...newCommunities];
