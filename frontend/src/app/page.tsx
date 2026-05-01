@@ -1,14 +1,15 @@
 "use client";
 
-import Home from "./home"
+import Home from "./home";
 import Navbar from "./Navbar";
 
 export default function Page() {
-
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-background">
       <Navbar />
-      <Home />
+      <main>
+        <Home />
+      </main>
     </div>
   );
 }

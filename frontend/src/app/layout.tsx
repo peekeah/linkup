@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 import Auth from "@/store/auth";
 import Chat from "@/store/chat";
 import Communities from "@/store/communities";
@@ -20,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={"flex flex-col scroll h-screen w-full"}
+        className={`${inter.variable} flex flex-col scroll h-screen w-full`}
       >
         <ThemeProvider
           attribute="class"
