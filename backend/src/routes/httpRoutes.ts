@@ -94,6 +94,37 @@ router.get("/users", requireRole("ADMIN"), async (_req, res) => {
   }
 });
 
+// Get User Profile
+router.get("/users/:id", async (req, res) => {
+  try {
+    const { id } = await validateRole(req, "USER");
+
+    if (id !== req.params.id) {
+      return res.status(403).send({ status: false, message: "Forbidden" });
+    }
+
+    const userProfile = await user.getUser(id);
+
+    res.send({
+      status: true,
+      data: {
+        id: userProfile.id,
+        name: userProfile.name,
+        email: userProfile.email,
+        mobile: userProfile.mobile,
+        bio: userProfile.bio,
+        image: userProfile.image,
+      },
+    });
+  } catch (err) {
+    const { statusCode, errMessage } = errorHandler(err);
+    res.status(statusCode).send({
+      status: false,
+      message: errMessage,
+    });
+  }
+});
+
 // Update User
 router.post("/users/:id", async (req, res) => {
   try {
@@ -103,13 +134,13 @@ router.post("/users/:id", async (req, res) => {
       return res.status(403).send({ status: false, message: "Forbidden" });
     }
 
-    const { name, email, mobile } = req.body;
+    const { name, mobile, bio } = req.body;
 
-    await user.update(id, { name, email, mobile });
+    const data = await user.update(id, { name, mobile, bio });
 
     res.send({
       status: true,
-      data: { id, name, email, mobile },
+      data,
     });
   } catch (err) {
     const { statusCode, errMessage } = errorHandler(err);

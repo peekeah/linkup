@@ -1,5 +1,6 @@
 "use client"
-import { createContext, ReactNode, RefObject, useCallback, useRef, useState } from "react";
+import { createContext, ReactNode, RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 
 interface AuthContextType {
   state: AuthState;
@@ -49,10 +50,27 @@ const Auth = ({ children }: AuthProps) => {
   const [state, setState] = useState<AuthState>(INITIAL_AUTH_STATE);
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectEnabledRef = useRef(true);
+  const { data: session } = useSession();
 
   const updateAuth = useCallback((payload: AuthState) => {
     setState(payload);
   }, []);
+
+  // Sync AuthContext with NextAuth session
+  useEffect(() => {
+    if (session?.user) {
+      updateAuth({
+        userId: session.user.userId || "",
+        userName: session.user.name || "",
+        email: session.user.email || "",
+        mobile: "", // Will be fetched from API
+        bio: "", // Will be fetched from API
+      });
+    } else {
+      // Clear auth state when no session
+      updateAuth(INITIAL_AUTH_STATE);
+    }
+  }, [session, updateAuth]);
 
   const updateConnection = useCallback((ws: WebSocket | null) => {
     wsRef.current = ws;

@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import { WebSocket, WebSocketServer } from 'ws';
 import express from 'express';
+import cookieParser from "cookie-parser";
 
 import url from "url";
 import requestHandler from "./routes/wsRoutes";
@@ -21,7 +22,11 @@ const server = createServer(app);
 const port = getEnv("API_PORT", "5000")
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
+}));
 
 export const wss = new WebSocketServer({ server });
 
