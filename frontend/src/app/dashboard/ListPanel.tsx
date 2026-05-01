@@ -8,7 +8,7 @@ import {
   useMemo,
 } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Search } from "@/components/ui/search";
+import { IconSearch } from "@tabler/icons-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { ChatContext, ChatHistory, PrivateChatHistory, ChatOrPrivateHistory } from "@/store/chat";
@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { getDate } from "@/lib/utils";
 import { toast } from "sonner";
 import { IconPlus, IconUser } from "@tabler/icons-react";
+import { Input } from "@/components/ui/input";
 
 const categories = [
   "Technology", "Design", "Business", "Career", "Education",
@@ -262,19 +263,23 @@ const ListPanel = ({ onSelectChat, disableHighliteSelected }: ListPanelProps) =>
 
   return (
     <div className="flex flex-col lg:min-w-sm h-full overflow-hidden">
-      <div className="flex-shrink-0 p-2 py-3">
-        <Search
-          className="rounded-full h-12 flex-1"
-          placeholder="Search"
-          value={searchFilter}
-          onChange={handleSearchChange}
-          aria-label="Search chats and communities"
-        />
+      <div className="shrink-0 p-2 py-3">
+        <div className="relative">
+          <IconSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Search"
+            value={searchFilter}
+            onChange={handleSearchChange}
+            className="w-full h-10 pl-10 pr-4 rounded-full border border-input bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+            aria-label="Search chats and communities"
+          />
+        </div>
       </div>
       <Separator orientation="horizontal" />
 
       {/* Tab Navigation */}
-      <div className="flex-shrink-0 flex items-center justify-between p-3" role="tablist">
+      <div className="shrink-0 flex items-center justify-between p-3" role="tablist">
         <div className="flex gap-2">
           <Button
             variant={activeTab === "communities" ? "default" : "ghost"}

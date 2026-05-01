@@ -1,4 +1,4 @@
-import { IconLogout, IconMessage, IconSettings, IconUser, IconUsersGroup } from "@tabler/icons-react"
+import { IconLogout, IconMessage, IconSettings, IconUser, IconUsersGroup, IconX } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button";
 import { useContext, useState, ReactNode } from "react";
 import { useRouter } from "next/navigation";
@@ -72,33 +72,52 @@ const Sidebar = ({ onClose }: SidebarProps) => {
   }
 
   return (
-    <div className="h-full px-3 py-5 flex flex-col gap-4 justify-start relative">
-        <div className="mx-auto text-xl font-bold font-serif">
-          <span className="text-primary">Lu</span>
+    <div className="h-full px-4 py-6 flex flex-col relative">
+        {/* Header with close button */}
+        <div className="flex justify-between items-center mb-8">
+            <div className="mx-auto text-xl font-bold font-serif">
+              <span className="text-primary">Lu</span>
+            </div>
+            {onClose && (
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    onClick={onClose} 
+                    className="md:hidden hover:bg-secondary/20"
+                >
+                    <IconX className="w-5 h-5" />
+                </Button>
+            )}
         </div>
-      {
-        sidebarTabs?.map(tab => (
-          <Link
-            key={tab.id}
-            href={`/dashboard/${tab.link}`}
-            className={tab.id === "setting" ? "absolute bottom-5 w-full" : "w-full"}
-          >
-            <Button
-              onClick={() => handleSelectTab(tab)}
-              className={clsx(
-                "bg-secondary/10 text-primary transition-all cursor-pointer shadow-sm rounded-md hover:bg-primary hover:text-secondary hover:border-primary w-full justify-start",
-                tab.id === activeTab.id && "bg-primary text-secondary",
-                "md:size-12 md:justify-center md:p-0"
-              )}
+        
+        {/* Navigation tabs */}
+        <div className="flex flex-col gap-3 flex-grow">
+        {
+          sidebarTabs?.map(tab => (
+            <Link
+              key={tab.id}
+              href={`/dashboard/${tab.link}`}
+              className={tab.id === "setting" ? "mt-auto" : ""}
             >
-              <div className="flex items-center gap-3">
-                {tab.icon}
-                <span className="md:hidden">{tab.title}</span>
-              </div>
-            </Button>
-          </Link>
-        ))
-      }
+              <Button
+                onClick={() => handleSelectTab(tab)}
+                className={clsx(
+                  "w-full justify-start h-12 px-4 transition-all duration-200 rounded-lg",
+                  "bg-secondary/10 text-primary hover:bg-primary hover:text-secondary",
+                  "shadow-sm hover:shadow-md border border-transparent hover:border-primary/20",
+                  tab.id === activeTab.id && "bg-primary text-secondary shadow-md border-primary/30",
+                  "md:size-12 md:justify-center md:p-0"
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-lg">{tab.icon}</span>
+                  <span className="font-medium md:hidden">{tab.title}</span>
+                </div>
+              </Button>
+            </Link>
+          ))
+        }
+        </div>
     </div >
   )
 }

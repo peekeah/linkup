@@ -148,8 +148,8 @@ const PeoplePage = () => {
                                             className="shrink-0 bg-primary hover:bg-primary/90 text-white text-xs md:text-sm px-3 md:px-4"
                                             onClick={() => handleMessageUser(user)}
                                         >
-                                            <IconMessage className="w-4 h-4 mr-1 md:mr-2" />
-                                            <span className="hidden md:inline">Message</span>
+                                            <IconMessage />
+                                            <span className="hidden sm:inline">Message</span>
                                         </Button>
                                     </div>
                                 </div>
