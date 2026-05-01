@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
-import { IconSearch, IconCheck, IconChevronDown, IconPlus } from "@tabler/icons-react";
+import { IconSearch, IconCheck, IconPlus } from "@tabler/icons-react";
 import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { CommunityContext } from "@/store/communities";
@@ -40,7 +40,6 @@ type CommunityCard = {
 const CommunitiesPage = () => {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [searchInput, setSearchInput] = useState("");
-    const [showFilters, setShowFilters] = useState(false);
     const debouncedSearchText = useDebounce(searchInput, 500);
 
     const sendMessage = useSendMessage();
