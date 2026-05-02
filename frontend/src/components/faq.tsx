@@ -50,7 +50,7 @@ const FAQItem = ({
 }) => {
   return (
     <motion.div 
-      className="border border-border border-l-0 rounded-lg overflow-hidden bg-card hover:border-l-2 hover:border-l-primary/60 hover:bg-white/5 transition-all duration-200"
+      className="rounded-lg overflow-hidden hover:bg-white/5 transition-all duration-200"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       whileHover={{ 
@@ -62,7 +62,7 @@ const FAQItem = ({
     >
       <motion.button
         onClick={onToggle}
-        className="w-full px-6 py-4 text-left flex items-center justify-between hover:bg-accent/50 transition-colors"
+        className="w-full cursor-pointer px-6 py-4 text-left flex items-center justify-between hover:bg-accent/50 transition-colors"
         whileHover={{ backgroundColor: "rgba(var(--accent), 0.1)" }}
         transition={{ duration: 0.2 }}
       >
@@ -134,7 +134,7 @@ export const FAQ = () => {
   };
 
   return (
-    <section id="faq" className="py-20 lg:py-24 border-t border-border/30">
+    <section id="faq" className="py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
@@ -144,6 +144,12 @@ export const FAQ = () => {
           variants={containerVariants}
           className="text-center space-y-4 mb-16"
         >
+          <motion.div 
+            variants={itemVariants}
+            className="text-xs font-semibold tracking-widest uppercase text-primary"
+          >
+            FAQ
+          </motion.div>
           <motion.h2 
             variants={itemVariants}
             className="text-3xl font-semibold tracking-tight"

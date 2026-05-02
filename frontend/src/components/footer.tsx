@@ -60,8 +60,7 @@ export const Footer = () => {
     <footer className="bg-background border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Newsletter Section */}
-        <div className="py-16 lg:py-20 border-t-2 border-t-primary/15 border-b-2 border-b-primary/15 bg-card/80 relative">
-          {/* Radial Glow Background */}
+        {/* <div className="py-16 lg:py-20 rounded-lg bg-card/80 relative">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary opacity-8 rounded-full blur-3xl"></div>
           </div>
@@ -101,7 +100,7 @@ export const Footer = () => {
               </motion.div>
             </form>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Footer Content */}
         <div className="py-16 lg:py-20">

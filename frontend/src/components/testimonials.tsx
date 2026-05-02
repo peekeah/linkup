@@ -106,7 +106,7 @@ export const Testimonials = () => {
   };
 
   return (
-    <section className="py-20 lg:py-24 border-t border-border/30">
+    <section className="py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
@@ -116,6 +116,12 @@ export const Testimonials = () => {
           variants={containerVariants}
           className="text-center space-y-4 mb-16"
         >
+          <motion.div 
+            variants={itemVariants}
+            className="text-xs font-semibold tracking-widest uppercase text-primary"
+          >
+            Testimonials
+          </motion.div>
           <motion.h2 
             variants={itemVariants}
             className="text-3xl font-semibold tracking-tight"
@@ -150,7 +156,7 @@ export const Testimonials = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 whileHover={{ 
-                  y: -12, 
+                  y: -8, 
                   scale: 1.02,
                   borderColor: "rgba(var(--primary), 0.3)",
                   boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"

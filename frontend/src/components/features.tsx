@@ -53,7 +53,7 @@ export const Features = () => {
   };
 
   return (
-    <section id="features" className="py-20 lg:py-24 border-t border-border/30">
+    <section id="features" className="py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
@@ -101,7 +101,7 @@ export const Features = () => {
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
               }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-card/60 border border-border border-t-2 border-t-primary/25 rounded-2xl p-6 space-y-4 hover:border-t-primary/60 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
+              className="bg-card/60 border rounded-2xl p-6 space-y-4 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group"
             >
               <motion.div 
                 className="p-3 bg-primary/10 w-fit rounded-xl text-muted-foreground group-hover:text-primary transition-colors duration-200"

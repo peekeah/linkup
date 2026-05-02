@@ -6,73 +6,57 @@ import {
   IconBriefcase, 
   IconSchool,
   IconMicroscope,
-  IconCamera,
-  IconMusic,
-  IconBook
+  IconUsers
 } from "@tabler/icons-react";
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-const useCases = [
+const categories = [
   {
-    icon: <IconCode className="h-8 w-8" />,
-    title: "Development Teams",
-    description: "Collaborate on code reviews, share best practices, and find solutions to technical challenges.",
+    icon: <IconCode className="h-6 w-6" />,
+    title: "Developers",
+    description: "Code collaboration",
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
   },
   {
-    icon: <IconPalette className="h-8 w-8" />,
-    title: "Design Communities",
-    description: "Get feedback on designs, share inspiration, and connect with fellow creative professionals.",
+    icon: <IconPalette className="h-6 w-6" />,
+    title: "Designers",
+    description: "Creative feedback",
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
   },
   {
-    icon: <IconBriefcase className="h-8 w-8" />,
-    title: "Business Networking",
-    description: "Build professional relationships, discuss industry trends, and explore partnership opportunities.",
+    icon: <IconBriefcase className="h-6 w-6" />,
+    title: "Professionals",
+    description: "Network & grow",
     color: "text-green-500",
     bgColor: "bg-green-500/10",
   },
   {
-    icon: <IconSchool className="h-8 w-8" />,
-    title: "Educational Groups",
-    description: "Study together, share learning resources, and get help from peers and mentors.",
+    icon: <IconSchool className="h-6 w-6" />,
+    title: "Students",
+    description: "Study together",
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
   },
   {
-    icon: <IconMicroscope className="h-8 w-8" />,
-    title: "Research Collaboration",
-    description: "Discuss findings, share methodologies, and connect with researchers in your field.",
+    icon: <IconMicroscope className="h-6 w-6" />,
+    title: "Researchers",
+    description: "Share findings",
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10",
   },
   {
-    icon: <IconCamera className="h-8 w-8" />,
-    title: "Creative Arts",
-    description: "Share your work, get constructive feedback, and collaborate on creative projects.",
+    icon: <IconUsers className="h-6 w-6" />,
+    title: "Communities",
+    description: "Connect & share",
     color: "text-pink-500",
     bgColor: "bg-pink-500/10",
   },
-  {
-    icon: <IconMusic className="h-8 w-8" />,
-    title: "Music & Audio",
-    description: "Connect with musicians, share compositions, and discuss production techniques.",
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-500/10",
-  },
-  {
-    icon: <IconBook className="h-8 w-8" />,
-    title: "Book Clubs",
-    description: "Discuss literature, share reading lists, and engage in thoughtful literary conversations.",
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-500/10",
-  },
 ];
 
-export const UseCases = () => {
+export const WhoUsesLinkup = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
@@ -90,15 +74,15 @@ export const UseCases = () => {
   const itemVariants = {
     hidden: { 
       opacity: 0, 
-      y: 60,
-      scale: 0.8
+      y: 30,
+      scale: 0.9
     },
     visible: {
       opacity: 1, 
       y: 0,
       scale: 1,
       transition: {
-        duration: 0.6,
+        duration: 0.5,
         ease: [0.25, 0.46, 0.45, 0.94] as const
       }
     }
@@ -115,29 +99,35 @@ export const UseCases = () => {
           variants={containerVariants}
           className="text-center space-y-4 mb-16"
         >
+          <motion.div 
+            variants={itemVariants}
+            className="text-xs font-semibold tracking-widest uppercase text-primary"
+          >
+            Community
+          </motion.div>
           <motion.h2 
             variants={itemVariants}
             className="text-3xl font-semibold tracking-tight"
           >
-            Perfect for every community
+            Who uses Linkup
           </motion.h2>
           <motion.p 
             variants={itemVariants}
             className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4"
           >
-            Whether you're a professional team, study group, or hobby community, Linkup adapts to your needs
+            The perfect platform for diverse communities and collaboration
           </motion.p>
         </motion.div>
 
-        {/* Use Cases Grid */}
+        {/* Categories Grid */}
         <motion.div 
           ref={ref}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={containerVariants}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6"
         >
-          {useCases.map((useCase, index) => (
+          {categories.map((category, index) => (
             <motion.div
               key={index}
               variants={itemVariants}
@@ -149,23 +139,23 @@ export const UseCases = () => {
               }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="group p-6 rounded-xl bg-card border hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
+              className="group p-4 rounded-xl bg-card border hover:-translate-y-0.5 transition-all duration-200 cursor-pointer text-center"
             >
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Icon */}
                 <motion.div 
-                  className="inline-flex p-3 rounded-xl bg-primary/10 text-muted-foreground group-hover:text-primary transition-colors duration-200"
+                  className="inline-flex p-3 rounded-xl bg-primary/10 text-muted-foreground group-hover:text-primary transition-colors duration-200 mx-auto"
                 >
-                  {useCase.icon}
+                  {category.icon}
                 </motion.div>
 
                 {/* Content */}
                 <div>
-                  <h3 className="text-base font-semibold mb-2 text-foreground">
-                    {useCase.title}
+                  <h3 className="text-sm font-semibold text-foreground mb-1">
+                    {category.title}
                   </h3>
-                  <p className="text-base leading-relaxed text-muted-foreground">
-                    {useCase.description}
+                  <p className="text-xs text-muted-foreground">
+                    {category.description}
                   </p>
                 </div>
               </div>
@@ -175,29 +165,26 @@ export const UseCases = () => {
 
         {/* Call to Action */}
         <motion.div 
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
           viewport={{ once: true, margin: "-100px" }}
-          className="text-center mt-12"
+          className="text-center mt-10"
         >
-          <p className="text-muted-foreground mb-4">
-            And many more use cases
-          </p>
           <motion.div 
             className="inline-flex items-center gap-2 text-primary font-medium cursor-pointer border border-primary/25 px-4 py-2 rounded-lg hover:border-primary/60 hover:bg-primary/5 transition-all duration-200"
-            whileHover={{ x: 10 }}
+            whileHover={{ x: 8 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
           >
-            Create your own community
+            Find your community
             <motion.svg 
               className="w-4 h-4" 
               fill="none" 
               stroke="currentColor" 
               viewBox="0 0 24 24"
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </motion.svg>

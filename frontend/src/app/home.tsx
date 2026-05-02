@@ -6,7 +6,8 @@ import { Features } from "@/components/features";
 import { HeroIllustration } from "@/components/hero-illustration";
 import { Statistics } from "@/components/statistics";
 import { Testimonials } from "@/components/testimonials";
-import { UseCases } from "@/components/use-cases";
+import { WhoUsesLinkup } from "@/components/who-uses-linkup";
+import { HowItWorks } from "@/components/how-it-works";
 import { FAQ } from "@/components/faq";
 import { Footer } from "@/components/footer";
 import { signIn } from "next-auth/react";
@@ -26,7 +27,7 @@ const Home = () => {
       {/* Hero Section */}
       <motion.div 
         style={{ translateY, opacity }}
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 md:pt-16 lg:pt-24 relative"
+        className="max-w-7xl mx-auto px-4 sm:px-6 pt-8 md:pt-12 lg:pt-12 relative"
       >
         {/* Radial Glow Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -39,9 +40,9 @@ const Home = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight"
+              className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-20"
             >
-              <span className="text-primary">Connect</span> with <br /> like-minded people
+              <span>Connect</span> with <br /><span className="text-primary">like-minded</span> people
             </motion.h1>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -63,6 +64,7 @@ const Home = () => {
                 transition={{ duration: 0.2 }}
               >
                 <Button
+                  size={"lg"}
                   className="relative px-8 py-4 text-primary-foreground font-semibold rounded-lg 
                     border-2 border-primary/40
                     bg-gradient-to-r from-primary/90 to-primary
@@ -98,9 +100,10 @@ const Home = () => {
         <div className="bg-accent/20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
           <Statistics />
         </div>
+        <HowItWorks />
         <Testimonials />
         <div className="bg-accent/20 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8">
-          <UseCases />
+          <WhoUsesLinkup />
         </div>
         <FAQ />
       </div>

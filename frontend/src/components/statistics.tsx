@@ -111,7 +111,7 @@ export const Statistics = () => {
   };
 
   return (
-    <section className="py-20 lg:py-24 border-t border-border/30">
+    <section className="py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
@@ -121,6 +121,12 @@ export const Statistics = () => {
           variants={containerVariants}
           className="text-center space-y-4 mb-16"
         >
+          <motion.div 
+            variants={itemVariants}
+            className="text-xs font-semibold tracking-widest uppercase text-primary"
+          >
+            Statistics
+          </motion.div>
           <motion.h2 
             variants={itemVariants}
             className="text-3xl font-semibold tracking-tight"
@@ -148,12 +154,13 @@ export const Statistics = () => {
               key={index}
               variants={itemVariants}
               whileHover={{ 
-                y: -4, 
+                y: -8, 
+                scale: 1.02,
                 borderColor: "rgba(var(--primary), 0.3)",
-                boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+                boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
               }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="text-center space-y-3 p-6 rounded-xl bg-card border border-border border-t-2 border-t-primary/25 hover:border-t-primary/60 hover:-translate-y-0.5 transition-all duration-200"
+              className="text-center space-y-3 p-6 rounded-xl bg-card hover:-translate-y-0.5 transition-all duration-200"
             >
               <motion.div 
                 initial={{ rotate: 0 }}
@@ -175,12 +182,13 @@ export const Statistics = () => {
           <motion.div
             variants={itemVariants}
             whileHover={{ 
-              y: -4, 
+              y: -8, 
+              scale: 1.02,
               borderColor: "rgba(var(--primary), 0.3)",
-              boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)"
+              boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}
-            className="text-center space-y-3 p-6 rounded-xl bg-card border border-border border-t-2 border-t-primary/25 hover:border-t-primary/60 hover:-translate-y-0.5 transition-all duration-200"
+            className="text-center space-y-3 p-6 rounded-xl bg-card hover:-translate-y-0.5 transition-all duration-200"
           >
             <div className="flex justify-center gap-1">
               {[...Array(5)].map((_, index) => (
