@@ -1,7 +1,10 @@
 import { CommunityRole } from "../middlewares/auth";
+import { SupportedChatMessages } from "../schema/chat";
+import { SupportedOutgoingUserMessages } from "../schema/user";
+import { activeClients } from "../store/clients";
 import { prisma } from "../utils/db";
 import communities from "./communities";
-import { UserId } from "./user";
+import user, { UserId } from "./user";
 
 class Chat {
   constructor() {}
@@ -13,7 +16,16 @@ class Chat {
   ) {
     return await prisma.chatMessage.findMany({
       where: { communityId },
-      include: { upvotes: true },
+      include: { 
+        upvotes: true,
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            image: true
+          }
+        }
+      },
       skip: offset,
       take: limit,
     });
@@ -85,6 +97,113 @@ class Chat {
     return await communities.broadcastMessage(existChat?.communityId);
   }
 
+  async updatePrivateChat(chatId: string, senderId: string, content: string){
+    try {
+      const res = await prisma.privateMessage.update({
+        where: { id: chatId, senderId },
+        data: { content }
+      });
+
+      const recipentId = res.recipientId;
+      const senderClient = activeClients.get(senderId)
+      const recipientClient = activeClients.get(recipentId)
+
+      if(senderClient && senderClient.OPEN){
+        senderClient.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+            data: await user.getPrivateChatHistory(senderId),
+          }),
+        );
+
+        const privateChats = await this.getPrivateChats(senderId, recipentId)
+
+        senderClient.send(
+          JSON.stringify({
+            type: SupportedChatMessages.GetPrivateChat,
+            data: {
+              roomId: recipentId,
+              messages: privateChats,
+            },
+          }),
+        );
+      }
+
+      if(recipientClient && recipientClient.OPEN){
+        recipientClient.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+            data: await user.getPrivateChatHistory(recipentId),
+          }),
+        );
+        recipientClient.send(
+          JSON.stringify({
+            type: SupportedChatMessages.GetPrivateChat,
+            data: {
+              roomId: recipentId,
+              messages: await this.getPrivateChats(recipentId, senderId),
+            },
+          }),
+        );
+      }
+    } catch (err) {
+      throw new Error("error while update")
+    }
+  }
+
+  async deletePrivateChat(chatId: string, senderId: UserId){
+    try {
+      const res = await prisma.privateMessage.update({
+        where: { id: chatId, senderId },
+        data: { content: "", isDeleted: true },
+      });
+
+      const recipentId = res.recipientId;
+      const senderClient = activeClients.get(senderId);
+      const recipientClient = activeClients.get(recipentId);
+
+      // Send updated private chat messages to sender
+      if (senderClient && senderClient.OPEN) {
+        senderClient.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+            data: await user.getPrivateChatHistory(senderId),
+          }),
+        );
+        senderClient.send(
+          JSON.stringify({
+            type: SupportedChatMessages.GetPrivateChat,
+            data: {
+              roomId: recipentId,
+              messages: await this.getPrivateChats(senderId, recipentId),
+            },
+          }),
+        );
+      }
+
+      // Send updated private chat messages to recipient
+      if (recipientClient && recipientClient.OPEN) {
+        recipientClient.send(
+          JSON.stringify({
+            type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
+            data: await user.getPrivateChatHistory(recipentId),
+          }),
+        );
+        recipientClient.send(
+          JSON.stringify({
+            type: SupportedChatMessages.GetPrivateChat,
+            data: {
+              roomId: recipentId,
+              messages: await this.getPrivateChats(recipentId, senderId),
+            },
+          }),
+        );
+      }
+    } catch (err) {
+      throw new Error("cannot delete chat");
+    }
+  }
+
   async upvote(userId: string, roomId: string, chatId: string) {
     const message = await prisma.chatMessage.findFirst({
       where: { id: chatId },
@@ -134,6 +253,15 @@ class Chat {
           { senderId: userId, recipientId: partnerId },
           { senderId: partnerId, recipientId: userId }
         ]
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            image: true
+          }
+        }
       },
       skip: offset,
       take: limit,

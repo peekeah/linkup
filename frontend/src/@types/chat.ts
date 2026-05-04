@@ -11,6 +11,8 @@ export enum SupportedChatMessages {
   GetPrivateChat = "GET_PRIVATE_CHAT",
   SendPrivateMessage = "SEND_PRIVATE_MESSAGE",
   LeaveCommunity = "LEAVE_COMMUNITY",
+  DeletePrivateChat = "DELETE_PRIVATE_CHAT",
+  UpdatePrivateChat = "UPDATE_PRIVATE_CHAT"
 }
 
 export type OutgoingChatMessage = {
@@ -39,6 +41,12 @@ export type OutgoingChatMessage = {
 }  |{
   type: SupportedChatMessages.LeaveCommunity,
   payload: LeaveCommunityType 
+} | {
+  type: SupportedChatMessages.DeletePrivateChat,
+  payload: DeletePrivateChatType
+} | {
+  type: SupportedChatMessages.UpdatePrivateChat,
+  payload: UpdatePrivateChatType
 };
 
 export enum SupportedIncomingChatMessages {
@@ -129,6 +137,15 @@ export const LeaveCommunity = z.object({
   roomId: z.string(),
 })
 
+export const DeletePrivateChatType = z.object({
+  chatId: z.string(),
+})
+
+export const UpdatePrivateChatType = z.object({
+  chatId: z.string(),
+  content: z.string()
+})
+
 export type GetChatType = z.infer<typeof GetChat>;
 export type AddChatType = z.infer<typeof AddChat>;
 export type UpdateChatType = z.infer<typeof UpdateChat>;
@@ -137,4 +154,6 @@ export type UpvoteMessageType = z.infer<typeof UpvoteMessage>;
 export type GetPrivateChatType = z.infer<typeof GetPrivateChat>;
 export type SendPrivateMessageType = z.infer<typeof SendPrivateMessage>;
 export type LeaveCommunityType = z.infer<typeof LeaveCommunity>;
+export type DeletePrivateChatType = z.infer<typeof DeletePrivateChatType>;
+export type UpdatePrivateChatType = z.infer<typeof UpdatePrivateChatType>;
 export type SearchCommunity = z.infer<typeof SearchCommunity>;

@@ -79,6 +79,24 @@ const useSendMessage = () => {
             );
             break;
 
+          case SupportedChatMessages.UpdatePrivateChat:
+            ws.send(
+              JSON.stringify({
+                type: SupportedChatMessages.UpdatePrivateChat,
+                payload: message.payload,
+              }),
+            );
+            break;
+
+          case SupportedChatMessages.DeletePrivateChat:
+            ws.send(
+              JSON.stringify({
+                type: SupportedChatMessages.DeletePrivateChat,
+                payload: message.payload,
+              }),
+            );
+            break;
+
           // User messages
           case SupportedOutgoingUserMessages.ChatHistory:
             ws.send(

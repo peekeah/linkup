@@ -27,10 +27,16 @@ export interface Message {
   id: string;
   content: string;
   senderId: string;
+  recipientId?: string;
   upvotes: { id: string }[],
   isDeleted: boolean;
   createdAt: string;
   updatedAt: string;
+  sender?: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
 }
 
 interface LastMessage {

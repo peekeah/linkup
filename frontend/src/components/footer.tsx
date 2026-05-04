@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { motion } from "framer-motion";
 import { 
   IconBrandTwitter, 
   IconBrandLinkedin, 
   IconBrandGithub, 
   IconBrandInstagram,
   IconMail,
-  IconSend
 } from "@tabler/icons-react";
 
 const footerLinks = {
@@ -48,60 +43,10 @@ const socialLinks = [
 ];
 
 export const Footer = () => {
-  const [email, setEmail] = useState("");
-
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Newsletter signup:", email);
-    setEmail("");
-  };
 
   return (
     <footer className="bg-background border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Newsletter Section */}
-        {/* <div className="py-16 lg:py-20 rounded-lg bg-card/80 relative">
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-primary opacity-8 rounded-full blur-3xl"></div>
-          </div>
-          <div className="max-w-2xl mx-auto text-center relative z-10 px-4">
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">
-              Stay connected with Linkup
-            </h3>
-            <p className="text-muted-foreground mb-8 text-lg">
-              Get the latest updates, features, and community news delivered to your inbox
-            </p>
-            <form onSubmit={handleNewsletterSubmit} className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-10 md:flex-1 md:h-12"
-                required
-              />
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                animate={{ scale: [1, 1.02, 1] }}
-                transition={{ 
-                  duration: 2, 
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              >
-                <Button 
-                  type="submit" 
-                  className="flex items-center gap-2 h-10 md:h-12 px-6 bg-primary hover:bg-primary/90 text-primary-foreground"
-                >
-                  <IconSend className="h-4 w-4" />
-                  Subscribe
-                </Button>
-              </motion.div>
-            </form>
-          </div>
-        </div> */}
-
         {/* Main Footer Content */}
         <div className="py-16 lg:py-20">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">

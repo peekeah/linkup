@@ -38,7 +38,7 @@ const wsRequestHandler = async (
         break;
 
       case SupportedUserMessages.Search:
-        if (payload && 'search' in payload) {
+        if (payload && "search" in payload) {
           const searchResults = await user.searchUser(payload.search);
           ws.send(
             JSON.stringify({
@@ -50,7 +50,9 @@ const wsRequestHandler = async (
         break;
 
       case SupportedUserMessages.GetPrivateChatHistory:
-        const privateChatHistory = await user.getPrivateChatHistory(tokenData.userId);
+        const privateChatHistory = await user.getPrivateChatHistory(
+          tokenData.userId,
+        );
         ws.send(
           JSON.stringify({
             type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
@@ -108,18 +110,20 @@ const wsRequestHandler = async (
 
       case SupportedChatMessages.UpvoteMessage:
         communityRole = await authorize(payload.roomId, tokenData.userId, [
-          "USER", "ADMIN", "OWNER"
+          "USER",
+          "ADMIN",
+          "OWNER",
         ]);
         await chat.upvote(tokenData.userId, payload.roomId, payload.chatId);
         break;
 
       case SupportedChatMessages.GetPrivateChat:
-        if (payload && 'recipientId' in payload) {
+        if (payload && "recipientId" in payload) {
           const privateMessages = await chat.getPrivateChats(
             tokenData.userId,
             payload.recipientId,
             payload.limit,
-            payload.offset
+            payload.offset,
           );
           ws.send(
             JSON.stringify({
@@ -134,9 +138,13 @@ const wsRequestHandler = async (
         break;
 
       case SupportedChatMessages.SendPrivateMessage:
-        if (payload && 'recipientId' in payload && 'content' in payload) {
-          const newMessages = await chat.sendPrivateMessage(payload.recipientId, payload.content, tokenData.userId);
-          
+        if (payload && "recipientId" in payload && "content" in payload) {
+          const newMessages = await chat.sendPrivateMessage(
+            payload.recipientId,
+            payload.content,
+            tokenData.userId,
+          );
+
           // Send the message back to the sender
           ws.send(
             JSON.stringify({
@@ -147,16 +155,18 @@ const wsRequestHandler = async (
               },
             }),
           );
-          
+
           // Send updated private chat history
-          const updatedChatHistory = await user.getPrivateChatHistory(tokenData.userId);
+          const updatedChatHistory = await user.getPrivateChatHistory(
+            tokenData.userId,
+          );
           ws.send(
             JSON.stringify({
               type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
               data: updatedChatHistory,
             }),
           );
-          
+
           // Broadcast to recipient when they're online
           const recipientConnection = activeClients.get(payload.recipientId);
           if (recipientConnection) {
@@ -170,9 +180,11 @@ const wsRequestHandler = async (
                 },
               }),
             );
-            
+
             // Update recipient's private chat history
-            const recipientChatHistory = await user.getPrivateChatHistory(payload.recipientId);
+            const recipientChatHistory = await user.getPrivateChatHistory(
+              payload.recipientId,
+            );
             recipientConnection.send(
               JSON.stringify({
                 type: SupportedOutgoingUserMessages.GetPrivateChatHistory,
@@ -183,12 +195,24 @@ const wsRequestHandler = async (
         }
         break;
 
+      case SupportedChatMessages.UpdatePrivateChat:
+        await chat.updatePrivateChat(
+          message.payload.chatId,
+          tokenData.userId,
+          message.payload.content,
+        );
+        break;
+
+      case SupportedChatMessages.DeletePrivateChat:
+        await chat.deletePrivateChat(message.payload.chatId, tokenData.userId);
+        break;
+
       // Community routes
       case SupportedCommunityMessages.CreateCommunity:
         await communities.create(
-          payload.name, 
+          payload.name,
           payload.category,
-          tokenData.userId
+          tokenData.userId,
         );
         // Send updated ChatHistory to include the newly created community
         ws.send(
@@ -218,17 +242,22 @@ const wsRequestHandler = async (
         break;
 
       case SupportedCommunityMessages.GetCommunities:
-        ws.send(JSON.stringify({
-          type: "GET_COMMUNITIES",
-          data: await communities.getCommunities()
-        }));
+        ws.send(
+          JSON.stringify({
+            type: "GET_COMMUNITIES",
+            data: await communities.getCommunities(),
+          }),
+        );
         break;
 
       case SupportedCommunityMessages.SearchCommunity:
         ws.send(
           JSON.stringify({
             type: "SEARCH_COMMUNITY",
-            data: await communities.searchCommunity(payload.search, payload.category),
+            data: await communities.searchCommunity(
+              payload.search,
+              payload.category,
+            ),
           }),
         );
         break;
@@ -238,10 +267,7 @@ const wsRequestHandler = async (
         communityRole = await authorize(payload.roomId, tokenData.userId, [
           "OWNER",
         ]);
-        await communities.addAdmin(
-          payload.roomId,
-          payload.userId,
-        );
+        await communities.addAdmin(payload.roomId, payload.userId);
         break;
 
       case SupportedCommunityMessages.RemoveAdmin:
@@ -252,13 +278,12 @@ const wsRequestHandler = async (
         break;
 
       case SupportedCommunityMessages.JoinCommunity:
-        await communities.joinCommunity(
-          payload.roomId,
-          tokenData.userId,
+        await communities.joinCommunity(payload.roomId, tokenData.userId);
+        ws.send(
+          JSON.stringify({
+            type: "JOIN_COMMUNITY",
+          }),
         );
-        ws.send(JSON.stringify({
-          type: "JOIN_COMMUNITY",
-        }));
         // Refresh ChatHistory to show the newly joined community
         ws.send(
           JSON.stringify({
@@ -274,10 +299,10 @@ const wsRequestHandler = async (
           JSON.stringify({
             type: SupportedCommunityMessages.LeaveCommunity,
             data: {
-              success: true
-            }
-          })
-        )
+              success: true,
+            },
+          }),
+        );
         // Refresh ChatHistory to show the updated community list after leaving
         ws.send(
           JSON.stringify({

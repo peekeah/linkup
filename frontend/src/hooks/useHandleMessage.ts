@@ -1,14 +1,33 @@
 import { useContext } from "react";
+import { useSession } from "next-auth/react";
 
 import {
   SupportedIncomingUserMessages,
 } from "@/@types/user";
 import { IncomingMessage } from "@/@types";
-import { ChatContext, ChatHistory, PrivateChatHistory } from "@/store/chat";
+import { ChatContext, ChatHistory, Message, PrivateChatHistory } from "@/store/chat";
 import { CommunityContext } from "@/store/communities";
 import { SupportedIncomingChatMessages } from "@/@types/chat";
 import { SupportedIncomingCommunityMessage } from "@/@types/community";
 import { toast } from "sonner";
+
+const getPrivateMessagesRoomId = (
+  fallbackRoomId: string,
+  messages: Message[],
+  currentUserId: string,
+) => {
+  if (!currentUserId) return fallbackRoomId;
+
+  const messageWithPartner = messages.find(message => (
+    message.senderId === currentUserId || message.recipientId === currentUserId
+  ));
+
+  if (!messageWithPartner) return fallbackRoomId;
+
+  return messageWithPartner.senderId === currentUserId
+    ? messageWithPartner.recipientId ?? fallbackRoomId
+    : messageWithPartner.senderId;
+};
 
 const useHandleMessage = () => {
   const {
@@ -22,13 +41,15 @@ const useHandleMessage = () => {
   } = useContext(ChatContext);
 
   const { updateCommunities } = useContext(CommunityContext);
+  const session = useSession();
+  const userId = session.data?.user.userId ?? "";
 
   const handleMessage = async (rawMessage: string) => {
     try {
       const message = JSON.parse(rawMessage) as IncomingMessage;
 
       let roomId = "";
-      let messages = [];
+      let messages: Message[] = [];
 
       switch (message.type) {
         // Incoming user messages
@@ -52,9 +73,10 @@ const useHandleMessage = () => {
           updateChatMessages(roomId, messages);
           break;
         case SupportedIncomingChatMessages.GetPrivateChat:
-          messages = message.data?.messages;
+          messages = message.data?.messages ?? [];
           roomId = message?.data?.roomId;
-          updatePrivateMessages(roomId, messages);
+          const privateRoomId = getPrivateMessagesRoomId(roomId, messages, userId);
+          updatePrivateMessages(privateRoomId, messages);
           break;
         case SupportedIncomingChatMessages.BroadcastPrivateMessage:
           roomId = message.data?.roomId;
@@ -107,9 +129,7 @@ const useHandleMessage = () => {
         default:
           break;
       }
-    } catch (err) {
-      console.log("err while parsing response", err);
-    }
+    } catch {}
   };
 
   return { handleMessage };

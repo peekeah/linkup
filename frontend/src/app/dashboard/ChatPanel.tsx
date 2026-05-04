@@ -34,6 +34,7 @@ const formatMessages = (message: Message[]) => {
 }
 
 const isUpvoted = (upvotes: { id: string }[], userId: string) => {
+  if(typeof upvotes !== "object" && !Array.isArray(upvotes)) return false
   for (const el of upvotes) {
     if (el.id === userId) {
       return true;
@@ -330,15 +331,24 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
   const onEditMessage = () => {
     try {
       if (selectedChat && onEditMessageModal.messageContent && onEditMessageModal.messageId) {
-        const roomId = selectedChat.type === 'community' ? selectedChat.communityId : selectedChat.recipientId;
-        sendMessage({
-          type: SupportedChatMessages.UpdateChat,
-          payload: {
-            roomId: roomId,
-            chatId: onEditMessageModal.messageId,
-            content: onEditMessageModal.messageContent
-          }
-        });
+        if (selectedChat?.type === "private") {
+          sendMessage({
+            type: SupportedChatMessages.UpdatePrivateChat,
+            payload: {
+              chatId: onEditMessageModal.messageId,
+              content: onEditMessageModal.messageContent
+            }
+          });
+        } else {
+          sendMessage({
+            type: SupportedChatMessages.UpdateChat,
+            payload: {
+              roomId: selectedChat.communityId,
+              chatId: onEditMessageModal.messageId,
+              content: onEditMessageModal.messageContent
+            }
+          });
+        }
         toast("Message", { description: "Successfully updated message" });
       }
       setEditMessageModal({ state: false, messageContent: "", messageId: "" });
@@ -359,9 +369,24 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
     }
   }
 
+  const handleDeletePrivateMessage = (chatId: string) => {
+    try {
+      sendMessage({
+        type: SupportedChatMessages.DeletePrivateChat,
+        payload: {
+          chatId
+        }
+      })
+      
+    } catch (err) {
+      console.log(err)
+    }
+  }
+
+  
   const handleUpvoteMessage = (chatId: string) => {
     try {
-      if (selectedChat && selectedChat.type === 'community') {
+      if (selectedChat && selectedChat.type !== 'private') {
         const roomId = selectedChat.communityId;
         sendMessage({
           type: SupportedChatMessages.UpvoteMessage,
@@ -451,14 +476,13 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
 
           <Separator orientation="horizontal" />
 
-            {/* Messages — flex-1 takes all remaining height, scrolls inside */}
-            <div 
+          {/* Messages — flex-1 takes all remaining height, scrolls inside */}
+          <div 
             ref={scrollContainerRef}
             className="chat-scroll flex-1 overflow-y-auto min-h-0 px-5 pb-4 flex flex-col"
-            >
-
-              {/* pushes messages to bottom when content is short */}
-              <div className="mt-auto" />
+          >
+            {/* pushes messages to bottom when content is short */}
+            <div className="mt-auto" />
 
             {currentMessages.length === 0 ? (
               <div className="mx-auto opacity-75 self-center py-4">
@@ -473,84 +497,122 @@ const ChatPanel = ({ onBackToList }: ChatPanelProps) => {
                     </div>
                   </div>
                   <div className="gap-3 flex flex-col">
-                    {messages.map(message => (
-                      <div
-                        key={message.id}
-                        className={clsx(
-                          "w-fit group space-y-1",
-                          message.senderId !== userId
-                            ? "text-left bg-secondary rounded-t-xl rounded-br-xl"
-                            : "bg-primary text-white rounded-xl rounded-bl-xl self-end"
-                        )}
-                      >
-                        <div className="p-3 relative">
-                          {!message?.isDeleted ? message.content : "This message is deleted"}
-                        </div>
-                        {!message?.isDeleted ? (
-                          <div className={clsx(
-                            "hidden group-hover:flex z-10 absolute w-fit rounded-xl items-center gap-2 bg-secondary p-1",
-                            message.senderId === userId ? "right-0" : "left-0"
-                          )}>
-                            <div className="flex items-center">
-                              {selectedChat?.type === 'community' && (
-                                !isUpvoted(message.upvotes, userId) ? (
-                                  <IconArrowBigUp
-                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                    onClick={() => handleUpvoteMessage(message.id)}
-                                  />
-                                ) : (
-                                  <IconArrowBigDown
-                                    className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
-                                    onClick={() => handleUpvoteMessage(message.id)}
-                                  />
-                                )
-                              )}
-                              {selectedChat?.type === 'community' && (
-                                <div>{message.upvotes?.length}</div>
-                              )}
-                            </div>
-                            {message.senderId === userId && selectedChat?.type === 'community' && (
-                              <>
-                                <IconTrash
-                                  className="text-primary size-5 cursor-pointer"
-                                  onClick={() => {
-                                    const roomId = selectedChat?.communityId;
-                                    handleDeleteMessage(roomId || "", message.id);
-                                  }}
-                                />
-                                <InputAlert
-                                  open={onEditMessageModal.state}
-                                  title="Edit message"
-                                  placeholder="Message"
-                                  value={onEditMessageModal.messageContent}
-                                  triggerButton={
-                                    <IconPencil
-                                      onClick={() => setEditMessageModal({
-                                        state: true,
-                                        messageContent: message.content,
-                                        messageId: message.id
-                                      })}
-                                      className="text-primary size-5 cursor-pointer"
-                                    />
-                                  }
-                                  onChange={onMessageChange}
-                                  onSubmit={() => onEditMessage()}
-                                  onClose={onModalClose}
-                                />
-                              </>
+                    {messages.map(message => {
+                      const isOtherUser = message.senderId !== userId;
+                      const isCommunity = selectedChat?.type !== 'private';
+                      const showSenderDetails = isCommunity && isOtherUser;
+                      const senderName = message.sender?.name || "Unknown";
+                      const senderInitial = senderName.charAt(0).toUpperCase();
+
+                      return (
+                        <div
+                          key={message.id}
+                          className={clsx(
+                            "flex gap-3 items-start",
+                            isOtherUser ? "justify-start" : "justify-end"
+                          )}
+                        >
+                          {showSenderDetails && (
+                            <Avatar className="w-10 h-10 shrink-0 self-start">
+                              <AvatarImage src={message.sender?.image || undefined} />
+                              <AvatarFallback className="text-xs">
+                                {senderInitial || <IconUser className="w-3 h-3" />}
+                              </AvatarFallback>
+                            </Avatar>
+                          )}
+
+                          <div
+                            className={clsx(
+                              "group relative max-w-[75%] rounded-xl wrap-break-word",
+                              isOtherUser
+                                ? "rounded-tl-none bg-secondary text-foreground text-left"
+                                : "rounded-br-none bg-primary text-white text-left"
                             )}
+                          >
+                            <div className="p-3">
+                              {showSenderDetails && (
+                                <div className="mb-1 text-xs font-semibold text-muted-foreground">
+                                  {senderName}
+                                </div>
+                              )}
+                              <div>
+                                {!message?.isDeleted ? message.content : "This message is deleted"}
+                              </div>
+                            </div>
+
+                            {!message?.isDeleted ? (
+                              <div className="absolute inset-0 pointer-events-none">
+                                <div
+                                  className={clsx(
+                                    "hidden group-hover:flex absolute z-10 -bottom-2 w-fit rounded-full items-center gap-2 bg-muted/90 p-1 text-foreground shadow-lg pointer-events-auto",
+                                    isOtherUser ? "left-0" : "right-0"
+                                  )}
+                                >
+                                  <div className="flex items-center gap-2">
+                                  {selectedChat?.type !== 'private' && (
+                                    !isUpvoted(message.upvotes, userId) ? (
+                                      <IconArrowBigUp
+                                        className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                        onClick={() => handleUpvoteMessage(message.id)}
+                                      />
+                                    ) : (
+                                      <IconArrowBigDown
+                                        className="text-primary size-5 cursor-pointer transition ease-in-out delay-150"
+                                        onClick={() => handleUpvoteMessage(message.id)}
+                                      />
+                                    )
+                                  )}
+                                  {selectedChat?.type !== 'private' && (
+                                    <span className="text-xs font-medium">
+                                      {message.upvotes?.length}
+                                    </span>
+                                  )}
+                                  {message.senderId === userId && (
+                                    <>
+                                      <IconTrash
+                                        className="text-primary size-5 cursor-pointer"
+                                        onClick={() => {
+                                          selectedChat?.type === "private" ?
+                                          handleDeletePrivateMessage(message.id) : 
+                                          handleDeleteMessage(selectedChat?.communityId || "", message.id);
+                                        }}
+                                      />
+                                      <InputAlert
+                                        open={onEditMessageModal.state}
+                                        title="Edit message"
+                                        placeholder="Message"
+                                        value={onEditMessageModal.messageContent}
+                                        triggerButton={
+                                          <IconPencil
+                                            onClick={() => setEditMessageModal({
+                                              state: true,
+                                              messageContent: message.content,
+                                              messageId: message.id
+                                            })}
+                                            className="text-primary size-5 cursor-pointer"
+                                          />
+                                        }
+                                        onChange={onMessageChange}
+                                        onSubmit={() => onEditMessage()}
+                                        onClose={onModalClose}
+                                      />
+                                    </>
+                                  )}
+                                </div>
+                                </div>
+                              </div>
+                            ) : null}
                           </div>
-                        ) : null}
-                      </div>
-                    ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 </Fragment>
               ))
             )}
 
-              {/* scroll anchor — always at the bottom */}
-              <div ref={bottomRef} />
-
+            {/* scroll anchor — always at the bottom */}
+            <div ref={bottomRef} />
           </div>
 
           {/* Input — pinned to bottom, never scrolls */}
