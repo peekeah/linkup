@@ -134,7 +134,6 @@ export const WhoUsesLinkup = () => {
               whileHover={{ 
                 y: -8, 
                 scale: 1.02,
-                borderColor: "rgba(var(--primary), 0.3)",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
               }}
               whileTap={{ scale: 0.98 }}

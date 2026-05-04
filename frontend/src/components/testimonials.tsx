@@ -106,8 +106,7 @@ export const Testimonials = () => {
   };
 
   return (
-    <section className="py-20 lg:py-24">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-20 lg:py-24 overflow-hidden! max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <motion.div 
           ref={ref}
@@ -137,7 +136,7 @@ export const Testimonials = () => {
         </motion.div>
 
         {/* Testimonials Scrolling Container */}
-        <div className="relative overflow-hidden">
+        <div className="relative">
           <motion.div 
             className="flex gap-8"
             animate={{ x: [0, -320 * testimonials.length] }}
@@ -157,12 +156,11 @@ export const Testimonials = () => {
                 viewport={{ once: true, margin: "-100px" }}
                 whileHover={{ 
                   y: -8, 
-                  scale: 1.02,
-                  borderColor: "rgba(var(--primary), 0.3)",
+                  borderColor: "oklch(0.9081 0.0026 56.3955)",
                   boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
                 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="flex-shrink-0 w-80 p-6 rounded-xl border border-border bg-card hover:border-primary/30 transition-all duration-200"
+                className="shrink-0 w-80 p-6 rounded-xl border border-border bg-card transition-all duration-200"
               >
                 <div className="space-y-4">
                   {/* Rating */}
@@ -196,7 +194,6 @@ export const Testimonials = () => {
           </motion.div>
         </div>
 
-              </div>
     </section>
   );
 };

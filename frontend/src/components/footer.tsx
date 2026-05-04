@@ -48,12 +48,12 @@ export const Footer = () => {
     <footer className="bg-background border-t">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
-        <div className="py-16 lg:py-20">
+        <div className="pt-10 pb-8 lg:pt-10">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 lg:gap-12">
             {/* Brand Column */}
             <div className="lg:col-span-2">
               <div className="text-2xl font-bold mb-4">
-                <span className="text-secondary">Link</span>
+                <span className="text-primary">Link</span>
                 <span className="text-muted-foreground">up</span>
               </div>
               <p className="text-muted-foreground mb-6 max-w-sm">
@@ -142,7 +142,7 @@ export const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="py-6 border-t border-border/50">
+        <div className="pb-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-muted-foreground text-sm">
               © {new Date().getFullYear()} Linkup. All rights reserved.

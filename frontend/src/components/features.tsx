@@ -97,7 +97,7 @@ export const Features = () => {
               variants={itemVariants}
               whileHover={{ 
                 y: -8, 
-                borderColor: "rgba(var(--primary), 0.4)",
+                borderColor: "oklch(0.9081 0.0026 56.3955)",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
               }}
               transition={{ duration: 0.2, ease: "easeOut" }}

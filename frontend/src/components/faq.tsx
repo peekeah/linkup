@@ -10,51 +10,56 @@ const faqData = [
   {
     id: 1,
     question: "How do I get started with Linkup?",
-    answer: "Getting started is easy! Simply sign up with your Google account, create your profile, and join communities that interest you. You can start chatting immediately with other members."
+    answer:
+      "Getting started is easy! Simply sign up with your Google account, create your profile, and join communities that interest you. You can start chatting immediately with other members.",
   },
   {
     id: 2,
-    question: "Can I create my own community?",
-    answer: "Yes! Pro and Enterprise users can create and manage their own communities. You'll have access to moderation tools, custom branding, and member management features."
+    question: "What kind of communities can I join?",
+    answer:
+      "Linkup hosts communities across tech, gaming, design, lifestyle, and more. Browse the explore page to find groups that match your interests, or create your own community in seconds.",
   },
   {
     id: 3,
     question: "Is Linkup free to use?",
-    answer: "Linkup offers a free tier with basic features, plus paid plans for advanced functionality. You can start with the free plan and upgrade as your needs grow."
+    answer:
+      "Yes, Linkup is completely free! Sign up, join unlimited communities, and chat with members at no cost. We believe great conversations shouldn't come with a price tag.",
   },
   {
     id: 4,
-    question: "How secure is my data on Linkup?",
-    answer: "We take security seriously. All conversations are encrypted, we follow GDPR compliance, and we never sell your data. Your privacy is our top priority."
+    question: "How does messaging work inside a community?",
+    answer:
+      "Every community has a real-time chat powered by WebSockets. Messages appear instantly, and you can upvote posts from any community member to highlight the best conversations.",
   },
   {
     id: 5,
-    question: "Can I use Linkup on mobile?",
-    answer: "Yes! Linkup works on all modern web browsers and we have native mobile apps for iOS and Android. You can chat on the go from any device."
+    question: "Can I search for specific communities or members?",
+    answer:
+      "Absolutely! Use the search bar to find communities by name or topic. Results update as you type, so discovering the right group is fast and effortless.",
   },
   {
     id: 6,
-    question: "How do I report inappropriate content?",
-    answer: "We have robust moderation tools and a dedicated team to handle reports. You can report any inappropriate content directly in the app, and we'll take immediate action."
-  }
+    question: "Who can see my messages inside a community?",
+    answer:
+      "Only members who have joined that community can view its messages. Linkup uses role-based access so your conversations stay private to the people who belong to that space.",
+  },
 ];
 
-const FAQItem = ({ 
-  item, 
-  isOpen, 
-  onToggle 
-}: { 
-  item: typeof faqData[0]; 
-  isOpen: boolean; 
+const FAQItem = ({
+  item,
+  isOpen,
+  onToggle
+}: {
+  item: typeof faqData[0];
+  isOpen: boolean;
   onToggle: () => void;
 }) => {
   return (
-    <motion.div 
-      className="rounded-lg overflow-hidden hover:bg-white/5 transition-all duration-200"
+    <motion.div
+      className="border rounded-lg overflow-hidden hover:bg-white/5 transition-all duration-200"
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      whileHover={{ 
-        borderColor: "rgba(var(--primary), 0.3)",
+      whileHover={{
         boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)"
       }}
       transition={{ duration: 0.2, ease: "easeOut" }}
@@ -74,7 +79,7 @@ const FAQItem = ({
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </motion.div>
       </motion.button>
-      
+
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -84,7 +89,7 @@ const FAQItem = ({
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <div className="px-6 py-4 text-muted-foreground leading-relaxed">
+            <div className="px-6 pb-4 text-muted-foreground leading-relaxed">
               {item.answer}
             </div>
           </motion.div>
@@ -100,8 +105,8 @@ export const FAQ = () => {
   const isInView = useInView(ref, { once: true, margin: "-100px" });
 
   const toggleItem = (id: number) => {
-    setOpenItems(prev => 
-      prev.includes(id) 
+    setOpenItems(prev =>
+      prev.includes(id)
         ? prev.filter(item => item !== id)
         : [...prev, id]
     );
@@ -119,12 +124,12 @@ export const FAQ = () => {
   };
 
   const itemVariants = {
-    hidden: { 
-      opacity: 0, 
+    hidden: {
+      opacity: 0,
       y: 30
     },
     visible: {
-      opacity: 1, 
+      opacity: 1,
       y: 0,
       transition: {
         duration: 0.5,
@@ -137,26 +142,26 @@ export const FAQ = () => {
     <section id="faq" className="py-20 lg:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <motion.div 
+        <motion.div
           ref={ref}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
           variants={containerVariants}
           className="text-center space-y-4 mb-16"
         >
-          <motion.div 
+          <motion.div
             variants={itemVariants}
             className="text-xs font-semibold tracking-widest uppercase text-primary"
           >
             FAQ
           </motion.div>
-          <motion.h2 
+          <motion.h2
             variants={itemVariants}
             className="text-3xl font-semibold tracking-tight"
           >
             Frequently asked questions
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4"
           >
@@ -165,7 +170,7 @@ export const FAQ = () => {
         </motion.div>
 
         {/* FAQ Items */}
-        <motion.div 
+        <motion.div
           ref={ref}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
@@ -183,7 +188,7 @@ export const FAQ = () => {
         </motion.div>
 
         {/* Still Have Questions */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.4 }}
@@ -193,17 +198,17 @@ export const FAQ = () => {
           <p className="text-muted-foreground mb-4">
             Still have questions?
           </p>
-          <motion.div 
+          <motion.div
             className="inline-flex items-center gap-2 text-primary font-medium cursor-pointer border border-primary/25 px-4 py-2 rounded-lg hover:border-primary/60 hover:bg-primary/5 transition-all duration-200"
             whileHover={{ x: 5 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2 }}
           >
             Contact our support team
-            <motion.svg 
-              className="w-4 h-4" 
-              fill="none" 
-              stroke="currentColor" 
+            <motion.svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
               viewBox="0 0 24 24"
               animate={{ x: [0, 3, 0] }}
               transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}

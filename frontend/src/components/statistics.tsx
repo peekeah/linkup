@@ -155,12 +155,11 @@ export const Statistics = () => {
               variants={itemVariants}
               whileHover={{ 
                 y: -8, 
-                scale: 1.02,
-                borderColor: "rgba(var(--primary), 0.3)",
+                borderColor: "oklch(0.9081 0.0026 56.3955)",
                 boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
               }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="text-center space-y-3 p-6 rounded-xl bg-card hover:-translate-y-0.5 transition-all duration-200"
+              className="text-center space-y-3 p-6 rounded-xl bg-card/60 border hover:-translate-y-0.5 transition-all duration-200"
             >
               <motion.div 
                 initial={{ rotate: 0 }}
@@ -183,8 +182,7 @@ export const Statistics = () => {
             variants={itemVariants}
             whileHover={{ 
               y: -8, 
-              scale: 1.02,
-              borderColor: "rgba(var(--primary), 0.3)",
+              borderColor: "oklch(0.9081 0.0026 56.3955)",
               boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
             }}
             transition={{ duration: 0.2, ease: "easeOut" }}

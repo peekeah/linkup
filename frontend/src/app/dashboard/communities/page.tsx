@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AvatarFallback } from "@radix-ui/react-avatar";
 import { ChangeEventHandler, useCallback, useContext, useEffect, useState } from "react";
 import { IconSearch, IconCheck, IconPlus } from "@tabler/icons-react";
+import { motion } from "framer-motion";
 import useSendMessage from "@/hooks/useSendMessage";
 import { useDebounce } from "@/hooks/useDebounce";
 import { CommunityContext } from "@/store/communities";
@@ -192,8 +193,14 @@ const CommunitiesPage = () => {
                     <div className="space-y-2 md:space-y-3">
                         {state.communities.length > 0 ? (
                             state.communities.map((community: CommunityCard) => (
-                                <div
+                                <motion.div
                                     key={community.id}
+                                    whileHover={{ 
+                                        y: -8, 
+                                        borderColor: "oklch(0.9081 0.0026 56.3955)",
+                                        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
+                                    }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
                                     className="group bg-card border border-border rounded-xl p-3 md:p-5 hover:bg-card/80 hover:border-primary/50 transition-all duration-200 hover:shadow-lg hover:shadow-primary/10"
                                 >
                                     <div className="flex items-center gap-4">
@@ -232,7 +239,7 @@ const CommunitiesPage = () => {
                                             </Button>
                                         )}
                                     </div>
-                                </div>
+                                </motion.div>
                             ))
                         ) : (
                             <div className="text-center py-12">
