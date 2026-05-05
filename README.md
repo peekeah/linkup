@@ -28,7 +28,6 @@ Linkup is a full-stack real-time chat application that lets users join topic-bas
 - **Message upvotes** — community members can upvote or rescind votes on any message
 - **Google OAuth** — passwordless sign-in via NextAuth → backend JWT exchange
 - **Live presence** — online member count updated in real time via active-client map
-- **Light/dark theme** — system-aware with user toggle
 
 
 ## Repository Structure
