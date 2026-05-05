@@ -1,138 +1,212 @@
-# Linkup - Real-Time Chat App
+<div align="center">
 
-Linkup is a real-time chat application designed to help you connect with like-minded people, join communities, and engage in private conversations. Built using WebSocket for seamless communication, Linkup prioritizes security and user-friendly design.
+# Linkup
 
-## Features
+**Real-time community chat built on WebSockets**
 
-- **Connect with Like-Minded People**: Discover and connect with individuals who share similar interests.
-- **Join Communities**: Participate in various public or private communities based on your interests.
-- **Private Chat**: Send private messages to friends or colleagues with end-to-end encryption.
-- **Security**: Your conversations are secure with industry-standard encryption, ensuring your privacy.
+[![Backend CI](https://img.shields.io/github/actions/workflow/status/peekeah/linkup/backend.yml?label=backend&logo=github)](https://github.com/peekeah/linkup/actions)
+[![Frontend CI](https://img.shields.io/github/actions/workflow/status/peekeah/linkup/frontend.yml?label=frontend&logo=github)](https://github.com/peekeah/linkup/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![Bun](https://img.shields.io/badge/Runtime-Bun-fbf0df?logo=bun)](https://bun.sh)
 
-## Technologies Used
+[Overview](#overview) · [Architecture](#architecture) · [Quick Start](#quick-start) · [Development](#development) · [Deployment](#deployment) · [Contributing](#contributing)
 
-### Frontend
-- **Next.js**: A React framework for building fast and scalable web applications.
-- **Tailwind CSS**: A utility-first CSS framework for creating modern designs.
-- **ShadCN**: A UI component library for React to enhance design consistency.
+</div>
 
-### Backend
-- **Node.js**: JavaScript runtime environment for building scalable network applications.
-- **Express**: Fast, unopinionated web framework for Node.js.
-- **WebSocket**: A protocol for real-time communication between client and server.
+---
 
-## Getting Started
+## Overview
+
+Linkup is a full-stack real-time chat application that lets users join topic-based communities, exchange private messages and conversations all over a persistent WebSocket connection.
+
+**Key capabilities:**
+
+- **Community chat** — create or join rooms by category; broadcast messages to all online members
+- **Private messaging** — real-time one-to-one DMs with edit and soft-delete; changes delivered live to both parties
+- **Role-based moderation** — three-tier RBAC (Owner / Admin / Member) with per-user community timeouts
+- **Message upvotes** — community members can upvote or rescind votes on any message
+- **Google OAuth** — passwordless sign-in via NextAuth → backend JWT exchange
+- **Live presence** — online member count updated in real time via active-client map
+- **Light/dark theme** — system-aware with user toggle
+
+
+## Repository Structure
+
+```
+linkup/
+├── backend/          # Node.js + Express + WebSocket API
+├── frontend/         # Next.js 16 application
+├── docker-compose.yml
+└── README.md         ← you are here
+```
+
+Each sub-project ships its own README with local setup instructions:
+
+| Package | Stack | README |
+|---------|-------|--------|
+| `backend/` | Bun · Express 5 · ws · Prisma 7 · PostgreSQL | [backend/README.md](backend/README.md) |
+| `frontend/` | Next.js 16 · NextAuth · Tailwind CSS 4 · shadcn/ui | [frontend/README.md](frontend/README.md) |
+
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│                   Browser                        │
+│  Next.js (SSR)  ←──HTTP──→  NextAuth            │
+│       │                         │               │
+│       └────────WebSocket────────┘               │
+└────────────────────┬────────────────────────────┘
+                     │ ws://  +  http://
+┌────────────────────▼────────────────────────────┐
+│              Backend (Express + ws)              │
+│                                                  │
+│  HTTP Routes          WebSocket Routes           │
+│  ─────────────        ─────────────────          │
+│  POST /auth/google    Chat messages              │
+│  GET  /users/:id      Community CRUD             │
+│  POST /users/:id      Private messages           │
+│  GET  /health         Presence tracking          │
+│                                                  │
+│  activeClients: Map<userId, WebSocket>           │
+└────────────────────┬────────────────────────────┘
+                     │ Prisma (connection pool)
+┌────────────────────▼────────────────────────────┐
+│              PostgreSQL                          │
+│  User · Community · ChatMessage                  │
+│  PrivateMessage · Timeout · Address              │
+└─────────────────────────────────────────────────┘
+```
+
+### Message flow
+
+All real-time traffic (chat, community events, presence) travels over a single WebSocket connection per user, authenticated via a JWT query parameter on the upgrade request. The server maintains an `activeClients` map keyed by `userId` to enable targeted DM delivery and community broadcast.
+
+HTTP is used only for OAuth callback and REST profile management.
+
+
+
+## Quick Start
 
 ### Prerequisites
 
-- Node.js installed on your local machine.
-- A code editor (VSCode is recommended).
+| Tool | Minimum version |
+|------|----------------|
+| [Bun](https://bun.sh) | 1.x |
+| [Docker](https://www.docker.com/) & Docker Compose | 24+ |
+| Google OAuth credentials | — |
 
-### Setup
-
-#### 1. Clone the repository:
+### Run with Docker Compose
 
 ```bash
 git clone https://github.com/peekeah/linkup.git
+cd linkup
+
+# Copy and fill in the required secrets
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+docker compose up --build
 ```
 
-#### 2. Set up the Backend
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8080 |
+| PostgreSQL | localhost:5432 |
 
-1. Navigate to the backend directory:
+> **Heads-up:** see the individual READMEs for required environment variables before running.
 
-   ```bash
-   cd linkup/backend
-   ```
+### Run without Docker
 
-2. Copy the `.env.example` file to `.env` and replace the environment variables with your own:
+```bash
+# 1. Start a local PostgreSQL instance (or point to a remote one)
 
-   ```bash
-   cp .env.example .env
-   ```
+# 2. Backend
+cd backend
+cp .env.example .env        # fill in DATABASE_URL, JWT_SECRET
+bun install
+bun run db:migrate-dev
+bun run dev                 # http://localhost:5001
 
-   (Make sure to update the variables inside `.env` according to your setup.)
+# 3. Frontend (separate terminal)
+cd frontend
+cp .env.example .env        # fill in NEXTAUTH_SECRET, GOOGLE_*
+bun install
+bun run dev                 # http://localhost:3000
+```
 
-3. Install dependencies for the backend:
+## Development
 
-   ```bash
-   npm install
-   ```
+### Branch strategy
 
-4. Start the backend server:
+| Branch | Purpose |
+|--------|---------|
+| `main` | Production-ready; CI must pass |
 
-   ```bash
-   npm run dev
-   ```
 
-   The backend API will be running at `http://localhost:5000` by default, or at the port specified in your environment configuration.
+CI runs lint + typecheck + build for both packages on every push to `main` and on all pull requests targeting those branches.
 
-#### 3. Set up the Frontend
+### Database migrations
 
-1. Open a new terminal window and navigate to the frontend directory:
+```bash
+cd backend
 
-   ```bash
-   cd linkup/frontend
-   ```
+# Create a new migration
+bun run db:migrate-dev --name <descriptive-name>
 
-2. Copy the `.env.example` file to `.env` and replace the environment variables with your own:
+# Apply migrations in production
+bun run db:migrate-prod
 
-   ```bash
-   cp .env.example .env
-   ```
+# Reset dev database and re-seed
+bun run db:reset
+```
 
-   (Make sure to update the variables inside `.env` according to your setup.)
+### Code style
 
-3. Install dependencies for the frontend:
+Both packages use **TypeScript strict mode**. The backend enforces Zod schema validation on every inbound WebSocket message. Run `bunx tsc --noEmit` locally before pushing.
 
-   ```bash
-   npm install
-   ```
+## Deployment
 
-4. Start the frontend application:
+### Backend
 
-   ```bash
-   npm run dev
-   ```
+The backend Dockerfile produces a minimal Alpine image. Set the following environment variables in your hosting platform:
 
-   The frontend application should now be running on `http://localhost:3000`.
+```
+DATABASE_URL=postgresql://...
+JWT_SECRET=<strong-random-secret>
+API_PORT=8080
+NODE_ENV=production
+FRONTEND_URL=https://your-frontend-domain.com
+```
 
-### Running the App
+Run migrations before the first deploy (or in a release phase):
 
-1. Open your browser and navigate to `http://localhost:3000` to access the frontend.
-2. The backend API will be running at `http://localhost:5000` by default, or at the port specified in your environment configuration.
+```bash
+bunx prisma migrate deploy
+```
 
-## Known Issues & Limitations
+### Frontend
 
-### Recently Resolved Issues ✅
-The following issues have been identified and fixed:
+The Next.js app is configured for `output: standalone` and deploys to Vercel out of the box. Set environment variables in the Vercel dashboard — never commit secrets to the repository.
 
-- **Private Chat Query Bug**: Fixed `getPrivateChats()` to return both sent and received messages for complete conversation history
-- **Message Storage Separation**: Implemented proper separation between community and private messages using distinct storage maps
-- **Real-time DM Delivery**: Implemented real-time private message broadcasting to online recipients
-- **Search Data Exposure**: Added select clause to `searchUser()` to prevent sensitive data exposure
-- **UI State Management**: Fixed infinite loop risks in useEffect dependencies and sidebar tab active states
-- **Fake Chat Objects**: Removed client-side synthetic chat creation to prevent conflicts with server-side records
-
-### Current Status
-All major functionality is working correctly:
-- ✅ Real-time community chat with upvotes
-- ✅ Private messaging with real-time delivery
-- ✅ User search and community discovery
-- ✅ Secure authentication and authorization
-- ✅ Proper data separation and state management
 
 ## Contributing
 
-If you'd like to contribute to Linkup, feel free to fork the repository and submit pull requests. We welcome contributions that improve the app's functionality, security, and user experience.
+Contributions are welcome. Please open an issue to discuss significant changes before submitting a PR.
+
+1. Fork the repository
+2. Create a branch: `git checkout -b feat/your-feature`
+3. Make changes and ensure CI passes locally (`bunx tsc --noEmit` + `bun run build`)
+4. Open a pull request targeting `dev`
+
 
 ## Special Thanks
 
-A huge thank you to the following people who contributed to the UI design and helped make this project better:
+- [Shrenaath SG](https://www.linkedin.com/in/shrenaath-sg-91245019a) — UI design contributions
+- [Niraj Chafle](https://www.linkedin.com/in/niraj-chafle) — design feedback and ideas
 
-
-- <a href="https://www.linkedin.com/in/shrenaath-sg-91245019a" target="_blank">Shrenaath SG</a> for their awesome UI design contributions.<br />
-- <a href="https://www.linkedin.com/in/niraj-chafle" target="_blank">Niraj chafle</a> for providing great design feedback and ideas.
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
+[MIT](LICENSE)
